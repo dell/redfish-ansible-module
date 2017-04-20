@@ -1,0 +1,12 @@
+---
+
+  - name: "Get data: {{ action }}" 
+    local_action: >
+       idrac choice={{ action }} idracuser={{ idracuser }}
+            idracpswd={{ idracpswd }} idracip={{ idracip }}
+    register: result
+
+
+  - name: Print inventory file
+    local_action: copy content={{ result | to_nice_json }}
+                       dest=/root/{{ host }}-{{ action }}
