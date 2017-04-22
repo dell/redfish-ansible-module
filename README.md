@@ -85,4 +85,4 @@ Please note this code is provided as-is and currently not supported by Dell EMC.
 
 ## Report problems or provide feedback
 
-If you run into any problems or would like to provide feedback, please open an issue [here](issues).
+If you run into any problems or would like to provide feedback, please open an issue [here](https://github.com/dell/idrac-ansible-module/issues).
