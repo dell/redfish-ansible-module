@@ -28,10 +28,10 @@ Your */etc/ansible/hosts* should look like this:
 
 ```
 [myhosts]
-# Hostname iDRAC IP               Host alias
-server1    idracip=192.168.0.101  host=web_server1
-server2    idracip=192.168.0.102  host=web_server2
-server3    idracip=192.168.0.103  host=db_server
+# Hostname        iDRAC IP               Host alias
+host1.domain.com  idracip=192.168.0.101  host=web_server1
+host2.domain.com  idracip=192.168.0.102  host=web_server2
+host3.domain.com  idracip=192.168.0.103  host=db_server
 ...
 ```
 
@@ -72,6 +72,12 @@ ok: [t630] => {
             }, 
   --- snip ---
 ```
+
+## TO DO
+
+  - Place information for each server in one file.
+  - Add option to place server info in CSV format (for import into spreadsheet).
+  - Add functionality to get [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) file.
 
 ## Limitations and Disclaimers
 
