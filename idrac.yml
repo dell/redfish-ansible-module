@@ -22,7 +22,9 @@
 
   tasks:
 
-  - include: get_data.yml action={{ item }}
+  - include: get_data.yml action={{item}}
+    vars:
+      json_file: /root/{{host}}-{{action}}
     with_items:
       - Health
       - Model
