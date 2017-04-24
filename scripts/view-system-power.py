@@ -10,10 +10,10 @@ def sig_handler(signum, frame):
     exit(1)
 
 def print_results(i):
-    print("Consumed power:  {}".format(i[u'PowerConsumedWatts']))
-    print("Average reading: {}".format(i[u'PowerMetrics'][u'AverageConsumedWatts']))
-    print("Max reading:     {}".format(i[u'PowerMetrics'][u'MaxConsumedWatts']))
-    print("Min reading:     {}".format(i[u'PowerMetrics'][u'MinConsumedWatts']))
+    print("Consumed power: {} W".format(i[u'PowerConsumedWatts']))
+    print("Average usage:  {} W".format(i[u'PowerMetrics'][u'AverageConsumedWatts']))
+    print("Max Peak:       {} W".format(i[u'PowerMetrics'][u'MaxConsumedWatts']))
+    print("Min Peak:       {} W".format(i[u'PowerMetrics'][u'MinConsumedWatts']))
     return
 
 def mymain():
