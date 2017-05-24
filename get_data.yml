@@ -11,6 +11,6 @@
                        dest={{ json_file }}
 
   # Using simple JSON parser jq (https://stedolan.github.io/jq/) to further
-  # simplify output. Uncomment once you have it installed. 
-# - local_action: shell jq .result {{ json_file }} > {{ json_file }}.final
-# - local_action: file path={{ json_file }} state=absent
+  # simplify output. Uncomment below lines to use. 
+  # - local_action: shell jq .result {{ json_file }} > {{ json_file }}.final
+  # - local_action: file path={{ json_file }} state=absent

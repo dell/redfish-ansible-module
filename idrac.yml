@@ -9,6 +9,10 @@
   vars:
      idracuser: root
      idracpswd: calvin
+     sharehost: 192.168.1.100
+     sharename: share2
+     shareuser: dell
+     sharepswd: 111111
 
   # Choices available:
   #   Health		Get server health
@@ -19,6 +23,7 @@
   #   CPU		Get CPU model
   #   PowerRead		Get power consumed (watts)
   #   Selog		Get SELogs
+  #   SCP		Export Server Configuration Profile (SCP)
 
   tasks:
 
@@ -34,3 +39,9 @@
       - CPU
       - PowerRead
       - Selog
+
+  - name: "Export SCP file"
+    local_action: >
+       idrac choice=SCP idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+       idracip={{ idracip }} sharehost={{ sharehost }} sharename={{ sharename }}
+       shareuser={{ shareuser }} sharepswd={{ sharepswd }} hostname={{ host }}

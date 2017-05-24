@@ -35,6 +35,11 @@ options:
     default: None
     description:
       - What type of information to get from server
+  idracip:
+    required: true
+    default: None
+    description:
+      - iDRAC IP address
   idracuser:
     required: false
     default: root
@@ -45,59 +50,71 @@ options:
     default: calvin
     description:
       - iDRAC user password
-  idracip:
-    required: true
+  hostname:
+    required: false
     default: None
     description:
-      - iDRAC IP address
+      - server name as defined in /etc/ansible/hosts
+  sharehost:
+    required: false
+    default: None
+    description:
+      - CIFS/SMB share hostname for managing SCP files
+  sharename:
+    required: false
+    default: None
+    description:
+      - CIFS/SMB share name for managing SCP files
+  shareuser:
+    required: false
+    default: None
+    description:
+      - CIFS/SMB share user for managing SCP files
+  sharepswd:
+    required: false
+    default: None
+    description:
+      - CIFS/SMB share user password for managing SCP files
 author: "jose.delarosa@dell.com"
-"""
-
-EXAMPLES = """
- - name: Get System Information
-    local_action: >
-       idrac choice=system idracuser={{ idracuser }}         
-            idracpswd={{ idracpswd }} idracip={{ idracip }}
-    register: result
-
-  - name: Output inventory file in pretty json format
-    local_action: copy content={{ result | to_nice_json }}
-                       dest=/root/{{ host }}-sysinfo
 """
 
 import os
 import requests
 import json
+import re
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from ansible.module_utils.basic import AnsibleModule
 
-def send_get_request(str, u, p):
+def send_get_request(idrac, uri):
     try:
-        system = requests.get(str, verify=False, auth=(u,p))
+        system = requests.get(uri, verify=False, auth=(idrac['user'], idrac['pswd']))
         systemData = system.json()
     except:
         raise
     return systemData
 
-def send_post_request(str, u, p):
+def send_post_request(idrac, uri, pyld, hdrs):
     try:
-        system = requests.post(str, verify=False, auth=(u,p))
+        response = requests.post(uri,  data=json.dumps(pyld), headers=hdrs,
+                           verify=False, auth=(idrac['user'], idrac['pswd']))
+        response_output = response.__dict__
+        job_id = response_output["headers"]["Location"]
+        job_id = re.search("JID_.+", job_id).group()
+    except:
+        raise
+    return job_id
+
+def send_patch_request(idrac, uri):
+    try:
+        system = requests.patch(uri, verify=False, auth=(idrac['user'], idrac['pswd']))
         systemData = system.json()
     except:
         raise
     return systemData
 
-def send_patch_request(str, u, p):
+def send_delete_request(idrac, uri):
     try:
-        system = requests.patch(str, verify=False, auth=(u,p))
-        systemData = system.json()
-    except:
-        raise
-    return systemData
-
-def send_delete_request(str, u, p):
-    try:
-        system = requests.delete(str, verify=False, auth=(u,p))
+        system = requests.delete(uri, verify=False, auth=(idrac['user'], idrac['pswd']))
         systemData = system.json()
     except:
         raise
@@ -107,21 +124,24 @@ def main():
     module = AnsibleModule(
         argument_spec = dict(
             choice = dict(required=True, type='str', default=None),
+            idracip = dict(required=True, type='str', default=None),
             idracuser = dict(required=False, type='str', default='root'),
             idracpswd = dict(required=False, type='str', default='calvin'),
-            idracip = dict(required=True, type='str', default=None),
+            hostname  = dict(required=False, type='str', default=None),
+            sharehost = dict(required=False, type='str', default=None),
+            sharename = dict(required=False, type='str', default=None),
+            shareuser = dict(required=False, type='str', default=None),
+            sharepswd = dict(required=False, type='str', default=None),
         ),
         supports_check_mode=True
     )
 
     params = module.params
-    choice    = params['choice']
-    idracip   = params['idracip']
-    idracuser = params['idracuser']
-    idracpswd = params['idracpswd']
+    choice   = params['choice']
+    hostname = params['hostname']
 
     # Build initial URI
-    root_uri = ''.join(["https://%s" % idracip, "/redfish/v1"])
+    root_uri = ''.join(["https://%s" % params['idracip'], "/redfish/v1"])
     system_uri   = root_uri + "/Systems/System.Embedded.1" 
     chassis_uri  = root_uri + "/Chassis/System.Embedded.1" 
     manager_uri  = root_uri + "/Managers/iDRAC.Embedded.1"
@@ -132,33 +152,56 @@ def main():
     # Disable insecure-certificate-warning message
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-    # How do we dynamically build these?
+    IDRAC_INFO = { 'ip'   : params['idracip'],
+                   'user' : params['idracuser'],
+                   'pswd' : params['idracpswd']
+                 } 
+    SHARE_INFO = { 'host' : params['sharehost'],
+                   'name' : params['sharename'],
+                   'user' : params['shareuser'],
+                   'pswd' : params['sharepswd']
+                 }
+
+    # Not sure this is the best approach. Final implementation might look very different.
     if choice == "Health":
-        system = send_get_request(system_uri, idracuser, idracpswd)
+        system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'Status'][u'Health']
     elif choice == "Model":
-        system = send_get_request(system_uri, idracuser, idracpswd)
+        system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'Model']
     elif choice == "BiosVersion":
-        system = send_get_request(system_uri, idracuser, idracpswd)
+        system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'BiosVersion']
     elif choice == "AssetTag":
-        system = send_get_request(system_uri, idracuser, idracpswd)
+        system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'AssetTag']
     elif choice == "Memory":
-        system = send_get_request(system_uri, idracuser, idracpswd)
+        system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'MemorySummary'][u'TotalSystemMemoryGiB']
     elif choice == "CPU":
-        system = send_get_request(system_uri, idracuser, idracpswd)
+        system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'ProcessorSummary'][u'Model']
     elif choice == "PowerRead":
-        power = send_get_request(chassis_uri + "/Power/PowerControl", idracuser, idracpswd)
+        power = send_get_request(IDRAC_INFO, chassis_uri + "/Power/PowerControl")
         result = power[u'PowerConsumedWatts']
     elif choice == "Selog":
-        result = send_get_request(manager_uri + "/Logs/Sel", idracuser, idracpswd)
+        result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/Sel")
+    elif choice == "SCP":
+        uri = manager_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
+        payload = { "ExportFormat" : "XML",
+                    "ShareParameters" : { "Target" : "ALL",
+                         "ShareType" : "CIFS",
+                         "IPAddress" : SHARE_INFO['host'],
+                         "ShareName" : SHARE_INFO['name'],
+                         "UserName"  : SHARE_INFO['user'],
+                         "Password"  : SHARE_INFO['pswd'],
+                         "FileName"  : hostname + "_SCP.xml"}
+                  }
+        headers = {'content-type': 'application/json'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
     # Catch-all: display Collections available
     else:
-        result = send_get_request(root_uri + "odata", idracuser, idracpswd)
+        result = send_get_request(IDRAC_INFO, root_uri + "odata")
 
     module.exit_json(result=result)
 
