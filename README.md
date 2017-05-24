@@ -75,9 +75,9 @@ ok: [t630] => {
 
 ## TO DO
 
-  - Place information for each server in one file.
   - Add option to place server info in CSV format (for import into spreadsheet).
-  - Add functionality to get [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) file.
+  - Add option to place server info into database (TBD)
+  - Add functionality to import [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601).
 
 ## Prerequisites
 
@@ -87,7 +87,6 @@ ok: [t630] => {
 ## Limitations and Disclaimers
 
   - This module is for demonstration purposes only.
-  - Only a few GET requests are available. Support for POST, PATCH and DELETE requests coming soon.
   - For demonstration purposes, the playbook redirects stdout to text files in JSON format. Ideally, they should be stored in a database or be formatted for easy import into a spreadsheet or audit tool.
 
 ## Support
