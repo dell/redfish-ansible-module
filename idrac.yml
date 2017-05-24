@@ -9,7 +9,7 @@
   vars:
      idracuser: root
      idracpswd: calvin
-     sharehost: 192.168.1.100
+     sharehost: 10.9.165.177
      sharename: share2
      shareuser: dell
      sharepswd: 111111

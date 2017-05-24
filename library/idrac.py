@@ -82,6 +82,7 @@ import os
 import requests
 import json
 import re
+from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from ansible.module_utils.basic import AnsibleModule
 
@@ -187,6 +188,8 @@ def main():
     elif choice == "Selog":
         result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/Sel")
     elif choice == "SCP":
+        # timestamp to add to SCP XML file name
+        ts = str(datetime.strftime(datetime.now(), "_%Y%m%d_%H%M%S"))
         uri = manager_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
         payload = { "ExportFormat" : "XML",
                     "ShareParameters" : { "Target" : "ALL",
@@ -195,7 +198,7 @@ def main():
                          "ShareName" : SHARE_INFO['name'],
                          "UserName"  : SHARE_INFO['user'],
                          "Password"  : SHARE_INFO['pswd'],
-                         "FileName"  : hostname + "_SCP.xml"}
+                         "FileName"  : "SCP_" + hostname + ts + ".xml"}
                   }
         headers = {'content-type': 'application/json'}
         result = send_post_request(IDRAC_INFO, uri, payload, headers)
