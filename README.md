@@ -29,9 +29,9 @@ Your */etc/ansible/hosts* should look like this:
 ```
 [myhosts]
 # Hostname        iDRAC IP               Host alias
-host1.domain.com  idracip=192.168.0.101  host=web_server1
-host2.domain.com  idracip=192.168.0.102  host=web_server2
-host3.domain.com  idracip=192.168.0.103  host=db_server
+host1.domain.com  idracip=192.168.0.101  host=webserver1
+host2.domain.com  idracip=192.168.0.102  host=webserver2
+host3.domain.com  idracip=192.168.0.103  host=dbserver1
 ...
 ```
 
@@ -47,19 +47,20 @@ $ ansible-playbook idrac.yml
 PLAY [PowerEdge iDRAC] *********************************************************
 
 TASK [Set timestamp variable] **************************************************
-ok: [r630]
-ok: [cn1d]
+ok: [webserver1]
+ok: [webserver2]
+ok: [dbserver1]
   --- snip ---
 ```
 
 You will see the usual task execution output, but please note that all server information retrieved is collected and put into text files defined by the *rootdir* variable in the playbook. The playbook creates a directory per server and places files there. For example:
 
 ```bash
-$ cd <rootdir>/r630
+$ cd <rootdir>/webserver1
 $ ls
-r630_info_20170615_132201.txt
-r630_SELogs_20170615_132201.json
-$ cat r630_info_20170615_132201.txt
+webserver1_info_20170615_132201.txt
+webserver1_SELogs_20170615_132201.json
+$ cat webserver1_info_20170615_132201.txt
 Health: OK
 Model: PowerEdge M620
 BiosVersion: 2.5.4
@@ -72,12 +73,12 @@ PowerState: On
 
 These files are in the format *{{host}}_{{datatype}}_{{datestamp}}* and each contains valuable server information. 
 
-All server data is returned in JSON format and where appropriate it is extracted into an easy-to-read format. In this case, the file *r630_info_20170615_132201.txt* contains server data that has already been parsed for consumption.
+All server data is returned in JSON format and where appropriate it is extracted into an easy-to-read format. In this case, the file *webserver1_info_20170615_132201.txt* contains server data that has already been parsed for consumption.
 
-The SELogs file is in JSON format but its relevant data can be easily read with any JSON parser. For example, using the [jq] (https://stedolan.github.io/jq/) parser:
+The SELogs file is in JSON format but its relevant data can be easily read with any JSON parser. For example, using the [jq](https://stedolan.github.io/jq/) parser:
 
 ```
-$ jq '.result.Members[] | {Date: .Created, Message: .Message}' r630_SELogs_20170615_132201.json
+$ jq '.result.Members[] | {Date: .Created, Message: .Message}' webserver1_SELogs_20170615_132201.json
 {
   "Date": "2017-05-22T19:12:57-05:00",
   "Message": "The system halted because system power exceeds capacity."
@@ -101,12 +102,12 @@ $ jq '.result.Members[] | {Date: .Created, Message: .Message}' r630_SELogs_20170
 
   - PowerEdge 12G/13G servers only
   - Minimum iDRAC 7/8 FW 2.40.40.40
-  - [jq] (https://stedolan.github.io/jq/) JSON parser
+  - SMB share to place Server Configuration Profile files
+  - [jq](https://stedolan.github.io/jq/) JSON parser
 
 ## Limitations and Disclaimers
 
   - This module is for demonstration purposes only.
-  - For demonstration purposes, the playbook redirects stdout to text files in JSON format. Ideally, they should be stored in a database or be formatted for easy import into a spreadsheet or audit tool.
 
 ## Support
 
