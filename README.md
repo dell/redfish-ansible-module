@@ -44,33 +44,31 @@ $ export ANSIBLE_LIBRARY=<directory-with-modules>
 
 $ ansible-playbook idrac.yml
   ...
-  TASK [report information] ******************************************************
-ok: [t630] => {
+PLAY [PowerEdge iDRAC] *********************************************************
+
+TASK [Set timestamp variable] **************************************************
+ok: [r630]
+ok: [cn1d]
+
+TASK [Create dropoff dir for host if needed] ***********************************
+changed: [r630 -> localhost]
+changed: [cn1d -> localhost]
   --- snip ---
-            }, 
-            "Manufacturer": "Dell Inc.", 
-            "MemorySummary": {
-                "Status": {
-                    "Health": "OK", 
-                    "HealthRollUp": "OK", 
-                    "State": "Enabled"
-                }, 
-                "TotalSystemMemoryGiB": 64.0
-            }, 
-            "Model": "PowerEdge T630", 
-            "Name": "System", 
-            "PartNumber": "", 
-            "PowerState": "On", 
-            "ProcessorSummary": {
-                "Count": 2, 
-                "Model": "Intel(R) Xeon(R) CPU E5-2640 v3 @ 2.60GHz", 
-                "Status": {
-                    "Health": "OK", 
-                    "HealthRollUp": "OK", 
-                    "State": "Enabled"
-                }
-            }, 
-  --- snip ---
+```
+
+You will see the usual task execution output, but please note that all server information retrieved is collected and put into text files defined by the *rootdir* variable in the playbook. The playbook creates a directory per server and places files there. For example:
+
+```bash
+$ cd r630
+$ ls
+r630_info_0615_1322.txt
+r630_SELogs_0615_1322.json
+
+These files are in the format {{host}}_{{datatype}}_{{datestamp}}
+
+The first file contains general information about the server.
+
+The SELogs file is in json format but its data can be easily read with any json parser. 
 ```
 
 ## TO DO

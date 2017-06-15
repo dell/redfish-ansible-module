@@ -1,0 +1,5 @@
+---
+
+  - set_fact: result="{{ lookup('pipe', 'jq .result {{ outfile }}') }}"
+  - local_action: shell echo {{action}}":" {{ result }} >> {{ outfile }}.txt
+  - local_action: file path={{ outfile }} state=absent

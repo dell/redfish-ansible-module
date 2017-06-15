@@ -98,12 +98,9 @@ def send_post_request(idrac, uri, pyld, hdrs):
     try:
         response = requests.post(uri,  data=json.dumps(pyld), headers=hdrs,
                            verify=False, auth=(idrac['user'], idrac['pswd']))
-        response_output = response.__dict__
-        job_id = response_output["headers"]["Location"]
-        job_id = re.search("JID_.+", job_id).group()
     except:
         raise
-    return job_id
+    return response
 
 def send_patch_request(idrac, uri):
     try:
@@ -167,26 +164,50 @@ def main():
     if choice == "Health":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'Status'][u'Health']
+
     elif choice == "Model":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'Model']
+
     elif choice == "BiosVersion":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'BiosVersion']
+
     elif choice == "AssetTag":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'AssetTag']
+
     elif choice == "Memory":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'MemorySummary'][u'TotalSystemMemoryGiB']
+
     elif choice == "CPU":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'ProcessorSummary'][u'Model']
-    elif choice == "PowerRead":
+
+    elif choice == "ConsumedWatts":
         power = send_get_request(IDRAC_INFO, chassis_uri + "/Power/PowerControl")
         result = power[u'PowerConsumedWatts']
+
+    elif choice == "PowerState":
+        power = send_get_request(IDRAC_INFO, system_uri)
+        result = power[u'PowerState']
+
+    elif choice == "PowerOn":
+        uri = system_uri + "/Actions/ComputerSystem.Reset"
+        payload = { 'ResetType' : 'On' }
+        headers = {'content-type': 'application/json'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
+
+    elif choice == "PowerOff":
+        uri = system_uri + "/Actions/ComputerSystem.Reset"
+        payload = { 'ResetType' : 'ForceOff' }
+        headers = {'content-type': 'application/json'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
+
     elif choice == "Selog":
         result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/Sel")
+
     elif choice == "SCP":
         # timestamp to add to SCP XML file name
         ts = str(datetime.strftime(datetime.now(), "_%Y%m%d_%H%M%S"))
@@ -201,7 +222,13 @@ def main():
                          "FileName"  : "SCP_" + hostname + ts + ".xml"}
                   }
         headers = {'content-type': 'application/json'}
-        result = send_post_request(IDRAC_INFO, uri, payload, headers)
+        response = send_post_request(IDRAC_INFO, uri, payload, headers)
+
+        response_output = response.__dict__
+        job_id = response_output["headers"]["Location"]
+        # This returns the iDRAC Job ID: a string
+        result = re.search("JID_.+", job_id).group()
+
     # Catch-all: display Collections available
     else:
         result = send_get_request(IDRAC_INFO, root_uri + "odata")

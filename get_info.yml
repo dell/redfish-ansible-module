@@ -1,0 +1,16 @@
+---
+
+  - name: "Get data: {{ action }}"
+    local_action: >
+       idrac choice={{ action }} idracuser={{ idracuser }}
+            idracpswd={{ idracpswd }} idracip={{ idracip }}
+    register: result
+
+  - name: Place data in file
+    local_action: copy content={{ result | to_nice_json }}
+                       dest={{ outfile }}
+
+  # JSON parser jq (https://stedolan.github.io/jq/)
+  - name: Parse JSON data
+    include: parse_json.yml
+    when: action != "Selog"
