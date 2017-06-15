@@ -49,30 +49,50 @@ PLAY [PowerEdge iDRAC] *********************************************************
 TASK [Set timestamp variable] **************************************************
 ok: [r630]
 ok: [cn1d]
-
-TASK [Create dropoff dir for host if needed] ***********************************
-changed: [r630 -> localhost]
-changed: [cn1d -> localhost]
   --- snip ---
 ```
 
 You will see the usual task execution output, but please note that all server information retrieved is collected and put into text files defined by the *rootdir* variable in the playbook. The playbook creates a directory per server and places files there. For example:
 
 ```bash
-$ cd r630
+$ cd <rootdir>/r630
 $ ls
-r630_info_0615_1322.txt
-r630_SELogs_0615_1322.json
-
-These files are in the format {{host}}_{{datatype}}_{{datestamp}}
-
-The first file contains general information about the server.
-
-The SELogs file is in json format but its data can be easily read with any json parser. 
+r630_info_20170615_132201.txt
+r630_SELogs_20170615_132201.json
+$ cat r630_info_20170615_132201.txt
+Health: OK
+Model: PowerEdge M620
+BiosVersion: 2.5.4
+AssetTag:
+Memory: 64
+CPU: Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz
+ConsumedWatts: 71
+PowerState: On
 ```
 
-## TO DO
+These files are in the format *{{host}}_{{datatype}}_{{datestamp}}* and each contains valuable server information. 
 
+All server data is returned in JSON format and where appropriate it is extracted into an easy-to-read format. In this case, the file *r630_info_20170615_132201.txt* contains server data that has already been parsed for consumption.
+
+The SELogs file is in JSON format but its relevant data can be easily read with any JSON parser. For example, using the [jq] (https://stedolan.github.io/jq/) parser:
+
+```
+$ jq '.result.Members[] | {Date: .Created, Message: .Message}' r630_SELogs_20170615_132201.json
+{
+  "Date": "2017-05-22T19:12:57-05:00",
+  "Message": "The system halted because system power exceeds capacity."
+}
+{
+  "Date": "2017-01-05T18:50:43-06:00",
+  "Message": "The process of installing an operating system or hypervisor is successfully completed."
+}
+  --- snip ---
+
+```
+
+## Wishlist (Coming Soon)
+
+  - IDRAC User Management
   - Add option to place server info in CSV format (for import into spreadsheet).
   - Add option to place server info into database (TBD)
   - Add functionality to import [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601).
@@ -81,6 +101,7 @@ The SELogs file is in json format but its data can be easily read with any json 
 
   - PowerEdge 12G/13G servers only
   - Minimum iDRAC 7/8 FW 2.40.40.40
+  - [jq] (https://stedolan.github.io/jq/) JSON parser
 
 ## Limitations and Disclaimers
 

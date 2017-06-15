@@ -32,7 +32,7 @@
   tasks:
 
   - name: Set timestamp variable
-    set_fact: timestamp="{{ lookup('pipe', 'date +%m%d_%H%M') }}"
+    set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
 
   - name: Create dropoff dir for host if needed
     local_action: file path={{rootdir}}/{{host}} state=directory
