@@ -32,3 +32,13 @@
   - name: Place SE Logs in file
     local_action: copy content={{ result | to_nice_json }}
              dest={{rootdir}}/{{host}}/{{host}}_SELogs_{{timestamp}}.json
+
+  - name: Get LC Logs
+    local_action: >
+       idrac_logs choice=Lclog idracuser={{ idracuser }}
+            idracpswd={{ idracpswd }} idracip={{ idracip }}
+    register: result
+
+  - name: Place LC Logs in file
+    local_action: copy content={{ result | to_nice_json }}
+             dest={{rootdir}}/{{host}}/{{host}}_LCLogs_{{timestamp}}.json

@@ -102,7 +102,7 @@ def main():
         result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/Sel")
 
     elif choice == "Lclog":
-        result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/LcLog")
+        result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/Lclog")
 
     else:
         result = "Option not valid"

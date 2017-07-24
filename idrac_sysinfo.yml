@@ -28,9 +28,9 @@
   - name: Create dropoff dir for host if needed
     local_action: file path={{rootdir}}/{{host}} state=directory
 
-  - name: Get information
+  - name: Get system information
     include: get_sysinfo.yml action={{item}}
-             outfile={{rootdir}}/{{host}}/{{host}}_info_{{timestamp}}
+             outfile={{rootdir}}/{{host}}/{{host}}_sysinfo_{{timestamp}}
     with_items:
       - Health
       - Model
