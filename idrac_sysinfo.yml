@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC Get Inventory
+  name: PowerEdge iDRAC Get System Information
   gather_facts: False
 
   # Here we define global variables, but if some servers have different
@@ -11,7 +11,7 @@
      idracuser: root
      idracpswd: calvin
 
-  # Inventory/Information available:
+  # System Information available:
   #   Health		Server health
   #   Model		Server model
   #   BiosVersion	BIOS version
@@ -29,7 +29,7 @@
     local_action: file path={{rootdir}}/{{host}} state=directory
 
   - name: Get information
-    include: get_inventory.yml action={{item}}
+    include: get_sysinfo.yml action={{item}}
              outfile={{rootdir}}/{{host}}/{{host}}_info_{{timestamp}}
     with_items:
       - Health

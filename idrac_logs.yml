@@ -25,7 +25,7 @@
 
   - name: Get SE Logs
     local_action: >
-       idrac_logs choice=selog idracuser={{ idracuser }}
+       idrac_logs choice=Selog idracuser={{ idracuser }}
             idracpswd={{ idracpswd }} idracip={{ idracip }}
     register: result
 

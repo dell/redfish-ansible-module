@@ -23,15 +23,15 @@ ANSIBLE_METADATA = {'status': ['preview'],
                     'version': '0.1'}
 
 DOCUMENTATION = """
-module: idrac_inventory
+module: idrac_sysinfo
 version_added: "2.3"
-short_description: Use iDRAC Redfish APIs to get system inventory.
+short_description: Use iDRAC Redfish APIs to get system information.
 options:
   choice:
     required: true
     default: None
     description:
-      - What type of inventory to get from server
+      - What type of information to get from server
   idracip:
     required: true
     default: None

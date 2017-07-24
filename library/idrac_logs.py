@@ -98,11 +98,11 @@ def main():
                  } 
 
     # Execute based on what we want
-    if choice == "selog":
+    if choice == "Selog":
         result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/Sel")
 
     elif choice == "Lclog":
-        result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/Sel")
+        result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/LcLog")
 
     else:
         result = "Option not valid"
