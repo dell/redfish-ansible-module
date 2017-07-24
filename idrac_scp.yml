@@ -1,0 +1,35 @@
+---
+- hosts: myhosts
+  name: PowerEdge iDRAC Manage SCP
+  gather_facts: False
+
+  # Here we define global variables, but if some servers have different
+  # credentials, then place these variables in /etc/ansible/hosts to override
+  # for each host
+  vars:
+     idracuser: root
+     idracpswd: calvin
+     sharehost: 10.9.165.171
+     sharename: share2
+     shareuser: dell
+     sharepswd: 111111
+
+  # Options available:
+  #   export	Export Server Configuration Profile (SCP)
+  #   import	Import Server Configuration Profile (SCP)
+
+  tasks:
+
+  - name: Export SCP file
+    local_action: >
+       idrac_scp choice=export idracuser={{ idracuser }}
+       idracpswd={{ idracpswd }} idracip={{ idracip }} sharehost={{ sharehost }}
+       sharename={{ sharename }} shareuser={{ shareuser }}
+       sharepswd={{ sharepswd }} hostname={{ host }}
+
+  - name: Import SCP file
+    local_action: >
+       idrac_scp choice=import idracuser={{ idracuser }}
+       idracpswd={{ idracpswd }} idracip={{ idracip }} sharehost={{ sharehost }}
+       sharename={{ sharename }} shareuser={{ shareuser }}
+       sharepswd={{ sharepswd }} hostname={{ host }}

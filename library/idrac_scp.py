@@ -23,12 +23,9 @@ ANSIBLE_METADATA = {'status': ['preview'],
                     'version': '0.1'}
 
 DOCUMENTATION = """
-module: idrac
+module: idrac_scp
 version_added: "2.3"
-short_description: Talk to Dell EMC PowerEdge iDRAC using supported Redfish APIs
-description:
-  - For demonstration purposes only (more functionality coming soon)
-  - TO DO: Add option to specify action: GET, POST, PATCH or DELETE
+short_description: Use iDRAC Redfish APIs to manage SCP file.
 options:
   choice:
     required: true
@@ -86,37 +83,13 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from ansible.module_utils.basic import AnsibleModule
 
-def send_get_request(idrac, uri):
-    try:
-        system = requests.get(uri, verify=False, auth=(idrac['user'], idrac['pswd']))
-        systemData = system.json()
-    except:
-        raise
-    return systemData
-
 def send_post_request(idrac, uri, pyld, hdrs):
     try:
-        response = requests.post(uri,  data=json.dumps(pyld), headers=hdrs,
+        response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,
                            verify=False, auth=(idrac['user'], idrac['pswd']))
     except:
         raise
     return response
-
-def send_patch_request(idrac, uri):
-    try:
-        system = requests.patch(uri, verify=False, auth=(idrac['user'], idrac['pswd']))
-        systemData = system.json()
-    except:
-        raise
-    return systemData
-
-def send_delete_request(idrac, uri):
-    try:
-        system = requests.delete(uri, verify=False, auth=(idrac['user'], idrac['pswd']))
-        systemData = system.json()
-    except:
-        raise
-    return systemData
 
 def main():
     module = AnsibleModule(
@@ -160,55 +133,8 @@ def main():
                    'pswd' : params['sharepswd']
                  }
 
-    # Not sure this is the best approach. Final implementation might look very different.
-    if choice == "Health":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'Status'][u'Health']
-
-    elif choice == "Model":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'Model']
-
-    elif choice == "BiosVersion":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'BiosVersion']
-
-    elif choice == "AssetTag":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'AssetTag']
-
-    elif choice == "Memory":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'MemorySummary'][u'TotalSystemMemoryGiB']
-
-    elif choice == "CPU":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'ProcessorSummary'][u'Model']
-
-    elif choice == "ConsumedWatts":
-        power = send_get_request(IDRAC_INFO, chassis_uri + "/Power/PowerControl")
-        result = power[u'PowerConsumedWatts']
-
-    elif choice == "PowerState":
-        power = send_get_request(IDRAC_INFO, system_uri)
-        result = power[u'PowerState']
-
-    elif choice == "PowerOn":
-        uri = system_uri + "/Actions/ComputerSystem.Reset"
-        payload = { 'ResetType' : 'On' }
-        headers = {'content-type': 'application/json'}
-        result = send_post_request(IDRAC_INFO, uri, payload, headers)
-
-    elif choice == "PowerOff":
-        uri = system_uri + "/Actions/ComputerSystem.Reset"
-        payload = { 'ResetType' : 'ForceOff' }
-        headers = {'content-type': 'application/json'}
-        result = send_post_request(IDRAC_INFO, uri, payload, headers)
-
-    elif choice == "Selog":
-        result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/Sel")
-
-    elif choice == "SCP":
+    # Execute based on what we want
+    if choice == "export":
         # timestamp to add to SCP XML file name
         ts = str(datetime.strftime(datetime.now(), "_%Y%m%d_%H%M%S"))
         uri = manager_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
@@ -229,9 +155,10 @@ def main():
         # This returns the iDRAC Job ID: a string
         result = re.search("JID_.+", job_id).group()
 
-    # Catch-all: display Collections available
+    elif choice == "import":
+        result = "Feature not yet implemented"
     else:
-        result = send_get_request(IDRAC_INFO, root_uri + "odata")
+        result = "Option not valid"
 
     module.exit_json(result=result)
 

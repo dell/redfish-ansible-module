@@ -2,7 +2,7 @@
 
   - name: "Get data: {{ action }}"
     local_action: >
-       idrac choice={{ action }} idracuser={{ idracuser }}
+       idrac_inventory choice={{ action }} idracuser={{ idracuser }}
             idracpswd={{ idracpswd }} idracip={{ idracip }}
     register: result
 
@@ -13,4 +13,3 @@
   # JSON parser jq (https://stedolan.github.io/jq/)
   - name: Parse JSON data
     include: parse_json.yml
-    when: action != "Selog"

@@ -1,0 +1,34 @@
+---
+- hosts: myhosts
+  name: PowerEdge iDRAC Logs
+  gather_facts: False
+
+  # Here we define global variables, but if some servers have different
+  # credentials, then place these variables in /etc/ansible/hosts to override
+  # for each host
+  vars:
+     rootdir: /root			# where I place all results 
+     idracuser: root
+     idracpswd: calvin
+
+  # Logs available:
+  #   Selog	System Event Log
+  #   Lclog	Lifecycle Log (coming soon)
+
+  tasks:
+
+  - name: Set timestamp variable
+    set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
+
+  - name: Create dropoff dir for host if needed
+    local_action: file path={{rootdir}}/{{host}} state=directory
+
+  - name: Get SE Logs
+    local_action: >
+       idrac_logs choice=selog idracuser={{ idracuser }}
+            idracpswd={{ idracpswd }} idracip={{ idracip }}
+    register: result
+
+  - name: Place SE Logs in file
+    local_action: copy content={{ result | to_nice_json }}
+             dest={{rootdir}}/{{host}}/{{host}}_SELogs_{{timestamp}}.json
