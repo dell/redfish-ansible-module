@@ -22,15 +22,17 @@
 
   tasks:
 
-  - name: Set timestamp variable
+  - name: Set timestamp
     set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
 
-  - name: Create dropoff dir for host if needed
+  - name: Set temporary file to place results
+    set_fact: outfile={{rootdir}}/{{host}}/{{host}}_sysinfo_{{timestamp}}
+
+  - name: Create dropoff directory for host if needed
     local_action: file path={{rootdir}}/{{host}} state=directory
 
   - name: Get system information
     include: get_sysinfo.yml action={{item}}
-             outfile={{rootdir}}/{{host}}/{{host}}_sysinfo_{{timestamp}}
     with_items:
       - Health
       - Model
@@ -40,3 +42,6 @@
       - CPU
       - ConsumedWatts
       - PowerState
+
+  - name: Remove temporary results file
+    local_action: file path={{ outfile }} state=absent

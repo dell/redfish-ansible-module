@@ -156,9 +156,10 @@ def main():
         result = re.search("JID_.+", job_id).group()
 
     elif choice == "import":
-        result = "Feature not yet implemented"
+        result = "Import option not yet implemented."
+
     else:
-        result = "Option not valid"
+        result = "Invalid Option."
 
     module.exit_json(result=result)
 

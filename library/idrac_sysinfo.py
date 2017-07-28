@@ -131,7 +131,7 @@ def main():
         result = power[u'PowerState']
 
     else:
-        result = "Option not valid"
+        result = "Invalid Option."
 
     module.exit_json(result=result)
 

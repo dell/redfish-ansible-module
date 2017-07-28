@@ -11,5 +11,5 @@
                        dest={{ outfile }}
 
   # JSON parser jq (https://stedolan.github.io/jq/)
-  - name: Parse JSON data
-    include: parse_json.yml
+  - set_fact: result="{{ lookup('pipe', 'jq .result {{ outfile }}') }}"
+  - local_action: shell echo {{ action }}":" {{ result }} >> {{ outfile }}.info

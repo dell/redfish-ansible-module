@@ -105,7 +105,7 @@ def main():
         result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/Lclog")
 
     else:
-        result = "Option not valid"
+        result = "Invalid Option."
 
     module.exit_json(result=result)
 

@@ -1,6 +1,6 @@
-# Ansible module for Dell EMC PowerEdge iDRAC (using Redfish APIs)
+# Ansible modules for Dell EMC PowerEdge iDRAC (using Redfish APIs)
 
-Ansible module and playbook that use the Redfish API to manage PowerEdge servers via the integrated Dell Remote Access Controller (iDRAC).
+Ansible modules and playbooks that use the Redfish API to manage PowerEdge servers via the integrated Dell Remote Access Controller (iDRAC).
 
 ## Why Ansible
 
@@ -35,14 +35,27 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
 ...
 ```
 
+## Modules
+
+  - idrac_logs: Collect System Event and Lifecycle Controller Logs
+  - idrac_scp: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
+  - idrac_sysinfo: Collects System Information (Health, CPUs, RAM, etc.)
+  - idrac_users (coming soon): Manages iDRAC users (add/delete/update)
+  - idrac_power (coming soon): Manages system power (status/on/off)
+  - idrac_raid (coming soon): Manages PERC RAID configuration
+  - idrac_config (coming soon): Manages iDRAC configuration
+  - idrac_license (coming soon): Manages iDRAC licenses
+  - idrac_provision (coming soon): Manages OS provisioning
+  - idrac_fw (coming soon): Manages Firmware updates
+
 ## Example
 
-Clone this repository. The idrac module is in the *library* directory, it can be left there or it can be placed somewhere else. If you move it, be sure to define the ANSIBLE_LIBRARY environment variable.
+Clone this repository. The idrac modules are in the *library* directory, they can be left there or placed somewhere else. If you move them, be sure to define the ANSIBLE_LIBRARY environment variable.
 
 ```bash
 $ export ANSIBLE_LIBRARY=<directory-with-modules>
 
-$ ansible-playbook idrac.yml
+$ ansible-playbook idrac_sysinfo.yml
   ...
 PLAY [PowerEdge iDRAC] *********************************************************
 
@@ -58,9 +71,8 @@ You will see the usual task execution output, but please note that all server in
 ```bash
 $ cd <rootdir>/webserver1
 $ ls
-webserver1_info_20170615_132201.txt
-webserver1_SELogs_20170615_132201.json
-$ cat webserver1_info_20170615_132201.txt
+webserver1_sysinfo_20170728_142202.info
+$ cat webserver1_sysinfo_20170728_142202.info
 Health: OK
 Model: PowerEdge M620
 BiosVersion: 2.5.4
@@ -73,9 +85,9 @@ PowerState: On
 
 These files are in the format *{{host}}_{{datatype}}_{{datestamp}}* and each contains valuable server information. 
 
-All server data is returned in JSON format and where appropriate it is extracted into an easy-to-read format. In this case, the file *webserver1_info_20170615_132201.txt* contains server data that has already been parsed for consumption.
+All server data is returned in JSON format and where appropriate it is extracted into an easy-to-read format. In this case, the file *webserver1_sysinfo_20170728_142202.txt* contains server data that has already been parsed for consumption.
 
-The SELogs file is in JSON format but its relevant data can be easily read with any JSON parser. For example, using the [jq](https://stedolan.github.io/jq/) parser:
+With the idrac_logs module, the SELogs file is in JSON format but its relevant data can be easily read with any JSON parser. For example, using the [jq](https://stedolan.github.io/jq/) parser:
 
 ```
 $ jq '.result.Members[] | {Date: .Created, Message: .Message}' webserver1_SELogs_20170615_132201.json
@@ -91,23 +103,20 @@ $ jq '.result.Members[] | {Date: .Created, Message: .Message}' webserver1_SELogs
 
 ```
 
-## Wishlist (Coming Soon)
+## Wishlist
 
-  - IDRAC User Management
-  - Add option to place server info in CSV format (for import into spreadsheet).
-  - Add option to place server info into database (TBD)
-  - Add functionality to import [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601).
+  - Add option to place server info in CSV format for import into spreadsheet.
 
 ## Prerequisites
 
-  - PowerEdge 12G/13G servers only
+  - PowerEdge 12G/13G servers only (not tested in 14G yet, but should work)
   - Minimum iDRAC 7/8 FW 2.40.40.40
-  - SMB share to place Server Configuration Profile files
+  - SMB share to place SCP files
   - [jq](https://stedolan.github.io/jq/) JSON parser
 
 ## Limitations and Disclaimers
 
-  - This module is for demonstration purposes only.
+  - For now, these modules are for demonstration purposes only.
 
 ## Support
 
