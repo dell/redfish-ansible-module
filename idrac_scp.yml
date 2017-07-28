@@ -22,14 +22,14 @@
 
   - name: Export SCP file
     local_action: >
-       idrac_scp choice=export idracuser={{ idracuser }}
-       idracpswd={{ idracpswd }} idracip={{ idracip }} sharehost={{ sharehost }}
+       idrac_scp choice=export idracip={{ idracip }} idracuser={{ idracuser }}
+       idracpswd={{ idracpswd }} sharehost={{ sharehost }}
        sharename={{ sharename }} shareuser={{ shareuser }}
        sharepswd={{ sharepswd }} hostname={{ host }}
 
   - name: Import SCP file
     local_action: >
-       idrac_scp choice=import idracuser={{ idracuser }}
-       idracpswd={{ idracpswd }} idracip={{ idracip }} sharehost={{ sharehost }}
+       idrac_scp choice=import idracip={{ idracip }} idracuser={{ idracuser }}
+       idracpswd={{ idracpswd }} sharehost={{ sharehost }}
        sharename={{ sharename }} shareuser={{ shareuser }}
        sharepswd={{ sharepswd }} hostname={{ host }}
