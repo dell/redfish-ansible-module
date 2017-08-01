@@ -10,6 +10,7 @@
      rootdir: /root			# where I place all results 
      idracuser: root
      idracpswd: calvin
+     csvformat: True			# True if we want it comma-separated
 
   # System Information available:
   #   Health		Server health
@@ -31,6 +32,10 @@
   - name: Create dropoff directory for host if needed
     local_action: file path={{rootdir}}/{{host}} state=directory
 
+  - name: Prepend Hostname at the beginning of each line
+    local_action: shell echo -n {{ host }}"," >> {{ outfile }}.csv
+    when: csvformat == True
+
   - name: Get system information
     include: get_sysinfo.yml action={{item}}
     with_items:
@@ -42,6 +47,13 @@
       - CPU
       - ConsumedWatts
       - PowerState
+
+  - local_action: shell echo "" >> {{ outfile }}.csv
+    when: csvformat == True
+
+  - name: Combine all host outputs to one CSV file
+    local_action: shell cat {{ outfile }}.csv >> {{ rootdir }}/allhosts_sysinfo_{{timestamp}}.csv
+    when: csvformat == True
 
   - name: Remove temporary results file
     local_action: file path={{ outfile }} state=absent

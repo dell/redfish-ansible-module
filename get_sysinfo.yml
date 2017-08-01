@@ -12,4 +12,9 @@
 
   # JSON parser jq (https://stedolan.github.io/jq/)
   - set_fact: result="{{ lookup('pipe', 'jq .result {{ outfile }}') }}"
+
+  - local_action: shell echo -n {{ result }}"," >> {{ outfile }}.csv
+    when: csvformat == True
+
   - local_action: shell echo {{ action }}":" {{ result }} >> {{ outfile }}.info
+    when: csvformat != True
