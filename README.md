@@ -103,10 +103,6 @@ $ jq '.result.Members[] | {Date: .Created, Message: .Message}' webserver1_SELogs
 
 ```
 
-## Wishlist
-
-  - Add option to place server info in CSV format for import into spreadsheet.
-
 ## Prerequisites
 
   - PowerEdge 12G/13G servers only (not tested in 14G yet, but should work)
@@ -114,9 +110,14 @@ $ jq '.result.Members[] | {Date: .Created, Message: .Message}' webserver1_SELogs
   - SMB share to place SCP files
   - [jq](https://stedolan.github.io/jq/) JSON parser
 
+## Contributors
+
+  - jose_delarosa@dell.com
+  - bhavesh_bharadiya@dell.com
+
 ## Limitations and Disclaimers
 
-  - For now, these modules are for demonstration purposes only.
+  - These Ansible modules are for demonstration purposes only (for now).
 
 ## Support
 
