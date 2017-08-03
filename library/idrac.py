@@ -205,6 +205,12 @@ def main():
         headers = {'content-type': 'application/json'}
         result = send_post_request(IDRAC_INFO, uri, payload, headers)
 
+    elif choice == "PowerRestart":
+        uri = system_uri + "/Actions/ComputerSystem.Reset"
+        payload = { 'ResetType' : 'GracefulRestart' }
+        headers = {'content-type': 'application/json'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
+
     elif choice == "Selog":
         result = send_get_request(IDRAC_INFO, manager_uri + "/Logs/Sel")
 
