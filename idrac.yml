@@ -49,6 +49,7 @@
       - CPU
       - ConsumedWatts
       - PowerState
+      - PowerRestart
 
   - name: Get SELogs
     include: get_info.yml action=Selog
