@@ -130,6 +130,10 @@ def main():
         power = send_get_request(IDRAC_INFO, system_uri)
         result = power[u'PowerState']
 
+    elif choice == "ServiceTag":
+        system = send_get_request(IDRAC_INFO, system_uri)
+        result = system[u'SKU']
+
     else:
         result = "Invalid Option."
 

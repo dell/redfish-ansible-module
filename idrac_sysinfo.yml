@@ -42,6 +42,7 @@
       - CPU
       - ConsumedWatts
       - PowerState
+      - ServiceTag
 
   - name: Remove temporary results file
     local_action: file path={{ outfile }} state=absent
