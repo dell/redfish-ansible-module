@@ -134,6 +134,10 @@ def main():
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'SKU']
 
+    elif choice == "SerialNumber":
+        system = send_get_request(IDRAC_INFO, system_uri)
+        result = system[u'SerialNumber']
+
     else:
         result = "Invalid Option."
 
