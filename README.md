@@ -112,8 +112,9 @@ $ jq '.result.Members[] | {Date: .Created, Message: .Message}' webserver1_SELogs
 
 ## Contributors
 
-  - jose_delarosa@dell.com
-  - bhavesh_bharadiya@dell.com
+  - [jose-delarosa](https://github.com/jose-delarosa)
+  - [bhavesh-bharadiya](https://github.com/bhavesh-bharadiya)
+  - [shubhrata-priya](https://github.com/shubhrata-priya)
 
 ## Limitations and Disclaimers
 
