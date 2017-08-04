@@ -41,32 +41,32 @@ options:
     required: false
     default: root
     description:
-      - iDRAC user name
+      - iDRAC user name used for authentication
   idracpswd:
     required: false
     default: calvin
     description:
-      - iDRAC user password
+      - iDRAC user password used for authentication
   userid:
     required: true
     default: None
     description:
-      - user ID of iDRAC user to modify
+      - ID of iDRAC user to add/delete/modify
   username:
     required: true
     default: None
     description:
-      - user name of iDRAC user to modify
+      - name of iDRAC user to add/delete/modify
   userpswd:
     required: true
     default: None
     description:
-      - user password of iDRAC user to modify
+      - password of iDRAC user to add/delete/modify
   userrole:
     required: true
     default: None
     description:
-      - user role of iDRAC user to modify
+      - role of iDRAC user to add/delete/modify
 author: "jose.delarosa@dell.com"
 """
 
@@ -98,12 +98,10 @@ def send_patch_request(idrac, uri, pyld, hdrs):
     try:
         response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,
                            verify=False, auth=(idrac['user'], idrac['pswd']))
-        response2 = response.json()
-        print("XXXXX = %s" % response)
-        print("YYYYY = %s" % response2)
+        statusCode = response.status_code
     except:
         raise
-    return response
+    return statusCode
 
 def send_delete_request(idrac, uri, pyld, hdrs):
     try:
@@ -163,8 +161,18 @@ def main():
         for payload in plUserName,plPass,plRoleID:
             result = send_patch_request(IDRAC_INFO, uri, payload, headers)
 
-#   elif choice == "Delete":
-#   elif choice == "UpdatePassword":
+    elif choice == "Delete":
+        result = "Not yet implemented."
+    elif choice == "UpdatePassword":
+        uri = manager_uri + "/Accounts/" + USER_INFO['userid']
+        headers = {'content-type': 'application/json'}
+        payload = {'Password': USER_INFO['userpswd']}
+        result = send_patch_request(IDRAC_INFO, uri, payload, headers)
+    elif choice == "UpdateRole":
+        uri = manager_uri + "/Accounts/" + USER_INFO['userid']
+        headers = {'content-type': 'application/json'}
+        payload = {'RoleId': USER_INFO['userrole']}
+        result = send_patch_request(IDRAC_INFO, uri, payload, headers)
     else:
         result = "Invalid Option."
 

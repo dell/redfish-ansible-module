@@ -11,10 +11,11 @@
      rootdir: /root
      idracuser: root
      idracpswd: calvin
-     userid: 3
-     username: test
-     userpswd: test
-     userrole: test
+     userid: 3			# user id of user to add/delete/modify (1-16)
+                                # userid 2 is default root user, be mindful!
+     username: testuser		# user name to add/delete/modify
+     userpswd: password		# user password to add/delete/modify
+     userrole: Administrator	# user role to add/delete/modify
 
   # Options available:
   #   Add		Add user
@@ -24,25 +25,25 @@
 
   tasks:
 
-  - name: Add iDRAC user
-    local_action: >
-       idrac_users choice=Add idracip={{ idracip }} idracuser={{ idracuser }}
-       idracpswd={{ idracpswd }} userid={{ userid }} username={{ username }}
-       userpswd={{ userpswd }} userrole={{ userrole }}
+# - name: Add iDRAC user
+#   local_action: >
+#      idrac_users choice=Add idracip={{ idracip }}
+#      idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
+#      username={{ username }} userpswd={{ userpswd }} userrole={{ userrole }}
 
-  - name: Delete iDRAC user
-    local_action: >
-       idrac_users choice=Delete idracip={{ idracip }} idracuser={{ idracuser }}
-       idracpswd={{ idracpswd }} userid={{ userid }}
+# - name: Delete iDRAC user
+#   local_action: >
+#      idrac_users choice=Delete idracip={{ idracip }}
+#      idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
 
   - name: Update iDRAC user role
     local_action: >
        idrac_users choice=UpdateRole idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
-       username={{ username }} userpswd={{ userpswd }} userrole={{ userrole }}
+       userrole={{ userrole }}
 
-  - name: Update iDRAC user password
-    local_action: >
-       idrac_users choice=UpdatePassword idracip={{ idracip }}
-       idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
-       username={{ username }} userpswd={{ userpswd }} userrole={{ userrole }}
+# - name: Update iDRAC user password
+#   local_action: >
+#      idrac_users choice=UpdatePassword idracip={{ idracip }}
+#      idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
+#      userpswd={{ userpswd }}
