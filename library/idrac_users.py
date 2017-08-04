@@ -96,7 +96,7 @@ def send_post_request(idrac, uri, pyld, hdrs):
 
 def send_patch_request(idrac, uri, pyld, hdrs):
     try:
-        response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,
+        response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,
                            verify=False, auth=(idrac['user'], idrac['pswd']))
         statusCode = response.status_code
     except:
@@ -105,7 +105,7 @@ def send_patch_request(idrac, uri, pyld, hdrs):
 
 def send_delete_request(idrac, uri, pyld, hdrs):
     try:
-        response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,
+        response = requests.delete(uri, data=json.dumps(pyld), headers=hdrs,
                            verify=False, auth=(idrac['user'], idrac['pswd']))
     except:
         raise
@@ -161,18 +161,25 @@ def main():
         for payload in plUserName,plPass,plRoleID:
             result = send_patch_request(IDRAC_INFO, uri, payload, headers)
 
-    elif choice == "Delete":
-        result = "Not yet implemented."
     elif choice == "UpdatePassword":
         uri = manager_uri + "/Accounts/" + USER_INFO['userid']
         headers = {'content-type': 'application/json'}
         payload = {'Password': USER_INFO['userpswd']}
         result = send_patch_request(IDRAC_INFO, uri, payload, headers)
+
     elif choice == "UpdateRole":
         uri = manager_uri + "/Accounts/" + USER_INFO['userid']
         headers = {'content-type': 'application/json'}
         payload = {'RoleId': USER_INFO['userrole']}
         result = send_patch_request(IDRAC_INFO, uri, payload, headers)
+
+    elif choice == "Delete":
+        #result = "Not yet implemented."
+        uri = manager_uri + "/Accounts/" + USER_INFO['userid']
+        headers = {'content-type': 'application/json'}
+        payload = {'UserName': USER_INFO['username']}
+        result = send_delete_request(IDRAC_INFO, uri, payload, headers)
+
     else:
         result = "Invalid Option."
 
