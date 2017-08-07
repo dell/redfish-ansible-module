@@ -23,9 +23,9 @@ ANSIBLE_METADATA = {'status': ['preview'],
                     'version': '0.1'}
 
 DOCUMENTATION = """
-module: idrac_users
+module: idrac_poser
 version_added: "2.3"
-short_description: User iDRAC Redfish APIs to manage iDRAC users.
+short_description: User iDRAC Redfish APIs to manage system power.
 options:
   choice:
     required: true
@@ -47,26 +47,6 @@ options:
     default: calvin
     description:
       - iDRAC user password used for authentication
-  userid:
-    required: true
-    default: None
-    description:
-      - ID of iDRAC user to add/delete/modify
-  username:
-    required: true
-    default: None
-    description:
-      - name of iDRAC user to add/delete/modify
-  userpswd:
-    required: true
-    default: None
-    description:
-      - password of iDRAC user to add/delete/modify
-  userrole:
-    required: true
-    default: None
-    description:
-      - role of iDRAC user to add/delete/modify
 author: "jose.delarosa@dell.com"
 """
 
@@ -90,26 +70,10 @@ def send_post_request(idrac, uri, pyld, hdrs):
     try:
         response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,
                            verify=False, auth=(idrac['user'], idrac['pswd']))
-    except:
-        raise
-    return response
-
-def send_patch_request(idrac, uri, pyld, hdrs):
-    try:
-        response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,
-                           verify=False, auth=(idrac['user'], idrac['pswd']))
         statusCode = response.status_code
     except:
         raise
     return statusCode
-
-def send_delete_request(idrac, uri, pyld, hdrs):
-    try:
-        response = requests.delete(uri, data=json.dumps(pyld), headers=hdrs,
-                           verify=False, auth=(idrac['user'], idrac['pswd']))
-    except:
-        raise
-    return response
 
 def main():
     module = AnsibleModule(
@@ -118,10 +82,6 @@ def main():
             idracip = dict(required=True, type='str', default=None),
             idracuser = dict(required=False, type='str', default='root'),
             idracpswd = dict(required=False, type='str', default='calvin'),
-            userid = dict(required=False, type='str', default=None),
-            username = dict(required=False, type='str', default=None),
-            userpswd = dict(required=False, type='str', default=None),
-            userrole = dict(required=False, type='str', default=None),
         ),
         supports_check_mode=True
     )
@@ -145,36 +105,30 @@ def main():
                    'user' : params['idracuser'],
                    'pswd' : params['idracpswd']
                  } 
-    USER_INFO = { 'userid'   : params['userid'],
-                  'username' : params['username'],
-                  'userpswd' : params['userpswd'],
-                  'userrole' : params['userrole']
-                 } 
+
+    headers = {'content-type': 'application/json'}
+    uri = system_uri + "/Actions/ComputerSystem.Reset"
 
     # Execute based on what we want
-    if choice == "Add":
-        uri = manager_uri + "/Accounts/" + USER_INFO['userid']
-        plUserName = {'UserName': USER_INFO['username']}
-        plPass     = {'Password': USER_INFO['userpswd']}
-        plRoleID   = {'RoleId': USER_INFO['userrole']}
-        headers = {'content-type': 'application/json'}
-        for payload in plUserName,plPass,plRoleID:
-            result = send_patch_request(IDRAC_INFO, uri, payload, headers)
+    if choice == "PowerState":
+        power = send_get_request(IDRAC_INFO, system_uri)
+        result = power[u'PowerState']
 
-    elif choice == "UpdatePassword":
-        uri = manager_uri + "/Accounts/" + USER_INFO['userid']
-        headers = {'content-type': 'application/json'}
-        payload = {'Password': USER_INFO['userpswd']}
-        result = send_patch_request(IDRAC_INFO, uri, payload, headers)
+    elif choice == "On":
+        payload = {'ResetType': 'On'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
 
-    elif choice == "UpdateRole":
-        uri = manager_uri + "/Accounts/" + USER_INFO['userid']
-        headers = {'content-type': 'application/json'}
-        payload = {'RoleId': USER_INFO['userrole']}
-        result = send_patch_request(IDRAC_INFO, uri, payload, headers)
+    elif choice == "Off":
+        payload = {'ResetType': 'ForceOff'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
 
-    elif choice == "Delete":
-        result = "Not yet implemented."
+    elif choice == "GracefulRestart":
+        payload = {'ResetType': 'GracefulRestart'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
+
+    elif choice == "GracefulShutdown":
+        payload = {'ResetType': 'GracefulShutdown'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
 
     else:
         result = "Invalid Option."

@@ -39,19 +39,19 @@
   - name: Get system information
     include: get_sysinfo.yml action={{item}}
     with_items:
+      - PowerState
       - Health
       - Model
       - BiosVersion
       - AssetTag
+      - ServiceTag
+      - SerialNumber
       - MemoryGiB
       - MemoryHealth
       - CPU
       - CPUHealth
       - CPUCount
       - ConsumedWatts
-      - PowerState
-      - ServiceTag
-      - SerialNumber
 
   - local_action: shell echo "" >> {{ outfile }}.csv
     when: csvformat == True
