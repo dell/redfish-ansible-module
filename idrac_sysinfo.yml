@@ -43,8 +43,11 @@
       - Model
       - BiosVersion
       - AssetTag
-      - Memory
+      - MemoryGiB
+      - MemoryHealth
       - CPU
+      - CPUHealth
+      - CPUCount
       - ConsumedWatts
       - PowerState
       - ServiceTag
