@@ -1,6 +1,6 @@
 # Ansible modules for Dell EMC PowerEdge iDRAC (using Redfish APIs)
 
-Ansible modules and playbooks that use the Redfish API to manage PowerEdge servers via the integrated Dell Remote Access Controller (iDRAC).
+Ansible modules and playbooks that use the Redfish API to manage PowerEdge servers via the integrated Dell Remote Access Controller (iDRAC). For more details, see these [slides](https://www.slideshare.net/JoseDeLaRosa7/s111013-delarosa).
 
 ## Why Ansible
 
@@ -40,7 +40,7 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
   - idrac_logs: Collect System Event and Lifecycle Controller Logs
   - idrac_scp: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
   - idrac_sysinfo: Collects System Information (Health, CPUs, RAM, etc.)
-  - idrac_users (coming soon): Manages iDRAC users (add/delete/update)
+  - idrac_users: Manages iDRAC users (add/delete/update)
   - idrac_power (coming soon): Manages system power (status/on/off)
   - idrac_raid (coming soon): Manages PERC RAID configuration
   - idrac_config (coming soon): Manages iDRAC configuration
@@ -74,13 +74,18 @@ $ ls
 webserver1_sysinfo_20170728_142202.info
 $ cat webserver1_sysinfo_20170728_142202.info
 Health: OK
-Model: PowerEdge M620
-BiosVersion: 2.5.4
+Model: PowerEdge R630
+BiosVersion: 2.4.3
 AssetTag:
-Memory: 64
-CPU: Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz
-ConsumedWatts: 71
+MemoryGiB: 128
+MemoryHealth: OK
+CPU: Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+CPUHealth: OK
+CPUCount: 2
+ConsumedWatts: 122
 PowerState: On
+ServiceTag: XYZ1234
+SerialNumber: CNxxxxxxxMyyyy
 ```
 
 These files are in the format *{{host}}_{{datatype}}_{{datestamp}}* and each contains valuable server information. 
@@ -118,7 +123,7 @@ $ jq '.result.Members[] | {Date: .Created, Message: .Message}' webserver1_SELogs
 
 ## Limitations and Disclaimers
 
-  - These Ansible modules are for demonstration purposes only (for now).
+  - For now, these Ansible modules are for demonstration purposes only.
 
 ## Support
 
