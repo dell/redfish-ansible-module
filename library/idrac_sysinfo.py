@@ -114,9 +114,13 @@ def main():
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'AssetTag']
 
-    elif choice == "Memory":
+    elif choice == "MemoryGiB":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'MemorySummary'][u'TotalSystemMemoryGiB']
+
+    elif choice == "MemoryHealth":
+        system = send_get_request(IDRAC_INFO, system_uri)
+        result = system[u'MemorySummary'][u'Status'][u'Health']
 
     elif choice == "CPU":
         system = send_get_request(IDRAC_INFO, system_uri)

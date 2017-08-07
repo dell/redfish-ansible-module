@@ -38,7 +38,8 @@
       - Model
       - BiosVersion
       - AssetTag
-      - Memory
+      - MemoryGiB
+      - MemoryHealth
       - CPU
       - ConsumedWatts
       - PowerState
