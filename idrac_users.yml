@@ -1,0 +1,53 @@
+---
+
+- hosts: myhosts
+  name: PowerEdge iDRAC Manage Users
+  gather_facts: False
+
+  # Here we define global variables, but if some servers have different
+  # credentials, then place these variables in /etc/ansible/hosts to override
+  # for each host
+  vars:
+     rootdir: /root
+     idracuser: root
+     idracpswd: calvin
+     userid: 3			# user id of user to add/delete/modify (1-16)
+                                # userid 2 is default root user, be mindful!
+     username: user3		# user name to add/delete/modify
+     userpswd: mypassword	# user password to add/delete/modify
+     userrole: Operator		# user role to add/delete/modify
+
+  # Options available:
+  #   Add		Add user
+  #   Delete		Delete user
+  #   UpdateRole	Update user role
+  #   UpdatePassword	Update user password
+
+  tasks:
+
+  # Though some tasks are not mutually exclusive, do only one task at a time
+
+  - name: Add iDRAC user
+    local_action: >
+       idrac_users choice=Add idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
+       username={{ username }} userpswd={{ userpswd }} userrole={{ userrole }}
+
+  - name: Update iDRAC user role
+    local_action: >
+       idrac_users choice=UpdateRole idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
+       userrole={{ userrole }}
+
+  - name: Update iDRAC user password
+    local_action: >
+       idrac_users choice=UpdatePassword idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
+       userpswd={{ userpswd }}
+
+  # Not  yet implemented
+  - name: Delete iDRAC user
+    local_action: >
+       idrac_users choice=Delete idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
+

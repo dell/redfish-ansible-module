@@ -2,8 +2,8 @@
 
   - name: "Get data: {{ action }}"
     local_action: >
-       idrac_sysinfo choice={{ action }} idracuser={{ idracuser }}
-            idracpswd={{ idracpswd }} idracip={{ idracip }}
+       idrac_sysinfo choice={{ action }} idracip={{ idracip }}
+            idracuser={{ idracuser }} idracpswd={{ idracpswd }}
     register: result
 
   - name: Place data in file
