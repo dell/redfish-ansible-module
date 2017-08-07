@@ -174,11 +174,7 @@ def main():
         result = send_patch_request(IDRAC_INFO, uri, payload, headers)
 
     elif choice == "Delete":
-        #result = "Not yet implemented."
-        uri = manager_uri + "/Accounts/" + USER_INFO['userid']
-        headers = {'content-type': 'application/json'}
-        payload = {'UserName': USER_INFO['username']}
-        result = send_delete_request(IDRAC_INFO, uri, payload, headers)
+        result = "Not yet implemented."
 
     else:
         result = "Invalid Option."
