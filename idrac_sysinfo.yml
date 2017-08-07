@@ -41,6 +41,7 @@
       - MemoryGiB
       - MemoryHealth
       - CPU
+      - CPUHealth
       - ConsumedWatts
       - PowerState
       - ServiceTag
