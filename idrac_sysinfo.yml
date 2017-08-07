@@ -42,6 +42,7 @@
       - MemoryHealth
       - CPU
       - CPUHealth
+      - CPUCount
       - ConsumedWatts
       - PowerState
       - ServiceTag

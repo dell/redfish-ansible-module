@@ -130,6 +130,10 @@ def main():
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'ProcessorSummary'][u'Status'][u'Health']
 
+    elif choice == "CPUCount":
+        system = send_get_request(IDRAC_INFO, system_uri)
+        result = system[u'ProcessorSummary'][u'Count']
+
     elif choice == "ConsumedWatts":
         power = send_get_request(IDRAC_INFO, chassis_uri + "/Power/PowerControl")
         result = power[u'PowerConsumedWatts']
