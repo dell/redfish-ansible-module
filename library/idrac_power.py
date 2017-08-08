@@ -23,9 +23,9 @@ ANSIBLE_METADATA = {'status': ['preview'],
                     'version': '0.1'}
 
 DOCUMENTATION = """
-module: idrac_sysinfo
+module: idrac_power
 version_added: "2.3"
-short_description: Use iDRAC Redfish APIs to get system information.
+short_description: User iDRAC Redfish APIs to manage system power.
 options:
   choice:
     required: true
@@ -41,12 +41,12 @@ options:
     required: false
     default: root
     description:
-      - iDRAC user name
+      - iDRAC user name used for authentication
   idracpswd:
     required: false
     default: calvin
     description:
-      - iDRAC user password
+      - iDRAC user password used for authentication
 author: "jose.delarosa@dell.com"
 """
 
@@ -65,6 +65,15 @@ def send_get_request(idrac, uri):
     except:
         raise
     return systemData
+
+def send_post_request(idrac, uri, pyld, hdrs):
+    try:
+        response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,
+                           verify=False, auth=(idrac['user'], idrac['pswd']))
+        statusCode = response.status_code
+    except:
+        raise
+    return statusCode
 
 def main():
     module = AnsibleModule(
@@ -97,66 +106,29 @@ def main():
                    'pswd' : params['idracpswd']
                  } 
 
+    headers = {'content-type': 'application/json'}
+    uri = system_uri + "/Actions/ComputerSystem.Reset"
+
     # Execute based on what we want
-    if choice == "Health":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'Status'][u'Health']
-
-    elif choice == "Model":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'Model']
-
-    elif choice == "BiosVersion":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'BiosVersion']
-
-    elif choice == "AssetTag":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'AssetTag']
-
-    elif choice == "MemoryGiB":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'MemorySummary'][u'TotalSystemMemoryGiB']
-
-    elif choice == "MemoryHealth":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'MemorySummary'][u'Status'][u'Health']
-
-    elif choice == "CPU":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'ProcessorSummary'][u'Model']
-
-    elif choice == "CPUHealth":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'ProcessorSummary'][u'Status'][u'Health']
-
-    elif choice == "CPUCount":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'ProcessorSummary'][u'Count']
-
-    elif choice == "ConsumedWatts":
-        power = send_get_request(IDRAC_INFO, chassis_uri + "/Power/PowerControl")
-        result = power[u'PowerConsumedWatts']
-
-    elif choice == "PowerState":
+    if choice == "PowerState":
         power = send_get_request(IDRAC_INFO, system_uri)
         result = power[u'PowerState']
 
-    elif choice == "ServiceTag":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'SKU']
+    elif choice == "On":
+        payload = {'ResetType': 'On'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
 
-    elif choice == "SerialNumber":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'SerialNumber']
+    elif choice == "Off":
+        payload = {'ResetType': 'ForceOff'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
 
-    elif choice == "IdracFirmwareVersion":
-        system = send_get_request(IDRAC_INFO, manager_uri)
-        result = system[u'FirmwareVersion']
+    elif choice == "GracefulRestart":
+        payload = {'ResetType': 'GracefulRestart'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
 
-    elif choice == "IdracHealth":
-        system = send_get_request(IDRAC_INFO, manager_uri)
-        result = system[u'Status'][u'Health']
+    elif choice == "GracefulShutdown":
+        payload = {'ResetType': 'GracefulShutdown'}
+        result = send_post_request(IDRAC_INFO, uri, payload, headers)
 
     else:
         result = "Invalid Option."

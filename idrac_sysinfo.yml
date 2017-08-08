@@ -43,13 +43,15 @@
       - Model
       - BiosVersion
       - AssetTag
+      - ServiceTag
+      - SerialNumber
       - MemoryGiB
       - MemoryHealth
       - CPU
       - CPUHealth
       - CPUCount
-      - ConsumedWatts
       - PowerState
+      - ConsumedWatts
       - ServiceTag
       - SerialNumber
       - IdracFirmwareVersion

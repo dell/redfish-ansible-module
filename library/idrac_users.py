@@ -31,7 +31,7 @@ options:
     required: true
     default: None
     description:
-      - What type of information to get from server
+      - Type of action to run on server
   idracip:
     required: true
     default: None

@@ -1,0 +1,50 @@
+---
+
+- hosts: myhosts
+  name: PowerEdge iDRAC Manage System Power
+  gather_facts: False
+
+  # Here we define global variables, but if some servers have different
+  # credentials, then place these variables in /etc/ansible/hosts to override
+  # for each host
+  vars:
+     rootdir: /root
+     idracuser: root
+     idracpswd: calvin
+
+  # Options available:
+  #   PowerState	Check system power
+  #   On		Turn system power on
+  #   Off		Turn system power off
+
+  tasks:
+
+  # Except for PowerSate, tasks are mutually exclusive, do only one at a time
+
+  - name: Check system power state
+    local_action: >
+       idrac_power choice=PowerState idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+
+  - name: Turn system power on
+    local_action: >
+       idrac_power choice=On idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+
+  # Commented out to avoid on/off actions in same run
+# - name: Turn system power off
+#   local_action: >
+#      idrac_power choice=Off idracip={{ idracip }}
+#      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+
+  # Not working yet
+# - name: Power graceful restart
+#   local_action: >
+#      idrac_power choice=GracefulRestart idracip={{ idracip }}
+#      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+
+  # Not working yet
+# - name: Power graceful shutdown
+#   local_action: >
+#      idrac_power choice=GracefulShutdown idracip={{ idracip }}
+#      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
