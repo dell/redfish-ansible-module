@@ -150,6 +150,10 @@ def main():
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'SerialNumber']
 
+    elif choice == "IdracFirmwareVersion":
+        system = send_get_request(IDRAC_INFO, manager_uri)
+        result = system[u'FirmwareVersion']
+
     else:
         result = "Invalid Option."
 
