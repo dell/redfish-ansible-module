@@ -98,11 +98,11 @@ def main():
                  } 
 
     # Execute based on what we want
-    if choice == "Health":
+    if choice == "ServerStatus":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'Status'][u'Health']
 
-    elif choice == "Model":
+    elif choice == "ServerModel":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'Model']
 
@@ -122,7 +122,7 @@ def main():
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'MemorySummary'][u'Status'][u'Health']
 
-    elif choice == "CPU":
+    elif choice == "CPUModel":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'ProcessorSummary'][u'Model']
 

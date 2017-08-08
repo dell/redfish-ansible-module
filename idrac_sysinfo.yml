@@ -10,16 +10,7 @@
      rootdir: /root			# where I place all results 
      idracuser: root
      idracpswd: calvin
-     csvformat: True			# True if we want it comma-separated
-
-  # System Information available:
-  #   Health		Server health
-  #   Model		Server model
-  #   BiosVersion	BIOS version
-  #   AssetTag		Asset tag
-  #   Memory		System memory (GB)
-  #   CPU		CPU model
-  #   ConsumedWatts	Power consumed (watts)
+     csvformat: False			# True if we want it comma-separated
 
   tasks:
 
@@ -39,21 +30,19 @@
   - name: Get system information
     include: get_sysinfo.yml action={{item}}
     with_items:
-      - Health
-      - Model
+      - ServerStatus
+      - ServerModel
       - BiosVersion
       - AssetTag
       - ServiceTag
       - SerialNumber
       - MemoryGiB
       - MemoryHealth
-      - CPU
+      - CPUModel
       - CPUHealth
       - CPUCount
       - PowerState
-      - ConsumedWatts
-      - ServiceTag
-      - SerialNumber
+      - ConsumedWatts		# Power consumed (watts)
       - IdracFirmwareVersion
       - IdracHealth
 

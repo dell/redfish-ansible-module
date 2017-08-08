@@ -37,11 +37,11 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
 
 ## Modules
 
+  - idrac_sysinfo: Collects System Information (Health, CPUs, RAM, etc.)
   - idrac_logs: Collect System Event and Lifecycle Controller Logs
   - idrac_scp: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
-  - idrac_sysinfo: Collects System Information (Health, CPUs, RAM, etc.)
   - idrac_users: Manages iDRAC users (add/delete/update)
-  - idrac_power (coming soon): Manages system power (status/on/off)
+  - idrac_power: Manages system power (status/on/off/restart)
   - idrac_raid (coming soon): Manages PERC RAID configuration
   - idrac_config (coming soon): Manages iDRAC configuration
   - idrac_license (coming soon): Manages iDRAC licenses
@@ -57,9 +57,9 @@ $ export ANSIBLE_LIBRARY=<directory-with-modules>
 
 $ ansible-playbook idrac_sysinfo.yml
   ...
-PLAY [PowerEdge iDRAC] *********************************************************
+PLAY [PowerEdge iDRAC Get System Information] **********************************
 
-TASK [Set timestamp variable] **************************************************
+TASK [Set timestamp ] **********************************************************
 ok: [webserver1]
 ok: [webserver2]
 ok: [dbserver1]
@@ -73,19 +73,21 @@ $ cd <rootdir>/webserver1
 $ ls
 webserver1_sysinfo_20170728_142202.info
 $ cat webserver1_sysinfo_20170728_142202.info
-Health: OK
-Model: PowerEdge R630
+ServerHealth: OK
+ServerModel: PowerEdge R630
 BiosVersion: 2.4.3
 AssetTag:
-MemoryGiB: 128
-MemoryHealth: OK
-CPU: Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
-CPUHealth: OK
-CPUCount: 2
-ConsumedWatts: 122
-PowerState: On
 ServiceTag: XYZ1234
 SerialNumber: CNxxxxxxxMyyyy
+MemoryGiB: 128
+MemoryHealth: OK
+CPUType: Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+CPUHealth: OK
+CPUCount: 2
+PowerState: On
+ConsumedWatts: 122
+IdracFirmwareVersion: 2.41.40.40
+IdracHealth: Ok
 ```
 
 These files are in the format *{{host}}_{{datatype}}_{{datestamp}}* and each contains valuable server information. 
