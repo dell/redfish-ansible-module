@@ -16,6 +16,8 @@
   #   PowerState	Check system power
   #   On		Turn system power on
   #   Off		Turn system power off
+  #   GracefulRestart	Reset OS gracefully
+  #   GracefulShutdown	Shutdown OS gracefully
 
   tasks:
 
@@ -32,18 +34,18 @@
        idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
   # Commented out to avoid on/off actions in same run
+
 # - name: Turn system power off
 #   local_action: >
 #      idrac_power choice=Off idracip={{ idracip }}
 #      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
-  # Not working yet
 # - name: Power graceful restart
 #   local_action: >
 #      idrac_power choice=GracefulRestart idracip={{ idracip }}
 #      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
-  # Not working yet
+  # 14G only
 # - name: Power graceful shutdown
 #   local_action: >
 #      idrac_power choice=GracefulShutdown idracip={{ idracip }}
