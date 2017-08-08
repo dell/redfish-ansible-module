@@ -154,6 +154,10 @@ def main():
         system = send_get_request(IDRAC_INFO, manager_uri)
         result = system[u'FirmwareVersion']
 
+    elif choice == "IdracHealth":
+        system = send_get_request(IDRAC_INFO, manager_uri)
+        result = system[u'Status'][u'Health']
+
     else:
         result = "Invalid Option."
 
