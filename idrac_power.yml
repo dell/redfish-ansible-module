@@ -31,7 +31,7 @@
        idrac_power choice=On idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
-  # Commented out to avoid on/off actions
+  # Commented out to avoid on/off actions in same run
 # - name: Turn system power off
 #   local_action: >
 #      idrac_power choice=Off idracip={{ idracip }}

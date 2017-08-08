@@ -23,7 +23,7 @@ ANSIBLE_METADATA = {'status': ['preview'],
                     'version': '0.1'}
 
 DOCUMENTATION = """
-module: idrac_poser
+module: idrac_power
 version_added: "2.3"
 short_description: User iDRAC Redfish APIs to manage system power.
 options:
