@@ -45,6 +45,11 @@
 #      idrac_power choice=GracefulRestart idracip={{ idracip }}
 #      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
+# - name: Idrac Power graceful restart
+#   local_action: >
+#      idrac_power choice=IdracGracefulRestart idracip={{ idracip }}
+#      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+
   # 14G only
 # - name: Power graceful shutdown
 #   local_action: >
