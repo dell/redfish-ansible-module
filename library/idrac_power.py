@@ -108,6 +108,7 @@ def main():
 
     headers = {'content-type': 'application/json'}
     uri = system_uri + "/Actions/ComputerSystem.Reset"
+    mgruri = manager_uri + "/Actions/Manager.Reset"
 
     # Execute based on what we want
     if choice == "PowerState":
@@ -129,6 +130,10 @@ def main():
     elif choice == "GracefulShutdown":
         payload = {'ResetType': 'GracefulShutdown'}
         result = send_post_request(IDRAC_INFO, uri, payload, headers)
+
+    elif choice == "IdracGracefulRestart":
+        payload = {'ResetType': 'GracefulRestart'}
+        result = send_post_request(IDRAC_INFO, mgruri, payload, headers)
 
     else:
         result = "Invalid Option."
