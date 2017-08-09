@@ -1,0 +1,43 @@
+---
+- hosts: myhosts
+  name: PowerEdge storage status and configuration
+  gather_facts: False
+
+  # Here we define global variables, but if some servers have different
+  # credentials, then place these variables in /etc/ansible/hosts to override
+  # for each host
+  vars:
+     rootdir: /root			# where I place all results 
+     idracuser: root
+     idracpswd: calvin
+     csvformat: False			# True if we want it comma-separated
+
+  tasks:
+
+  - name: Set timestamp
+    set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
+
+  - name: Set temporary file to place results
+    set_fact: outfile={{rootdir}}/{{host}}/{{host}}_storageinfo_{{timestamp}}
+
+  - name: Create dropoff directory for host if needed
+    local_action: file path={{rootdir}}/{{host}} state=directory
+
+  - name: Prepend Hostname at the beginning of each line
+    local_action: shell echo -n {{ host }}"," >> {{ outfile }}.csv
+    when: csvformat == True
+
+  - name: Get storage information
+    include: get_storageinfo.yml action={{item}}
+    with_items:
+      - Status
+
+  - local_action: shell echo "" >> {{ outfile }}.csv
+    when: csvformat == True
+
+  - name: Combine all host outputs to one CSV file
+    local_action: shell cat {{ outfile }}.csv >> {{ rootdir }}/allhosts_storageinfo_{{timestamp}}.csv
+    when: csvformat == True
+
+  - name: Remove temporary results file
+    local_action: file path={{ outfile }} state=absent
