@@ -109,12 +109,13 @@ def main():
         for controller in i["Members"]:
             for controller_name in controller.items():
                 list_of_uris.append(uri + controller_name[1].split("/")[-1])
-                # for each controller, get name and status
-                for storuri in list_of_uris:
-                    data = send_get_request(IDRAC_INFO, storuri)
-                    # Only interested in PERC and PCIe? What about SATA?
-                    if "PERC" in data['Name'] or "PCIe" in data['Name']:
-                        controller_list[data['Name']] = data['Status']['Health']
+
+        # for each controller, get name and status
+        for storuri in list_of_uris:
+            data = send_get_request(IDRAC_INFO, storuri)
+            # Only interested in PERC and PCIe? What about SATA?
+            if "PERC" in data['Name'] or "PCIe" in data['Name']:
+                controller_list[data['Name']] = data['Status']['Health']
 
         # Returning a list of all controllers found along with status
         result = controller_list
