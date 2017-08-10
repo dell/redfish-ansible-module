@@ -118,6 +118,10 @@ def main():
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'PartNumber']
 
+    elif choice == "SystemType":
+        system = send_get_request(IDRAC_INFO, system_uri)
+        result = system[u'SystemType']
+
     elif choice == "AssetTag":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'AssetTag']
