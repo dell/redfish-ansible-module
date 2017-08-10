@@ -32,6 +32,9 @@
     with_items:
       - ServerStatus
       - ServerModel
+      - ServerManufacturer
+      - ServerPartNumber
+      - SystemType
       - BiosVersion
       - AssetTag
       - ServiceTag
