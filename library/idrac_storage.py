@@ -99,29 +99,33 @@ def main():
 
     uri = system_uri + "/Storage/Controllers/"
 
-    # Execute based on what we want
-    if choice == "Status":
-        controller_list={}
-        list_of_uris=[]
-        # get a list of all controllers available
-        i = send_get_request(IDRAC_INFO, uri)
+    # Get a list of all storage controllers and build respective URIs
+    controller_list={}
+    list_of_uris=[]
+    i = send_get_request(IDRAC_INFO, uri)
 
-        for controller in i["Members"]:
-            for controller_name in controller.items():
-                list_of_uris.append(uri + controller_name[1].split("/")[-1])
+    for controller in i["Members"]:
+        for controller_name in controller.items():
+            list_of_uris.append(uri + controller_name[1].split("/")[-1])
 
-        # for each controller, get name and status
-        for storuri in list_of_uris:
-            data = send_get_request(IDRAC_INFO, storuri)
-            # Only interested in PERC and PCIe? What about SATA?
-            if "PERC" in data['Name'] or "PCIe" in data['Name']:
+    # for each controller, get name and status
+    for storuri in list_of_uris:
+        data = send_get_request(IDRAC_INFO, storuri)
+        # Only interested in PERC and PCIe? What about SATA?
+        if "PERC" in data['Name'] or "PCIe" in data['Name']:
+            # Execute based on what we want
+            if choice == "Status":
+                # Returns a list of all controllers along with status
                 controller_list[data['Name']] = data['Status']['Health']
+            elif choice == "listDevices":
+                # Returns a list of all controllers along with devices. Messy, clean up.
+                controller_list[data['Name']] = data['Devices']
+            else:
+                controller_list['Invalid'] = "Invalid Option"
+                break
 
-        # Returning a list of all controllers found along with status
-        result = controller_list
-
-    else:
-        result = "Invalid Option."
+    # Returning a list of all controllers along with status
+    result = json.dumps(controller_list)
 
     module.exit_json(result=result)
 
