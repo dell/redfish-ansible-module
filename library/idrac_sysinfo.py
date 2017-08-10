@@ -114,6 +114,10 @@ def main():
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'Manufacturer']
 
+    elif choice == "ServerPartNumber":
+        system = send_get_request(IDRAC_INFO, system_uri)
+        result = system[u'PartNumber']
+
     elif choice == "AssetTag":
         system = send_get_request(IDRAC_INFO, system_uri)
         result = system[u'AssetTag']

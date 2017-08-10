@@ -33,6 +33,7 @@
       - ServerStatus
       - ServerModel
       - ServerManufacturer
+      - ServerPartNumber
       - BiosVersion
       - AssetTag
       - ServiceTag
