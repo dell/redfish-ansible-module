@@ -1,4 +1,41 @@
 ---
+- hosts: nohost:myhosts
+  name: Set global variables for all hosts
+  gather_facts: False
+
+  tasks:
+  - set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
+  - set_fact: rootdir="/root"
+  - set_fact: csvformat=False                   # True if we want it comma-separated
+
+- hosts: nohost
+  gather_facts: False
+  name: Add header for CSV
+
+  tasks:
+  - name: Add header
+    local_action: shell echo -n "{{item}}," >> {{ rootdir }}/allhosts_sysinfo_{{timestamp}}.csv
+    with_items:
+      - HostName
+      - ServerStatus
+      - ServerModel
+      - BiosVersion
+      - AssetTag
+      - ServiceTag
+      - SerialNumber
+      - MemoryGiB
+      - MemoryHealth
+      - CPUModel
+      - CPUHealth
+      - CPUCount
+      - PowerState
+      - ConsumedWatts           # Power consumed (watts)
+      - IdracFirmwareVersion
+      - IdracHealth
+    when: csvformat == True
+  - local_action: shell echo "" >> {{ rootdir }}/allhosts_sysinfo_{{timestamp}}.csv
+    when: csvformat == True
+
 - hosts: myhosts
   name: PowerEdge iDRAC Get System Information
   gather_facts: False
@@ -7,15 +44,10 @@
   # credentials, then place these variables in /etc/ansible/hosts to override
   # for each host
   vars:
-     rootdir: /root			# where I place all results 
      idracuser: root
      idracpswd: calvin
-     csvformat: False			# True if we want it comma-separated
 
   tasks:
-
-  - name: Set timestamp
-    set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
 
   - name: Set temporary file to place results
     set_fact: outfile={{rootdir}}/{{host}}/{{host}}_sysinfo_{{timestamp}}
