@@ -16,6 +16,25 @@
       - SerialNumber
       - ServiceTag
       - PartNumber
+      - Manufacturer
+      - BiosVersion
+      - SystemType
+      - PowerState
+      - MemoryHealth
+      - TotalSystemMemoryGiB 
+      - ProcessorCount
+      - ProcessorHealth
+      - ProcessorModel
+      - BootSources
+      - SecureBoot
+      - SecureBootCerts
+      - FirmwareInventory
+      
+      #- PermanentMACAddress
+      #- EthernetInterfaces
+      #- StorageControllers
+      #- StorageControllerDisks
+      
       
         
       
