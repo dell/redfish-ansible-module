@@ -34,6 +34,11 @@ options:
         choices: [ system, chassis, event, sessions, idrac, jobs, FW ]
         description:
             - sub modules in Redfish Service Root
+    cmd:
+        required: true
+        default: None
+        description:
+            - sub module command is going to execute 
     idracip:
         required: true
         default: None
@@ -62,7 +67,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 class iDRAC(object):
     def __init__(self,module):
         self.module=module
-        root_uri = ''.join(["https://%s" %module.params['idrac_ip'] , "/redfish/v1"])
+        root_uri = ''.join(["https://%s" %module.params['idracip'] , "/redfish/v1"])
         self.system_uri   = root_uri + "/Systems/System.Embedded.1"
         self.chassis_uri  = root_uri + "/Chassis/System.Embedded.1"
         self.manager_uri  = root_uri + "/Managers/iDRAC.Embedded.1"
@@ -72,24 +77,29 @@ class iDRAC(object):
         self.updatesvc_uri = root_uri + "/UpdateService"
     def send_get_request(self,uri):
         try:
-            response = requests.get(uri, verify=False, auth=(self.idrac_info['user'], self.idrac_info['passwd']))
+            response = requests.get(uri, verify=False, auth=( self.module.params['idracuser'], self.module.params['idracpswd']))
             systemData = response.json()
         except:
             raise
-        return ( response.status_codes,systemData)
+
+        return systemData
     
     def get_system_health(self):
         resp = self.send_get_request(self.system_uri)
         return resp[u'Status'][u'Health']
+    
+    def get_system_serial_number(self):
+        resp = self.send_get_request(self.system_uri)
+        return resp[u'SerialNumber']
     
 def main():
     # Parsing argument file
     module=AnsibleModule(
             argument_spec=dict(
                 subsystem = dict(required=True, type='str', default=None),
-                idrac_ip = dict(required=True, type='str', default=None),
-                idrac_user = dict(required=True, type='str', default=None),
-                idrac_passwd = dict(required=True, type='str', default=None),
+                idracip = dict(required=True, type='str', default=None),
+                idracuser = dict(required=True, type='str', default=None),
+                idracpswd = dict(required=True, type='str', default=None),
                 cmd = dict(required=True, type='str', default=None),
                 
             ),
@@ -114,7 +124,11 @@ def main():
     if params['subsystem']  == "System":
         if params['cmd'] == 'Health':
             result['subsystem']=params['subsystem']
-            result=idrac.get_system_health()
+            out=idrac.get_system_health()
+            
+        if params['cmd'] == 'SerialNumber':
+            out=idrac.get_system_serial_number()
+
     if rc is None:
         result['changed']=False
     else:

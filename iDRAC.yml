@@ -2,6 +2,7 @@
 - hosts: myhosts
   name: PowerEdge iDRAC Get System Information
   gather_facts: False
+
   
   vars:
      idrac_user: root      
@@ -9,7 +10,8 @@
      
   tasks:
   - name: get system info
-    idrac: idrac_user={{idrac_user}} idrac_passwd={{idrac_passwd}} idrac_ip={{idrac_ip}} subsystem=System cmd={{item}}
+    idrac: idracuser={{idrac_user}} idracpswd={{idrac_passwd}} idracip={{idrac_ip}} subsystem=System cmd={{item}}
     with_items:
-      -Health
+      - Health
+      - SerialNumber
   
