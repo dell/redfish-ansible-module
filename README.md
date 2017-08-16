@@ -42,7 +42,7 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
   - idrac_scp: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
   - idrac_users: Manages iDRAC users (add/delete/update)
   - idrac_power: Manages system power (status/on/off/restart)
-  - idrac_raid (coming soon): Manages PERC RAID configuration
+  - idrac_storage: Manages storage controllers
   - idrac_config (coming soon): Manages iDRAC configuration
   - idrac_license (coming soon): Manages iDRAC licenses
   - idrac_provision (coming soon): Manages OS provisioning
