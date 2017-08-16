@@ -96,6 +96,10 @@ class iDRAC(object):
         resp = self.send_get_request(self.system_uri)
         return resp[u'SKU']
     
+    def get_server_part_number(self):
+        resp = self.send_get_request(self.system_uri)
+        return resp[u'PartNumber']
+    
 def main():
     # Parsing argument file
     module=AnsibleModule(
@@ -137,6 +141,9 @@ def main():
             
         if params['cmd'] == 'ServiceTag':
             out=idrac.get_system_service_tag()
+            
+        if params['cmd'] == 'AssetTag':
+            out=idrac.get_boot_sources()
             
     if rc is None:
         result['changed']=False
