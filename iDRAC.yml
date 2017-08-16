@@ -14,4 +14,7 @@
     with_items:
       - Health
       - SerialNumber
+      - ServiceTag
+        
+      
   

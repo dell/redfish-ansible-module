@@ -92,6 +92,10 @@ class iDRAC(object):
         resp = self.send_get_request(self.system_uri)
         return resp[u'SerialNumber']
     
+    def get_system_service_tag(self):
+        resp = self.send_get_request(self.system_uri)
+        return resp[u'SKU']
+    
 def main():
     # Parsing argument file
     module=AnsibleModule(
@@ -121,14 +125,19 @@ def main():
     if not 'cmd' in params.keys():
         module.fail_json(msg="You haven't specified a subsystem command")
         
+    result['subsystem']=params['subsystem']
+    
     if params['subsystem']  == "System":
         if params['cmd'] == 'Health':
-            result['subsystem']=params['subsystem']
+            
             out=idrac.get_system_health()
             
         if params['cmd'] == 'SerialNumber':
             out=idrac.get_system_serial_number()
-
+            
+        if params['cmd'] == 'ServiceTag':
+            out=idrac.get_system_service_tag()
+            
     if rc is None:
         result['changed']=False
     else:
