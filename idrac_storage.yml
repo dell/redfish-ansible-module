@@ -33,9 +33,6 @@
   - name: Get storage information
     include: get_storageinfo.yml action=listDevices
 
-  - name: Get storage information
-    include: get_storageinfo.yml action=Whatever
-
   - local_action: shell echo "" >> {{ outfile }}.csv
     when: csvformat == True
 
