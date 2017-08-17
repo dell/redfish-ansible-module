@@ -2,36 +2,25 @@
 - hosts: nohost:myhosts
   name: Set global variables for all hosts
   gather_facts: False
-
+ 
+# below task defines global vaiables which can be used in multiple playbooks  
   tasks:
   - set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
-  - set_fact: rootdir="/root"
   - set_fact: csvformat=False                   # True if we want it comma-separated
+  - set_fact: rootdir="/root"
+  - set_fact: param="[ 'ServerStatus', 'ServerModel', 'BiosVersion', 'AssetTag', 'ServiceTag', 'SerialNumber', 'MemoryGiB', 'MemoryHealth', 'CPUModel', 'CPUHealth', 'CPUCount', 'PowerState', 'ConsumedWatts', 'IdracFirmwareVersion', 'IdracHealth' ]"  
 
-- hosts: nohost
+- hosts: nohost   #nohost has only one entry 
   gather_facts: False
   name: Add header for CSV
 
+# below task should be executed only once, so only one entry for hosts required in /etc/ansible/hosts file, This adds header row in CSV file  
   tasks:
+  - local_action: shell echo -n "Hostname," >> {{ rootdir }}/allhosts_sysinfo_{{timestamp}}.csv
+    when: csvformat == True
   - name: Add header
     local_action: shell echo -n "{{item}}," >> {{ rootdir }}/allhosts_sysinfo_{{timestamp}}.csv
-    with_items:
-      - HostName
-      - ServerStatus
-      - ServerModel
-      - BiosVersion
-      - AssetTag
-      - ServiceTag
-      - SerialNumber
-      - MemoryGiB
-      - MemoryHealth
-      - CPUModel
-      - CPUHealth
-      - CPUCount
-      - PowerState
-      - ConsumedWatts           # Power consumed (watts)
-      - IdracFirmwareVersion
-      - IdracHealth
+    with_items: "{{ param }}" # param array is global variable
     when: csvformat == True
   - local_action: shell echo "" >> {{ rootdir }}/allhosts_sysinfo_{{timestamp}}.csv
     when: csvformat == True
@@ -61,22 +50,7 @@
 
   - name: Get system information
     include: get_sysinfo.yml action={{item}}
-    with_items:
-      - ServerStatus
-      - ServerModel
-      - BiosVersion
-      - AssetTag
-      - ServiceTag
-      - SerialNumber
-      - MemoryGiB
-      - MemoryHealth
-      - CPUModel
-      - CPUHealth
-      - CPUCount
-      - PowerState
-      - ConsumedWatts		# Power consumed (watts)
-      - IdracFirmwareVersion
-      - IdracHealth
+    with_items: "{{ param }}" # param array is global variable
 
   - local_action: shell echo "" >> {{ outfile }}.csv
     when: csvformat == True
