@@ -66,6 +66,13 @@ options:
         default: None
         description:
           - storage controller name i.e.  RAID.Slot.1-1 or  AHCI.Embedded.1-1
+          
+    ResetType:
+        required: False
+        default: None
+        choices: ["On", "ForceOff", "GracefulRestart", "GracefulShutdown", "PushPowerButton", "Nmi"]
+        description:
+          - reset system based on type
 '''
 ANSIBLE_METADATA = {'status': ['preview'],
                     'supported_by': 'community',
@@ -87,15 +94,23 @@ class iDRAC(object):
         self.session_uri = root_uri + "/Sessions"
         self.tasksvc_uri = root_uri + "/TaskService"
         self.updatesvc_uri = root_uri + "/UpdateService"
+        
     def send_get_request(self, uri):
         try:
             response = requests.get(uri, verify=False, auth=(self.module.params['idracuser'], self.module.params['idracpswd']))
             systemData = response.json()
         except:
             raise
-
+        
         return systemData
     
+    def send_post_request(self,uri, pyld, hdrs):
+        try:
+            response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,verify=False, auth=(self.module.params['idracuser'], self.module.params['idracpswd']))
+        except:
+            raise   
+        
+        return str(response.status_code)
     def get_system_health(self):
         resp = self.send_get_request(self.system_uri)
         return str(resp[u'Status'][u'Health'])
@@ -150,61 +165,69 @@ class iDRAC(object):
     
     def get_boot_sources(self):
         sources = []
-        resp = self.send_get_request(self.system_uri + '/BootSources')
-        if 'UefiBootSeq' in resp[u'Attributes']:
+        resp = self.send_get_request(self.system_uri + u'/BootSources')
+        if u'UefiBootSeq' in resp[u'Attributes']:
                 for i in resp[u'Attributes'][u'UefiBootSeq']:
                         sources.append(i[u'Name'])
         return ",".join(str(x) for x in sources)
         
     def get_system_ethernet_interfaces(self):
         eth = []
-        resp = self.send_get_request(self.system_uri + '/EthernetInterfaces')
+        resp = self.send_get_request(self.system_uri + u'/EthernetInterfaces')
         for i in resp[u'Members']:
-            eth.append(os.path.basename(i['@odata.id']))
+            eth.append(os.path.basename(i[u'@odata.id']))
         return json.dumps(eth)
 
     def get_system_ethernet_permanent_MAC_address(self):
-        resp = self.send_get_request(self.system_uri + '/EthernetInterfaces/%s' % self.module.params['eth_interface'])
+        resp = self.send_get_request(self.system_uri + u'/EthernetInterfaces/%s' % self.module.params[u'eth_interface'])
         return resp[u'PermanentMACAddress']
     
     def get_system_secure_boot_status(self):
-        resp = self.send_get_request(self.system_uri + '/SecureBoot')
+        resp = self.send_get_request(self.system_uri + u'/SecureBoot')
         return resp[u'SecureBootCurrentBoot']
     
     def get_system_secure_boot_certificates(self):
         cert = []
-        resp = self.send_get_request(self.system_uri + '/SecureBoot/Certificates')
+        resp = self.send_get_request(self.system_uri + u'/SecureBoot/Certificates')
         for i in resp[u'Members']:
-            cert.append(os.path.basename(i['@odata.id']))
+            cert.append(os.path.basename(i[u'@odata.id']))
         return ",".join(str(x) for x in cert)
 
     def get_system_storage_controllers(self):
         ctrls = []
-        resp = self.send_get_request(self.system_uri + '/Storage/Controllers')
+        resp = self.send_get_request(self.system_uri + u'/Storage/Controllers')
         for i in resp[u'Members']:
-            ctrls.append(os.path.basename(i['@odata.id']))
+            ctrls.append(os.path.basename(i[u'@odata.id']))
         return json.dumps(ctrls)
 
     def get_system_storage_controller_disks(self):
-        resp = self.send_get_request(self.system_uri + '/Storage/Controllers/%s' % self.module.params['storage_controller'])
+        resp = self.send_get_request(self.system_uri + u'/Storage/Controllers/%s' % self.module.params[u'storage_controller'])
         if len(resp[u'Devices']) > 1:
             return json.dumps(resp[u'Devices'])
         else:
             return json.dumps([])
+    def system_reset(self):
+        payload = {'ResetType': self.module.params[u'ResetType']}
+        headers = {'content-type': 'application/json'}
+        return self.send_post_request(self.system_uri+u'/Actions/ComputerSystem.Reset"',payload,headers )
+ 
+    def get_manager_health(self):
+        resp = self.send_get_request(self.manager_uri)
+        return str(resp[u'"Status"'][u'Health'])
     
     def get_manager_reset_options(self):
         resp = self.send_get_request(self.manager_uri)
-        return str(resp[u'Actions']['#Manager.Reset']['ResetType@Redfish.AllowableValues'])
+        return str(resp[u'Actions'][u'#Manager.Reset'][u'ResetType@Redfish.AllowableValues'])
     
     def get_manager_command_shells(self):
         resp = self.send_get_request(self.manager_uri)
-        return str(resp[u'CommandShell']['ConnectTypesSupported'])
+        return str(resp[u'CommandShell'][u'ConnectTypesSupported'])
     
     def get_manager_ethernet_interfaces(self):
         eth = []
-        resp = self.send_get_request(self.manager_uri + '/EthernetInterfaces')
+        resp = self.send_get_request(self.manager_uri + u'/EthernetInterfaces')
         for i in resp[u'Members']:
-            eth.append(os.path.basename(i['@odata.id']))
+            eth.append(os.path.basename(i[u'@odata.id']))
         return ",".join(str(x) for x in eth)
     
     def get_manager_firmware(self):
@@ -213,27 +236,33 @@ class iDRAC(object):
     
     def get_manager_graphical_console(self):
         resp = self.send_get_request(self.manager_uri)
-        return str(resp[u'GraphicalConsole']['ConnectTypesSupported'])
+        return str(resp[u'GraphicalConsole'][u'ConnectTypesSupported'])
     
     def get_manager_sel_log(self):
-        resp = self.send_get_request(self.manager_uri + '/Logs/Sel')
+        resp = self.send_get_request(self.manager_uri + u'/Logs/Sel')
         return str(resp[u'Members'])
         
     
     def get_manager_lc_log(self):
-        resp = self.send_get_request(self.manager_uri + '/Logs/Lclog')
+        resp = self.send_get_request(self.manager_uri + u'/Logs/Lclog')
         return str(resp[u'Members'])
     
     def get_manager_jobs(self):
         jobs = []
-        resp = self.send_get_request(self.manager_uri + '/Jobs')
+        resp = self.send_get_request(self.manager_uri + u'/Jobs')
         for i in resp[u'Members']:
-            jobs.append(os.path.basename(i['@odata.id']))
+            jobs.append(os.path.basename(i[u'@odata.id']))
         return ",".join(str(x) for x in jobs)
 
     def get_manager_host_name(self):
-        resp = self.send_get_request(self.manager_uri + '/NetworkProtocol')
+        resp = self.send_get_request(self.manager_uri + u'/NetworkProtocol')
         return str(resp[u'HostName'])
+    
+    def manager_reset(self):
+        payload = {u'ResetType': u"%s"%(self.module.params[u'ResetType'])}
+        headers = {u'content-type': u'application/json'}
+        return self.send_post_request(self.manager_uri+u'/Actions/Manager.Reset',payload,headers )
+         
     
     def get_event_type_for_subscription(self):
         resp = self.send_get_request(self.eventsvc_uri)
@@ -241,7 +270,7 @@ class iDRAC(object):
     
     def get_event_service_health(self):
         resp = self.send_get_request(self.eventsvc_uri)
-        return str(resp[u'Status']['Health'])
+        return str(resp[u'Status'][u'Health'])
     
     def get_event_state(self):
         resp = self.send_get_request(self.eventsvc_uri)
@@ -251,15 +280,15 @@ class iDRAC(object):
         mem = []
         resp = self.send_get_request(self.session_uri)
         for i in resp[u'Members']:
-            mem.append(os.path.basename(i['@odata.id']))
+            mem.append(os.path.basename(i[u'@odata.id']))
         return ",".join(str(x) for x in mem)
     
     def get_firmware_inventory(self):
         fw = dict()
-        resp = self.send_get_request(self.updatesvc_uri + '/FirmwareInventory')
+        resp = self.send_get_request(self.updatesvc_uri + u'/FirmwareInventory')
         for i in resp[u'Members']:
-            fw_info = self.send_get_request(self.updatesvc_uri + '/FirmwareInventory/' + '%s' % os.path.basename(i['@odata.id']))
-            fw[fw_info['Name']] = fw_info['Version']
+            fw_info = self.send_get_request(self.updatesvc_uri + u'/FirmwareInventory/' + '%s' % os.path.basename(i[u'@odata.id']))
+            fw[fw_info[u'Name']] = fw_info[u'Version']
         return json.dumps(fw)
         
 
@@ -274,7 +303,8 @@ def main():
                 idracpswd = dict(required=False, type='str', default='calvin'),
                 cmd = dict(required=False, type='str', default=None),
                 eth_interface = dict(required=False, type='str', default=None),
-                storage_controller = dict(required=False, type='str', default=None)
+                storage_controller = dict(required=False, type='str', default=None),
+                ResetType = dict(required=False, type='str', default=None,choices=["On", "ForceOff", "GracefulRestart", "GracefulShutdown", "PushPowerButton", "Nmi"])
             ),
             supports_check_mode=True
     )
@@ -357,10 +387,23 @@ def main():
             
         if params['cmd'] == 'StorageControllerDisks':
             out = idrac.get_system_storage_controller_disks()
-            
+        if params['cmd'] == 'Reset':
+            if params['ResetType'] != None:
+                resp=idrac.system_reset()
+                if resp == '204':
+                    rc=resp
+                    out='OK'
+                else:
+                    err="system reset failed. Error code:%s"%(resp)
+            else:
+                module.fail_json(msg="Please provide type of reset")
+                   
         
             
     if params['subsystem'] == "Manager":
+        if params['cmd'] == 'Health':
+            out = idrac.get_manager_health()
+            
         if params['cmd'] == 'ResetOptions':
             out = idrac.get_manager_reset_options()
             
@@ -384,6 +427,17 @@ def main():
             
         if params['cmd'] == 'Jobs':
             out = idrac.get_manager_jobs()
+        if params['cmd'] == 'Reset':
+            if params['ResetType'] != None:
+                resp=idrac.manager_reset()
+                if resp == '204':
+                    rc=resp
+                    out='OK'
+                else:
+                    err="Manager reset failed. Error code:%s"%(resp)
+            else:
+                module.fail_json(msg="Please provide type of reset")
+                
     if params['subsystem'] == "Event":
         if params['cmd'] == 'types':
             out = idrac.get_event_type_for_subscription()

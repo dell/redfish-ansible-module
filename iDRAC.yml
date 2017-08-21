@@ -34,6 +34,7 @@
     register: "managerinfo"
     ignore_errors: True
     with_items:
+      - Health
       - ResetOptions
       - CommandShells
       - EthernetInterfaces
@@ -94,6 +95,13 @@
     idrac: idracip={{idrac_ip}} subsystem=System cmd=StorageControllerDisks storage_controller={{item}}
     with_items:
       - "{{disk.stdout}}"
+
+  - name: system reset 
+    idrac: idracip={{idrac_ip}} subsystem=System cmd=Reset ResetType=On
+    
+  - name: iDrac manager reset
+    idrac: idracip={{idrac_ip}} subsystem=Manager cmd=Reset ResetType=GracefulRestart
+
 
 
     
