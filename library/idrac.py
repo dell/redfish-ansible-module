@@ -73,6 +73,12 @@ options:
         choices: ["On", "ForceOff", "GracefulRestart", "GracefulShutdown", "PushPowerButton", "Nmi"]
         description:
           - reset system based on type
+    OneTimeBoot:
+        required: False
+        default: None
+        choices=["None","Pxe","Floppy","Cd","Hdd","BiosSetup","Utilities","UefiTarget","SDCard","UefiHttp"])
+        description:
+          - system set to onetime boot from sources
 '''
 ANSIBLE_METADATA = {'status': ['preview'],
                     'supported_by': 'community',
@@ -107,6 +113,14 @@ class iDRAC(object):
     def send_post_request(self,uri, pyld, hdrs):
         try:
             response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,verify=False, auth=(self.module.params['idracuser'], self.module.params['idracpswd']))
+        except:
+            raise   
+        
+        return str(response.status_code)
+    
+    def send_patch_request(self,uri, pyld, hdrs):
+        try:
+            response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,verify=False, auth=(self.module.params['idracuser'], self.module.params['idracpswd']))
         except:
             raise   
         
@@ -209,8 +223,12 @@ class iDRAC(object):
     def system_reset(self):
         payload = {'ResetType': self.module.params[u'ResetType']}
         headers = {'content-type': 'application/json'}
-        return self.send_post_request(self.system_uri+u'/Actions/ComputerSystem.Reset"',payload,headers )
- 
+        return self.send_post_request(self.system_uri+u'/Actions/ComputerSystem.Reset',payload,headers )
+    def system_onetime(self):
+        payload = {'Boot': {'BootSourceOverrideTarget' : self.module.params[u'Target']}}
+        headers = {'content-type': 'application/json'}
+        return self.send_patch_request(self.system_uri,payload,headers )
+    
     def get_manager_health(self):
         resp = self.send_get_request(self.manager_uri)
         return str(resp[u'"Status"'][u'Health'])
@@ -304,7 +322,8 @@ def main():
                 cmd = dict(required=False, type='str', default=None),
                 eth_interface = dict(required=False, type='str', default=None),
                 storage_controller = dict(required=False, type='str', default=None),
-                ResetType = dict(required=False, type='str', default=None,choices=["On", "ForceOff", "GracefulRestart", "GracefulShutdown", "PushPowerButton", "Nmi"])
+                ResetType = dict(required=False, type='str', default=None,choices=["On", "ForceOff", "GracefulRestart", "GracefulShutdown", "PushPowerButton", "Nmi"]),
+                Target = dict(required=False, type='str', default=None, choices=["None","Pxe","Floppy","Cd","Hdd","BiosSetup","Utilities","UefiTarget","SDCard","UefiHttp"])
             ),
             supports_check_mode=True
     )
@@ -398,7 +417,16 @@ def main():
             else:
                 module.fail_json(msg="Please provide type of reset")
                    
-        
+        if params['cmd'] == 'OneTimeBoot':
+            if params['Target'] != None:
+                resp=idrac.system_onetime()
+                if resp == '200':
+                    rc=resp
+                    out='OK'
+                else:
+                    err="system OneTimeBoot setting failed. Error code:%s"%(resp)
+            else:
+                module.fail_json(msg="Please provide Target name for oneTimeBoot")
             
     if params['subsystem'] == "Manager":
         if params['cmd'] == 'Health':

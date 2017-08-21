@@ -96,26 +96,11 @@
     with_items:
       - "{{disk.stdout}}"
 
+  - name: set Onetime boot from PXE
+    idrac: idracip={{idrac_ip}} subsystem=System cmd=OneTimeBoot Target=Pxe
+
   - name: system reset 
     idrac: idracip={{idrac_ip}} subsystem=System cmd=Reset ResetType=On
     
   - name: iDrac manager reset
     idrac: idracip={{idrac_ip}} subsystem=Manager cmd=Reset ResetType=GracefulRestart
-
-
-
-    
-  
-    
-  
-
-    
-  
-      
-    
-      
-
-      
-        
-      
-  
