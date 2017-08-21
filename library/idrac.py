@@ -62,23 +62,24 @@ ANSIBLE_METADATA = {'status': ['preview'],
                     'version': '0.1'}
 import requests
 import os
+import json
 from ansible.module_utils.basic import AnsibleModule
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 class iDRAC(object):
-    def __init__(self,module):
-        self.module=module
-        root_uri = ''.join(["https://%s" %module.params['idracip'] , "/redfish/v1"])
-        self.system_uri   = root_uri + "/Systems/System.Embedded.1"
-        self.chassis_uri  = root_uri + "/Chassis/System.Embedded.1"
-        self.manager_uri  = root_uri + "/Managers/iDRAC.Embedded.1"
+    def __init__(self, module):
+        self.module = module
+        root_uri = ''.join(["https://%s" % module.params['idracip'] , "/redfish/v1"])
+        self.system_uri = root_uri + "/Systems/System.Embedded.1"
+        self.chassis_uri = root_uri + "/Chassis/System.Embedded.1"
+        self.manager_uri = root_uri + "/Managers/iDRAC.Embedded.1"
         self.eventsvc_uri = root_uri + "/EventService"
-        self.session_uri  = root_uri + "/Sessions"
-        self.tasksvc_uri  = root_uri + "/TaskService"
+        self.session_uri = root_uri + "/Sessions"
+        self.tasksvc_uri = root_uri + "/TaskService"
         self.updatesvc_uri = root_uri + "/UpdateService"
-    def send_get_request(self,uri):
+    def send_get_request(self, uri):
         try:
-            response = requests.get(uri, verify=False, auth=( self.module.params['idracuser'], self.module.params['idracpswd']))
+            response = requests.get(uri, verify=False, auth=(self.module.params['idracuser'], self.module.params['idracpswd']))
             systemData = response.json()
         except:
             raise
@@ -138,45 +139,45 @@ class iDRAC(object):
         return str(resp[u'ProcessorSummary'][u'Model'])
     
     def get_boot_sources(self):
-        sources=[]
-        resp = self.send_get_request(self.system_uri+'/BootSources')
+        sources = []
+        resp = self.send_get_request(self.system_uri + '/BootSources')
         if 'UefiBootSeq' in resp[u'Attributes']:
                 for i in resp[u'Attributes']['UefiBootSeq']:
                         sources.append(i['Name'])
         return ",".join(str(x) for x in sources)
         
     def get_system_ethernet_interfaces(self):
-        eth=[]
-        resp = self.send_get_request(self.system_uri+'/EthernetInterfaces')
+        eth = []
+        resp = self.send_get_request(self.system_uri + '/EthernetInterfaces')
         for i in resp[u'Members']:
             eth.append(os.path.basename(i['@odata.id']))
         return ",".join(str(x) for x in eth)
 
     def get_system_ethernet_permanent_MAC_address(self):
-        resp = self.send_get_request(self.system_uri+'/EthernetInterfaces/%s'%self.module.params['eth_interface'])
+        resp = self.send_get_request(self.system_uri + '/EthernetInterfaces/%s' % self.module.params['eth_interface'])
         return resp[u'PermanentMACAddress']
     
     def get_system_secure_boot_status(self):
-        resp = self.send_get_request(self.system_uri+'/SecureBoot')
+        resp = self.send_get_request(self.system_uri + '/SecureBoot')
         return resp[u'SecureBootCurrentBoot']
     
     def get_system_secure_boot_certificates(self):
-        cert=[]
-        resp = self.send_get_request(self.system_uri+'/SecureBoot/Certificates')
+        cert = []
+        resp = self.send_get_request(self.system_uri + '/SecureBoot/Certificates')
         for i in resp[u'Members']:
             cert.append(os.path.basename(i['@odata.id']))
         return ",".join(str(x) for x in cert)
 
     def get_system_storage_controllers(self):
-        ctrls=[]
-        resp = self.send_get_request(self.system_uri+'/Storage/Controllers')
+        ctrls = []
+        resp = self.send_get_request(self.system_uri + '/Storage/Controllers')
         for i in resp[u'Members']:
             ctrls.append(os.path.basename(i['@odata.id']))
         return ",".join(str(x) for x in ctrls)
 
     def get_system_storage_controller_disks(self):
-        disk=[]
-        resp = self.send_get_request(self.system_uri+'/Storage/Controllers/%s'%self.module.params['controller'])
+        disk = []
+        resp = self.send_get_request(self.system_uri + '/Storage/Controllers/%s' % self.module.params['controller'])
         return resp[u'Devices']
     
     def get_manager_reset_options(self):
@@ -188,8 +189,8 @@ class iDRAC(object):
         return str(resp[u'CommandShell']['ConnectTypesSupported'])
     
     def get_manager_ethernet_interfaces(self):
-        eth=[]
-        resp = self.send_get_request(self.manager_uri+'/EthernetInterfaces')
+        eth = []
+        resp = self.send_get_request(self.manager_uri + '/EthernetInterfaces')
         for i in resp[u'Members']:
             eth.append(os.path.basename(i['@odata.id']))
         return ",".join(str(x) for x in eth)
@@ -203,55 +204,73 @@ class iDRAC(object):
         return str(resp[u'GraphicalConsole']['ConnectTypesSupported'])
     
     def get_manager_sel_log(self):
-        resp = self.send_get_request(self.manager_uri+'/Logs/Sel')
+        resp = self.send_get_request(self.manager_uri + '/Logs/Sel')
         return str(resp[u'Members'])
         
     
     def get_manager_lc_log(self):
-        resp = self.send_get_request(self.manager_uri+'/Logs/Lclog')
+        resp = self.send_get_request(self.manager_uri + '/Logs/Lclog')
         return str(resp[u'Members'])
     
     def get_manager_jobs(self):
-        jobs=[]
-        resp = self.send_get_request(self.manager_uri+'/Jobs')
+        jobs = []
+        resp = self.send_get_request(self.manager_uri + '/Jobs')
         for i in resp[u'Members']:
             jobs.append(os.path.basename(i['@odata.id']))
         return ",".join(str(x) for x in jobs)
 
     def get_manager_host_name(self):
-        resp = self.send_get_request(self.manager_uri+'/NetworkProtocol')
+        resp = self.send_get_request(self.manager_uri + '/NetworkProtocol')
         return str(resp[u'HostName'])
     
+    def get_event_type_for_subscription(self):
+        resp = self.send_get_request(self.eventsvc_uri)
+        return str(resp[u'EventTypesForSubscription'])
+    
+    def get_event_service_health(self):
+        resp = self.send_get_request(self.eventsvc_uri)
+        return str(resp[u'Status']['Health'])
+    
+    def get_event_state(self):
+        resp = self.send_get_request(self.eventsvc_uri)
+        return str(resp[u'Status'][u'State'])
+    
+    def get_session_id(self):
+        mem = []
+        resp = self.send_get_request(self.session_uri)
+        for i in resp[u'Members']:
+            mem.append(os.path.basename(i['@odata.id']))
+        return ",".join(str(x) for x in mem)
     
     def get_firmware_inventory(self):
-        fw=dict()
-        resp = self.send_get_request(self.updatesvc_uri+'/FirmwareInventory')
+        fw = dict()
+        resp = self.send_get_request(self.updatesvc_uri + '/FirmwareInventory')
         for i in resp[u'Members']:
-            fw_info=self.send_get_request(self.updatesvc_uri+'/FirmwareInventory/'+ '%s'%os.path.basename(i['@odata.id']))
-            fw[fw_info['Name']]=fw_info['Version']
-        return " ".join(str(x) for x in fw)
+            fw_info = self.send_get_request(self.updatesvc_uri + '/FirmwareInventory/' + '%s' % os.path.basename(i['@odata.id']))
+            fw[fw_info['Name']] = fw_info['Version']
+        return json.dumps(fw)
         
 
     
 def main():
     # Parsing argument file
-    module=AnsibleModule(
+    module = AnsibleModule(
             argument_spec=dict(
-                subsystem = dict(required=True, type='str', default=None),
-                idracip = dict(required=True, type='str', default=None),
-                idracuser = dict(required=True, type='str', default=None),
-                idracpswd = dict(required=True, type='str', default=None),
-                cmd = dict(required=True, type='str', default=None),
+                subsystem=dict(required=True, type='str', default=None),
+                idracip=dict(required=True, type='str', default=None),
+                idracuser=dict(required=True, type='str', default=None),
+                idracpswd=dict(required=True, type='str', default=None),
+                cmd=dict(required=True, type='str', default=None),
                 
             ),
             supports_check_mode=True
     )
-    idrac=iDRAC(module)
+    idrac = iDRAC(module)
     params = module.params
-    rc=None
-    out=''
-    err=''
-    result={}
+    rc = None
+    out = ''
+    err = ''
+    result = {}
 
     # Disable insecure-certificate-warning message
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -262,105 +281,121 @@ def main():
     if not 'cmd' in params.keys():
         module.fail_json(msg="You haven't specified a subsystem command")
         
-    result['subsystem']=params['subsystem']
+    result['subsystem'] = params['subsystem']
     
-    if params['subsystem']  == "System":
+    if params['subsystem'] == "System":
         if params['cmd'] == 'Health':
             
-            out=idrac.get_system_health()
+            out = idrac.get_system_health()
             
         if params['cmd'] == 'SerialNumber':
-            out=idrac.get_system_serial_number()
+            out = idrac.get_system_serial_number()
             
         if params['cmd'] == 'ServiceTag':
-            out=idrac.get_system_service_tag()
+            out = idrac.get_system_service_tag()
             
         if params['cmd'] == 'AssetTag':
-            out=idrac.get_boot_sources()
+            out = idrac.get_boot_sources()
             
         if params['cmd'] == 'Manufacturer':
-            out=idrac.get_system_Manufacturer()
+            out = idrac.get_system_Manufacturer()
             
         if params['cmd'] == 'BiosVersion':
-            out=idrac.get_system_bios_version()
+            out = idrac.get_system_bios_version()
             
         if params['cmd'] == 'SystemType':
-            out=idrac.get_system_type()
+            out = idrac.get_system_type()
             
         if params['cmd'] == 'PowerState':
-            out=idrac.get_system_power_state()
+            out = idrac.get_system_power_state()
             
         if params['cmd'] == 'MemoryHealth':
-            out=idrac.get_system_memory_health()
+            out = idrac.get_system_memory_health()
             
         if params['cmd'] == 'TotalSystemMemoryGiB':
-            out=idrac.get_system_memory_in_GB()
+            out = idrac.get_system_memory_in_GB()
             
         if params['cmd'] == 'ProcessorCount':
-            out=idrac.get_processor_count()
+            out = idrac.get_processor_count()
             
         if params['cmd'] == 'ProcessorHealth':
-            out=idrac.get_processor_health()
+            out = idrac.get_processor_health()
             
         if params['cmd'] == 'ProcessorModel':
-            out=idrac.get_processor_model()
+            out = idrac.get_processor_model()
             
         if params['cmd'] == 'BootSources':
-            out=idrac.get_boot_sources()
+            out = idrac.get_boot_sources()
             
         if params['cmd'] == 'EthernetInterfaces':
-            out=idrac.get_system_ethernet_interfaces()
+            out = idrac.get_system_ethernet_interfaces()
             
         if params['cmd'] == 'PermanentMACAddress':
-            out=idrac.get_system_ethernet_permanent_MAC_address()
+            out = idrac.get_system_ethernet_permanent_MAC_address()
             
         if params['cmd'] == 'SecureBoot':
-            out=idrac.get_system_secure_boot_status()
+            out = idrac.get_system_secure_boot_status()
             
         if params['cmd'] == 'SecureBootCerts':
-            out=idrac.get_system_secure_boot_certificates()
+            out = idrac.get_system_secure_boot_certificates()
             
         if params['cmd'] == 'StorageControllers':
-            out=idrac.get_system_storage_controllers()
+            out = idrac.get_system_storage_controllers()
             
         if params['cmd'] == 'StorageControllerDisks':
-            out=idrac.get_system_storage_controller_disks()
+            out = idrac.get_system_storage_controller_disks()
             
-        if params['cmd'] == 'FirmwareInventory':
-            out=idrac.get_firmware_inventory()
+        
             
-    if params['subsystem']  == "manager":
+    if params['subsystem'] == "manager":
         if params['cmd'] == 'ResetOptions':
-            out=idrac.get_manager_reset_options()
+            out = idrac.get_manager_reset_options()
             
         if params['cmd'] == 'CommandShells':
-            out=idrac.get_manager_command_shells()
+            out = idrac.get_manager_command_shells()
             
         if params['cmd'] == 'EthernetInterfaces':
-            out=idrac.get_manager_ethernet_interfaces()
+            out = idrac.get_manager_ethernet_interfaces()
             
         if params['cmd'] == 'FirmwareVersion':
-            out=idrac.get_manager_firmware()
+            out = idrac.get_manager_firmware()
             
         if params['cmd'] == 'GraphicalConsole':
-            out=idrac.get_manager_graphical_console()
+            out = idrac.get_manager_graphical_console()
             
         if params['cmd'] == 'SELLogs':
-            out=idrac.get_manager_sel_log()
+            out = idrac.get_manager_sel_log()
             
         if params['cmd'] == 'LCLogs':
-            out=idrac.get_manager_lc_log()
+            out = idrac.get_manager_lc_log()
             
         if params['cmd'] == 'Jobs':
-            out=idrac.get_manager_jobs()
+            out = idrac.get_manager_jobs()
+    if params['subsystem'] == "Event":
+        if params['cmd'] == 'types':
+            out = idrac.get_event_type_for_subscription()
+            
+        if params['cmd'] == 'health':
+            out = idrac.get_event_service_health()
+            
+        if params['cmd'] == 'state':
+            out = idrac.get_event_state()
+            
+    if params['subsystem'] == "Session":
+        if params['cmd'] == 'id':
+            out = idrac.get_session_id()
+            
+    if params['subsystem'] == "FW":  
+        if params['cmd'] == 'FirmwareInventory':
+            out = idrac.get_firmware_inventory()
     if rc is None:
-        result['changed']=False
+        result['changed'] = False
     else:
-        result['changed']=True
+        result['changed'] = True
     if out:
-        result['stdout']=out
+        result['stdout'] = out
     if err:
-        result['stderr']=err
+        result['stderr'] = err
         
     module.exit_json(**result)
 

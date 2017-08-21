@@ -7,47 +7,17 @@
   vars:
      idrac_user: root      
      idrac_passwd: calvin
-     
-     
-  tasks:
-  - name: get idrac info
-    idrac: idracuser={{idrac_user}} idracpswd={{idrac_passwd}} idracip={{idrac_ip}} subsystem=manager cmd={{item}}
-    register: "managerinfo"
+  
+  tasks: 
+
+  - name: get firmware info
+    idrac: idracuser={{idrac_user}} idracpswd={{idrac_passwd}} idracip={{idrac_ip}} subsystem=FW cmd={{item}}
+    register: "fwinfo"
     ignore_errors: True
     with_items:
-      - ResetOptions
-      - CommandShells
-      - EthernetInterfaces
-      - FirmwareVersion
-      - GraphicalConsole
-      - SELLogs
-      - LCLogs
-      - Jobs
-    
-  - name: get system info
-    idrac: idracuser={{idrac_user}} idracpswd={{idrac_passwd}} idracip={{idrac_ip}} subsystem=System cmd={{item}}
-    register: "sysinfo"
-    ignore_errors: True
-    with_items:
-      - Health
-      - SerialNumber
-      - ServiceTag
-      - PartNumber
-      - Manufacturer
-      - BiosVersion
-      - SystemType
-      - PowerState
-      - MemoryHealth
-      - TotalSystemMemoryGiB 
-      - ProcessorCount
-      - ProcessorHealth
-      - ProcessorModel
-      - BootSources
-      - SecureBoot
-      - SecureBootCerts
       - FirmwareInventory
-      - EthernetInterfaces
-      - StorageControllers
+    
+  
     
   
 
