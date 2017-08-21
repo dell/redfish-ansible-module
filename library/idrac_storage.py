@@ -23,9 +23,9 @@ ANSIBLE_METADATA = {'status': ['preview'],
                     'version': '0.1'}
 
 DOCUMENTATION = """
-module: idrac_sysinfo
+module: idrac_storage
 version_added: "2.3"
-short_description: Use iDRAC Redfish APIs to get system information.
+short_description: Use iDRAC Redfish APIs to get system storage information.
 options:
   choice:
     required: true
@@ -97,81 +97,35 @@ def main():
                    'pswd' : params['idracpswd']
                  } 
 
-    # Execute based on what we want
-    if choice == "ServerStatus":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'Status'][u'Health']
+    uri = system_uri + "/Storage/Controllers/"
 
-    elif choice == "ServerModel":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'Model']
+    # Get a list of all storage controllers and build respective URIs
+    controller_list={}
+    list_of_uris=[]
+    i = send_get_request(IDRAC_INFO, uri)
 
-    elif choice == "BiosVersion":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'BiosVersion']
+    for controller in i["Members"]:
+        for controller_name in controller.items():
+            list_of_uris.append(uri + controller_name[1].split("/")[-1])
 
-    elif choice == "ServerManufacturer":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'Manufacturer']
+    # for each controller, get name and status
+    for storuri in list_of_uris:
+        data = send_get_request(IDRAC_INFO, storuri)
+        # Only interested in PERC and PCIe? What about SATA?
+        if "PERC" in data['Name'] or "PCIe" in data['Name']:
+            # Execute based on what we want
+            if choice == "Status":
+                # Returns a list of all controllers along with status
+                controller_list[data['Name']] = data['Status']['Health']
+            elif choice == "listDevices":
+                # Returns a list of all controllers along with devices. Messy, clean up.
+                controller_list[data['Name']] = data['Devices']
+            else:
+                controller_list['Invalid'] = "Invalid Option"
+                break
 
-    elif choice == "ServerPartNumber":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'PartNumber']
-
-    elif choice == "SystemType":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'SystemType']
-
-    elif choice == "AssetTag":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'AssetTag']
-
-    elif choice == "MemoryGiB":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'MemorySummary'][u'TotalSystemMemoryGiB']
-
-    elif choice == "MemoryHealth":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'MemorySummary'][u'Status'][u'Health']
-
-    elif choice == "CPUModel":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'ProcessorSummary'][u'Model']
-
-    elif choice == "CPUHealth":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'ProcessorSummary'][u'Status'][u'Health']
-
-    elif choice == "CPUCount":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'ProcessorSummary'][u'Count']
-
-    elif choice == "ConsumedWatts":
-        power = send_get_request(IDRAC_INFO, chassis_uri + "/Power/PowerControl")
-        result = power[u'PowerConsumedWatts']
-
-    elif choice == "PowerState":
-        power = send_get_request(IDRAC_INFO, system_uri)
-        result = power[u'PowerState']
-
-    elif choice == "ServiceTag":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'SKU']
-
-    elif choice == "SerialNumber":
-        system = send_get_request(IDRAC_INFO, system_uri)
-        result = system[u'SerialNumber']
-
-    elif choice == "IdracFirmwareVersion":
-        system = send_get_request(IDRAC_INFO, manager_uri)
-        result = system[u'FirmwareVersion']
-
-    elif choice == "IdracHealth":
-        system = send_get_request(IDRAC_INFO, manager_uri)
-        result = system[u'Status'][u'Health']
-
-    else:
-        result = "Invalid Option."
+    # Returning a list of all controllers along with status
+    result = json.dumps(controller_list)
 
     module.exit_json(result=result)
 
