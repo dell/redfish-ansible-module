@@ -54,8 +54,18 @@ options:
         default: calvin
         description:
           - iDRAC user password
-      
-    
+          
+    eth_interface:
+        required: False
+        default: None
+        description:
+          - Ethernet interface name i.e NIC.Slot.2-1-1 or NIC.Integrated.1-2-1
+          
+    storage_controller:
+        required: False
+        default: None
+        description:
+          - storage controller name i.e.  RAID.Slot.1-1 or  AHCI.Embedded.1-1
 '''
 ANSIBLE_METADATA = {'status': ['preview'],
                     'supported_by': 'community',
@@ -142,8 +152,8 @@ class iDRAC(object):
         sources = []
         resp = self.send_get_request(self.system_uri + '/BootSources')
         if 'UefiBootSeq' in resp[u'Attributes']:
-                for i in resp[u'Attributes']['UefiBootSeq']:
-                        sources.append(i['Name'])
+                for i in resp[u'Attributes'][u'UefiBootSeq']:
+                        sources.append(i[u'Name'])
         return ",".join(str(x) for x in sources)
         
     def get_system_ethernet_interfaces(self):
@@ -151,7 +161,7 @@ class iDRAC(object):
         resp = self.send_get_request(self.system_uri + '/EthernetInterfaces')
         for i in resp[u'Members']:
             eth.append(os.path.basename(i['@odata.id']))
-        return ",".join(str(x) for x in eth)
+        return json.dumps(eth)
 
     def get_system_ethernet_permanent_MAC_address(self):
         resp = self.send_get_request(self.system_uri + '/EthernetInterfaces/%s' % self.module.params['eth_interface'])
@@ -173,12 +183,14 @@ class iDRAC(object):
         resp = self.send_get_request(self.system_uri + '/Storage/Controllers')
         for i in resp[u'Members']:
             ctrls.append(os.path.basename(i['@odata.id']))
-        return ",".join(str(x) for x in ctrls)
+        return json.dumps(ctrls)
 
     def get_system_storage_controller_disks(self):
-        disk = []
-        resp = self.send_get_request(self.system_uri + '/Storage/Controllers/%s' % self.module.params['controller'])
-        return resp[u'Devices']
+        resp = self.send_get_request(self.system_uri + '/Storage/Controllers/%s' % self.module.params['storage_controller'])
+        if len(resp[u'Devices']) > 1:
+            return json.dumps(resp[u'Devices'])
+        else:
+            return json.dumps([])
     
     def get_manager_reset_options(self):
         resp = self.send_get_request(self.manager_uri)
@@ -255,13 +267,14 @@ class iDRAC(object):
 def main():
     # Parsing argument file
     module = AnsibleModule(
-            argument_spec=dict(
-                subsystem=dict(required=True, type='str', default=None),
-                idracip=dict(required=True, type='str', default=None),
-                idracuser=dict(required=True, type='str', default=None),
-                idracpswd=dict(required=True, type='str', default=None),
-                cmd=dict(required=True, type='str', default=None),
-                
+            argument_spec = dict(
+                subsystem = dict(required=True, type='str', default=None, choices=['System', 'Manager', 'Session', 'Event', 'Chassis', 'FW']),
+                idracip = dict(required=True, type='str', default=None),
+                idracuser = dict(required=False, type='str', default='root'),
+                idracpswd = dict(required=False, type='str', default='calvin'),
+                cmd = dict(required=False, type='str', default=None),
+                eth_interface = dict(required=False, type='str', default=None),
+                storage_controller = dict(required=False, type='str', default=None)
             ),
             supports_check_mode=True
     )
@@ -347,7 +360,7 @@ def main():
             
         
             
-    if params['subsystem'] == "manager":
+    if params['subsystem'] == "Manager":
         if params['cmd'] == 'ResetOptions':
             out = idrac.get_manager_reset_options()
             
