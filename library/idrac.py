@@ -31,7 +31,7 @@ options:
     subsystem:
         required: true
         default: None
-        choices: [ system, chassis, event, sessions, idrac, jobs, FW ]
+        choices: [ system, chassis, event, session, manager, jobs, FW ]
         description:
             - sub modules in Redfish Service Root
     cmd:
@@ -136,45 +136,92 @@ class iDRAC(object):
     def get_processor_model(self):
         resp = self.send_get_request(self.system_uri)
         return str(resp[u'ProcessorSummary'][u'Model'])
+    
     def get_boot_sources(self):
         sources=[]
         resp = self.send_get_request(self.system_uri+'/BootSources')
         if 'UefiBootSeq' in resp[u'Attributes']:
                 for i in resp[u'Attributes']['UefiBootSeq']:
                         sources.append(i['Name'])
-        return " ".join(str(x) for x in sources)
+        return ",".join(str(x) for x in sources)
         
     def get_system_ethernet_interfaces(self):
         eth=[]
         resp = self.send_get_request(self.system_uri+'/EthernetInterfaces')
         for i in resp[u'Members']:
             eth.append(os.path.basename(i['@odata.id']))
-        return " ".join(str(x) for x in eth)
+        return ",".join(str(x) for x in eth)
 
     def get_system_ethernet_permanent_MAC_address(self):
         resp = self.send_get_request(self.system_uri+'/EthernetInterfaces/%s'%self.module.params['eth_interface'])
         return resp[u'PermanentMACAddress']
+    
     def get_system_secure_boot_status(self):
         resp = self.send_get_request(self.system_uri+'/SecureBoot')
         return resp[u'SecureBootCurrentBoot']
+    
     def get_system_secure_boot_certificates(self):
         cert=[]
         resp = self.send_get_request(self.system_uri+'/SecureBoot/Certificates')
         for i in resp[u'Members']:
             cert.append(os.path.basename(i['@odata.id']))
-        return " ".join(str(x) for x in cert)
+        return ",".join(str(x) for x in cert)
 
     def get_system_storage_controllers(self):
         ctrls=[]
         resp = self.send_get_request(self.system_uri+'/Storage/Controllers')
         for i in resp[u'Members']:
             ctrls.append(os.path.basename(i['@odata.id']))
-        return " ".join(str(x) for x in ctrls)
+        return ",".join(str(x) for x in ctrls)
 
     def get_system_storage_controller_disks(self):
         disk=[]
         resp = self.send_get_request(self.system_uri+'/Storage/Controllers/%s'%self.module.params['controller'])
         return resp[u'Devices']
+    
+    def get_manager_reset_options(self):
+        resp = self.send_get_request(self.manager_uri)
+        return str(resp[u'Actions']['#Manager.Reset']['ResetType@Redfish.AllowableValues'])
+    
+    def get_manager_command_shells(self):
+        resp = self.send_get_request(self.manager_uri)
+        return str(resp[u'CommandShell']['ConnectTypesSupported'])
+    
+    def get_manager_ethernet_interfaces(self):
+        eth=[]
+        resp = self.send_get_request(self.manager_uri+'/EthernetInterfaces')
+        for i in resp[u'Members']:
+            eth.append(os.path.basename(i['@odata.id']))
+        return ",".join(str(x) for x in eth)
+    
+    def get_manager_firmware(self):
+        resp = self.send_get_request(self.manager_uri)
+        return str(resp[u'FirmwareVersion'])
+    
+    def get_manager_graphical_console(self):
+        resp = self.send_get_request(self.manager_uri)
+        return str(resp[u'GraphicalConsole']['ConnectTypesSupported'])
+    
+    def get_manager_sel_log(self):
+        resp = self.send_get_request(self.manager_uri+'/Logs/Sel')
+        return str(resp[u'Members'])
+        
+    
+    def get_manager_lc_log(self):
+        resp = self.send_get_request(self.manager_uri+'/Logs/Lclog')
+        return str(resp[u'Members'])
+    
+    def get_manager_jobs(self):
+        jobs=[]
+        resp = self.send_get_request(self.manager_uri+'/Jobs')
+        for i in resp[u'Members']:
+            jobs.append(os.path.basename(i['@odata.id']))
+        return ",".join(str(x) for x in jobs)
+
+    def get_manager_host_name(self):
+        resp = self.send_get_request(self.manager_uri+'/NetworkProtocol')
+        return str(resp[u'HostName'])
+    
     
     def get_firmware_inventory(self):
         fw=dict()
@@ -282,6 +329,30 @@ def main():
         if params['cmd'] == 'FirmwareInventory':
             out=idrac.get_firmware_inventory()
             
+    if params['subsystem']  == "manager":
+        if params['cmd'] == 'ResetOptions':
+            out=idrac.get_manager_reset_options()
+            
+        if params['cmd'] == 'CommandShells':
+            out=idrac.get_manager_command_shells()
+            
+        if params['cmd'] == 'EthernetInterfaces':
+            out=idrac.get_manager_ethernet_interfaces()
+            
+        if params['cmd'] == 'FirmwareVersion':
+            out=idrac.get_manager_firmware()
+            
+        if params['cmd'] == 'GraphicalConsole':
+            out=idrac.get_manager_graphical_console()
+            
+        if params['cmd'] == 'SELLogs':
+            out=idrac.get_manager_sel_log()
+            
+        if params['cmd'] == 'LCLogs':
+            out=idrac.get_manager_lc_log()
+            
+        if params['cmd'] == 'Jobs':
+            out=idrac.get_manager_jobs()
     if rc is None:
         result['changed']=False
     else:

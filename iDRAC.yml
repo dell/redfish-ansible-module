@@ -8,9 +8,26 @@
      idrac_user: root      
      idrac_passwd: calvin
      
+     
   tasks:
+  - name: get idrac info
+    idrac: idracuser={{idrac_user}} idracpswd={{idrac_passwd}} idracip={{idrac_ip}} subsystem=manager cmd={{item}}
+    register: "managerinfo"
+    ignore_errors: True
+    with_items:
+      - ResetOptions
+      - CommandShells
+      - EthernetInterfaces
+      - FirmwareVersion
+      - GraphicalConsole
+      - SELLogs
+      - LCLogs
+      - Jobs
+    
   - name: get system info
     idrac: idracuser={{idrac_user}} idracpswd={{idrac_passwd}} idracip={{idrac_ip}} subsystem=System cmd={{item}}
+    register: "sysinfo"
+    ignore_errors: True
     with_items:
       - Health
       - SerialNumber
@@ -29,12 +46,17 @@
       - SecureBoot
       - SecureBootCerts
       - FirmwareInventory
+      - EthernetInterfaces
+      - StorageControllers
+    
+  
+
+    
+  
       
-      #- PermanentMACAddress
-      #- EthernetInterfaces
-      #- StorageControllers
-      #- StorageControllerDisks
+    
       
+
       
         
       
