@@ -1,0 +1,106 @@
+---
+- hosts: myhosts
+  name: PowerEdge iDRAC Get System Information
+  gather_facts: False
+
+
+  tasks: 
+  - name: get system info
+    idrac: idracip={{idrac_ip}} subsystem=System cmd={{item}}
+    register: "sysinfo"
+    ignore_errors: True
+    with_items:
+      - Health
+      - SerialNumber
+      - ServiceTag
+      - PartNumber
+      - Manufacturer
+      - BiosVersion
+      - SystemType
+      - PowerState
+      - MemoryHealth
+      - TotalSystemMemoryGiB 
+      - ProcessorCount
+      - ProcessorHealth
+      - ProcessorModel
+      - BootSources
+      - SecureBoot
+      - SecureBootCerts
+      - EthernetInterfaces
+      - StorageControllers
+       
+  - name: get idrac manager info
+    idrac: idracip={{idrac_ip}} subsystem=Manager cmd={{item}}
+    register: "managerinfo"
+    ignore_errors: True
+    with_items:
+      - Health
+      - ResetOptions
+      - CommandShells
+      - EthernetInterfaces
+      - FirmwareVersion
+      - GraphicalConsole
+      - SELLogs
+      - LCLogs
+      - Jobs
+
+  - name: get event info
+    idrac: idracip={{idrac_ip}} subsystem=Event cmd={{item}}
+    register: "eventinfo"
+    ignore_errors: True
+    with_items:
+      - types
+      - health
+      - state
+   
+  - name: get session  info
+    idrac: idracip={{idrac_ip}} subsystem=Session cmd={{item}}
+    register: "sessioninfo"
+    ignore_errors: True
+    with_items:
+      - id
+      
+  - name: get firmware info
+    idrac: idracip={{idrac_ip}} subsystem=FW cmd={{item}}
+    register: "fwinfo"
+    ignore_errors: True
+    with_items:
+       - FirmwareInventory
+
+
+  - name: get NIC info
+    idrac: idracip={{idrac_ip}} subsystem=System cmd=EthernetInterfaces
+    register: nic
+    
+  - name: get permanent mac address of each nic 
+    idrac: idracip={{idrac_ip}} subsystem=System cmd=PermanentMACAddress eth_interface={{item}}
+    with_items:
+      - "{{nic.stdout}}"
+    
+  - name: get storage controller info
+    idrac: idracip={{idrac_ip}} subsystem=System cmd=StorageControllers
+    register: nic
+    
+  - name: get disks info in storage controller
+    idrac: idracip={{idrac_ip}} subsystem=System cmd=StorageControllerDisks storage_controller={{item}}
+    with_items:
+      - "{{nic.stdout}}"  
+
+    
+  - name: get storage controller info
+    idrac: idracip={{idrac_ip}} subsystem=System cmd=StorageControllers
+    register: disk
+    
+  - name: get disks info in storage controller
+    idrac: idracip={{idrac_ip}} subsystem=System cmd=StorageControllerDisks storage_controller={{item}}
+    with_items:
+      - "{{disk.stdout}}"
+
+  - name: set Onetime boot from PXE
+    idrac: idracip={{idrac_ip}} subsystem=System cmd=OneTimeBoot Target=Pxe
+
+  - name: system reset 
+    idrac: idracip={{idrac_ip}} subsystem=System cmd=Reset ResetType=On
+    
+  - name: iDrac manager reset
+    idrac: idracip={{idrac_ip}} subsystem=Manager cmd=Reset ResetType=GracefulRestart
