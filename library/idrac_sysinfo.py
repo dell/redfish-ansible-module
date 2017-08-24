@@ -170,6 +170,14 @@ def main():
         system = send_get_request(IDRAC_INFO, manager_uri)
         result = system[u'Status'][u'Health']
 
+    elif choice == "BootSourceOverrideMode":
+        system = send_get_request(IDRAC_INFO, system_uri)
+        systemdict = system[u'Boot']
+        if 'BootSourceOverrideMode' in systemdict.keys():
+                result = system[u'Boot'][u'BootSourceOverrideMode']
+        else:
+                result = " 14G only."
+
     else:
         result = "Invalid Option."
 

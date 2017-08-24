@@ -21,7 +21,7 @@
     set_fact: outfile={{rootdir}}/{{host}}/{{host}}_sysinfo_{{timestamp}}
 
   - name: Set system information items array
-    set_fact: sys_info_items="[ 'ServerStatus', 'ServerModel', 'BiosVersion', 'AssetTag', 'ServiceTag', 'SerialNumber', 'MemoryGiB', 'MemoryHealth', 'CPUModel', 'CPUHealth', 'CPUCount', 'PowerState', 'ConsumedWatts', 'IdracFirmwareVersion', 'IdracHealth' ]"
+    set_fact: sys_info_items="[ 'ServerStatus', 'ServerModel', 'BiosVersion', 'AssetTag', 'ServiceTag', 'SerialNumber', 'MemoryGiB', 'MemoryHealth', 'CPUModel', 'CPUHealth', 'CPUCount', 'PowerState', 'ConsumedWatts', 'IdracFirmwareVersion', 'IdracHealth', 'BootSourceOverrideMode' ]"
 
   - name: Create dropoff directory for host if needed
     local_action: file path={{rootdir}}/{{host}} state=directory
