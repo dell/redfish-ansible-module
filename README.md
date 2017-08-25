@@ -24,6 +24,8 @@ Together, Ansible and Redfish can be used by system administrators to fully auto
 
 A client talks to iDRAC via its IP address by sending Redfish URIs that the iDRAC will then process and send information back.
 
+![alt text](http://linux.dell.com/images/ansible-redfish-overview.png)
+
 Your */etc/ansible/hosts* should look like this:
 
 ```
@@ -112,24 +114,14 @@ $ jq '.result.Members[] | {Date: .Created, Message: .Message}' webserver1_SELogs
 
 ## Prerequisites
 
-  - PowerEdge 12G/13G servers only (not tested in 14G yet, but should work)
+  - PowerEdge 12G/13G servers only (not fully tested with 14G yet)
   - Minimum iDRAC 7/8 FW 2.40.40.40
   - SMB share to place SCP files
   - [jq](https://stedolan.github.io/jq/) JSON parser
 
-## Contributors
-
-  - [jose-delarosa](https://github.com/jose-delarosa)
-  - [bhavesh-bharadiya](https://github.com/bhavesh-bharadiya)
-  - [shubhrata-priya](https://github.com/shubhrata-priya)
-
-## Limitations and Disclaimers
-
-  - For now, these Ansible modules are for demonstration purposes only.
-
 ## Support
 
-Please note this code is provided as-is and currently not supported by Dell EMC.
+Please note this code is provided as-is and not supported by Dell EMC.
 
 ## Report problems or provide feedback
 
