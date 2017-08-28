@@ -91,6 +91,33 @@ eventsvc_uri = "/EventService"
 session_uri  = "/Sessions"
 tasksvc_uri  = "/TaskService"
 
+def manage_power(command, IDRAC_INFO, root_uri):
+    headers = {'content-type': 'application/json'}
+    reseturi = root_uri + system_uri + "/Actions/ComputerSystem.Reset"
+    idracreseturi = root_uri + manager_uri + "/Actions/Manager.Reset"
+
+    if command == "PowerState":
+        power = send_get_request(IDRAC_INFO, root_uri + system_uri)
+        result = power[u'PowerState']
+    elif command == "PowerOn":
+        payload = {'ResetType': 'On'}
+        result = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+    elif command == "PowerOff":
+        payload = {'ResetType': 'ForceOff'}
+        result = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+    elif command == "GracefulRestart":
+        payload = {'ResetType': 'GracefulRestart'}
+        result = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+    elif command == "GracefulShutdown":
+        payload = {'ResetType': 'GracefulShutdown'}
+        result = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+    elif command == "IdracGracefulRestart":
+        payload = {'ResetType': 'GracefulRestart'}
+        result = send_post_request(IDRAC_INFO, idracreseturi, payload, headers)
+    else:
+        result = "Invalid Option."
+    return result
+
 def manage_users(command, IDRAC_INFO, USER_INFO, root_uri):
     headers = {'content-type': 'application/json'}
     uri = root_uri + manager_uri + "/Accounts/" + USER_INFO['userid']
@@ -201,6 +228,15 @@ def send_get_request(idrac, uri):
         raise
     return systemData
 
+def send_post_request(idrac, uri, pyld, hdrs):
+    try:
+        response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,
+                           verify=False, auth=(idrac['user'], idrac['pswd']))
+        statusCode = response.status_code
+    except:
+        raise
+    return statusCode
+
 def send_patch_request(idrac, uri, pyld, hdrs):
     try:
         response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,
@@ -253,6 +289,8 @@ def main():
         result = get_system_logs(command, IDRAC_INFO, root_uri)
     elif category == "Users":
         result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri)
+    elif category == "Power":
+        result = manage_power(command, IDRAC_INFO, root_uri)
     else:
         result = "Invalid Category"
 

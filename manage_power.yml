@@ -12,10 +12,10 @@
      idracuser: root
      idracpswd: calvin
 
-  # Options available:
+  # Commands available:
   #   PowerState	Check system power
-  #   On		Turn system power on
-  #   Off		Turn system power off
+  #   PowerOn		Turn system power on
+  #   PowerOff		Turn system power off
   #   GracefulRestart	Reset OS gracefully
   #   GracefulShutdown	Shutdown OS gracefully
 
@@ -25,33 +25,33 @@
 
   - name: Check system power state
     local_action: >
-       idrac_power choice=PowerState idracip={{ idracip }}
+       idrac category=Power command=PowerState idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
   - name: Turn system power on
     local_action: >
-       idrac_power choice=On idracip={{ idracip }}
+       idrac category=Power command=PowerOn idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
   # Commented out to avoid on/off actions in same run
 
 # - name: Turn system power off
 #   local_action: >
-#      idrac_power choice=Off idracip={{ idracip }}
+#      idrac category=Power command=PowerOff idracip={{ idracip }}
 #      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
 # - name: Power graceful restart
 #   local_action: >
-#      idrac_power choice=GracefulRestart idracip={{ idracip }}
+#      idrac category=Power command=GracefulRestart idracip={{ idracip }}
 #      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
 # - name: Idrac Power graceful restart
 #   local_action: >
-#      idrac_power choice=IdracGracefulRestart idracip={{ idracip }}
+#      idrac category=Power command=IdracGracefulRestart idracip={{ idracip }}
 #      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
   # 14G only
 # - name: Power graceful shutdown
 #   local_action: >
-#      idrac_power choice=GracefulShutdown idracip={{ idracip }}
+#      idrac category=Power command=GracefulShutdown idracip={{ idracip }}
 #      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
