@@ -1,6 +1,6 @@
-# Ansible modules for Dell EMC PowerEdge iDRAC (using Redfish APIs)
+# Ansible module for Dell EMC PowerEdge iDRAC (using Redfish APIs)
 
-Ansible modules and playbooks that use the Redfish API to manage PowerEdge servers via the integrated Dell Remote Access Controller (iDRAC). For more details, see these [slides](https://www.slideshare.net/JoseDeLaRosa7/s111013-delarosa).
+Ansible module and playbooks that use the Redfish API to manage PowerEdge servers via the integrated Dell Remote Access Controller (iDRAC). For more details, see these [slides](https://www.slideshare.net/JoseDeLaRosa7/s111013-delarosa).
 
 ## Why Ansible
 
@@ -37,27 +37,27 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
 ...
 ```
 
-## Modules
+## Categories
 
-  - idrac_sysinfo: Collects System Information (Health, CPUs, RAM, etc.)
-  - idrac_logs: Collect System Event and Lifecycle Controller Logs
-  - idrac_scp: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
-  - idrac_users: Manages iDRAC users (add/delete/update)
-  - idrac_power: Manages system power (status/on/off/restart)
-  - idrac_storage: Manages storage controllers
-  - idrac_config (coming soon): Manages iDRAC configuration
-  - idrac_license (coming soon): Manages iDRAC licenses
-  - idrac_provision (coming soon): Manages OS provisioning
-  - idrac_fw (coming soon): Manages Firmware updates
+  - Inventory: Collects System Information (Health, CPUs, RAM, etc.)
+  - Logs: Collect System Event and Lifecycle Controller Logs
+  - SCP: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
+  - Users: Manages iDRAC users (add/delete/update)
+  - Power: Manages system power (status/on/off/restart)
+  - Storage: Manages storage controllers
+  - Configuration (coming soon): Manages iDRAC configuration
+  - License (coming soon): Manages iDRAC licenses
+  - Provision (coming soon): Manages OS provisioning
+  - Firmware (coming soon): Manages Firmware updates
 
 ## Example
 
-Clone this repository. The idrac modules are in the *library* directory, they can be left there or placed somewhere else. If you move them, be sure to define the ANSIBLE_LIBRARY environment variable.
+Clone this repository. The idrac module is in the *library* directory, it can be left there or placed somewhere else. If you move it, be sure to define the ANSIBLE_LIBRARY environment variable.
 
 ```bash
-$ export ANSIBLE_LIBRARY=<directory-with-modules>
+$ export ANSIBLE_LIBRARY=<directory-with-module>
 
-$ ansible-playbook idrac_sysinfo.yml
+$ ansible-playbook get_inventory.yml
   ...
 PLAY [PowerEdge iDRAC Get System Information] **********************************
 
