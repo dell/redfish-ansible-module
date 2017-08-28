@@ -2,7 +2,7 @@
 
   - name: "Get data: {{ action }}"
     local_action: >
-       idrac_storage choice={{ action }} idracip={{ idracip }}
+       idrac category=Storage command={{ action }} idracip={{ idracip }}
             idracuser={{ idracuser }} idracpswd={{ idracpswd }}
     register: result
 

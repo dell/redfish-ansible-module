@@ -91,6 +91,38 @@ eventsvc_uri = "/EventService"
 session_uri  = "/Sessions"
 tasksvc_uri  = "/TaskService"
 
+def manage_storage(command, IDRAC_INFO, root_uri):
+    storageuri = root_uri + system_uri + "/Storage/Controllers/"
+
+    # Get a list of all storage controllers and build respective URIs
+    controller_list={}
+    list_of_uris=[]
+    i = send_get_request(IDRAC_INFO, storageuri)
+
+    for controller in i["Members"]:
+        for controller_name in controller.items():
+            list_of_uris.append(storageuri + controller_name[1].split("/")[-1])
+
+    # for each controller, get name and status
+    for storuri in list_of_uris:
+        data = send_get_request(IDRAC_INFO, storuri)
+        # Only interested in PERC and PCIe? What about SATA?
+        if "PERC" in data['Name'] or "PCIe" in data['Name']:
+            # Execute based on what we want
+            if command == "GetStorageInfo":
+                # Returns a list of all controllers along with status
+                controller_list[data['Name']] = data['Status']['Health']
+            elif command == "ListDevices":
+                # Returns a list of all controllers along with devices. Messy, clean up.
+                controller_list[data['Name']] = data['Devices']
+            else:
+                controller_list['Invalid'] = "Invalid Option"
+                break
+
+    # Returning a list of all controllers along with status
+    result = json.dumps(controller_list)
+    return result
+
 def manage_power(command, IDRAC_INFO, root_uri):
     headers = {'content-type': 'application/json'}
     reseturi = root_uri + system_uri + "/Actions/ComputerSystem.Reset"
@@ -291,6 +323,8 @@ def main():
         result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri)
     elif category == "Power":
         result = manage_power(command, IDRAC_INFO, root_uri)
+    elif category == "Storage":
+        result = manage_storage(command, IDRAC_INFO, root_uri)
     else:
         result = "Invalid Category"
 
