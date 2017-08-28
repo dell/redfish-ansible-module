@@ -46,12 +46,33 @@ options:
     required: false
     default: root
     description:
-      - iDRAC user name
+      - iDRAC user name used for authentication
   idracpswd:
     required: false
     default: calvin
     description:
-      - iDRAC user password
+      - iDRAC user passwore used for authentication
+  userid:
+    required: false
+    default: None
+    description:
+      - ID of iDRAC user to add/delete/modify
+  username:
+    required: false
+    default: None
+    description:
+      - name of iDRAC user to add/delete/modify
+  userpswd:
+    required: false
+    default: None
+    description:
+      - password of iDRAC user to add/delete/modify
+  userrole:
+    required: false
+    default: None
+    description:
+      - role of iDRAC user to add/delete/modify
+
 author: "jose.delarosa@dell.com"
 """
 
@@ -69,6 +90,32 @@ manager_uri  = "/Managers/iDRAC.Embedded.1"
 eventsvc_uri = "/EventService"
 session_uri  = "/Sessions"
 tasksvc_uri  = "/TaskService"
+
+def manage_users(command, IDRAC_INFO, USER_INFO, root_uri):
+    headers = {'content-type': 'application/json'}
+    uri = root_uri + manager_uri + "/Accounts/" + USER_INFO['userid']
+
+    if command == "AddUser":
+        plUserName = {'UserName': USER_INFO['username']}
+        plPass     = {'Password': USER_INFO['userpswd']}
+        plRoleID   = {'RoleId': USER_INFO['userrole']}
+        for payload in plUserName,plPass,plRoleID:
+            result = send_patch_request(IDRAC_INFO, uri, payload, headers)
+
+    elif command == "UpdateUserPassword":
+        payload = {'Password': USER_INFO['userpswd']}
+        result = send_patch_request(IDRAC_INFO, uri, payload, headers)
+
+    elif command == "UpdateUserRole":
+        payload = {'RoleId': USER_INFO['userrole']}
+        result = send_patch_request(IDRAC_INFO, uri, payload, headers)
+
+    elif command == "DeleteUser":
+        result = "Not yet implemented."
+
+    else:
+        result = "Invalid Option."
+    return result
 
 def get_system_logs(command, IDRAC_INFO, root_uri):
     if command == "GetSelog":
@@ -154,6 +201,15 @@ def send_get_request(idrac, uri):
         raise
     return systemData
 
+def send_patch_request(idrac, uri, pyld, hdrs):
+    try:
+        response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,
+                           verify=False, auth=(idrac['user'], idrac['pswd']))
+        statusCode = response.status_code
+    except:
+        raise
+    return statusCode
+
 def main():
     module = AnsibleModule(
         argument_spec = dict(
@@ -162,6 +218,10 @@ def main():
             idracip = dict(required=True, type='str', default=None),
             idracuser = dict(required=False, type='str', default='root'),
             idracpswd = dict(required=False, type='str', default='calvin'),
+            userid = dict(required=False, type='str', default=None),
+            username = dict(required=False, type='str', default=None),
+            userpswd = dict(required=False, type='str', default=None),
+            userrole = dict(required=False, type='str', default=None),
         ),
         supports_check_mode=True
     )
@@ -180,12 +240,19 @@ def main():
                    'user' : params['idracuser'],
                    'pswd' : params['idracpswd']
                  } 
+    USER_INFO = { 'userid'   : params['userid'],
+                  'username' : params['username'],
+                  'userpswd' : params['userpswd'],
+                  'userrole' : params['userrole']
+                 }
 
     # Execute based on what we want
     if category == "SysInfo":
         result = get_system_information(command, IDRAC_INFO, root_uri)
     elif category == "Logs":
         result = get_system_logs(command, IDRAC_INFO, root_uri)
+    elif category == "Users":
+        result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri)
     else:
         result = "Invalid Category"
 

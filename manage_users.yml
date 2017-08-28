@@ -18,10 +18,10 @@
      userrole: Operator		# user role to add/delete/modify
 
   # Options available:
-  #   Add		Add user
-  #   Delete		Delete user
-  #   UpdateRole	Update user role
-  #   UpdatePassword	Update user password
+  #   AddUser			Add user
+  #   DeleteUser		Delete user
+  #   UpdateUserRole		Update user role
+  #   UpdateUserPassword	Update user password
 
   tasks:
 
@@ -29,25 +29,25 @@
 
   - name: Add iDRAC user
     local_action: >
-       idrac_users choice=Add idracip={{ idracip }}
+       idrac category=Users command=AddUser idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
        username={{ username }} userpswd={{ userpswd }} userrole={{ userrole }}
 
   - name: Update iDRAC user role
     local_action: >
-       idrac_users choice=UpdateRole idracip={{ idracip }}
+       idrac category=Users command=UpdateUserRole idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
        userrole={{ userrole }}
 
   - name: Update iDRAC user password
     local_action: >
-       idrac_users choice=UpdatePassword idracip={{ idracip }}
+       idrac category=Users command=UpdateUserPassword idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
        userpswd={{ userpswd }}
 
   # Not  yet implemented
   - name: Delete iDRAC user
     local_action: >
-       idrac_users choice=Delete idracip={{ idracip }}
+       idrac category=Users command=DeleteUser idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
 
