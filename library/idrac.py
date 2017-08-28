@@ -230,7 +230,7 @@ def manage_users(command, IDRAC_INFO, USER_INFO, root_uri):
         result = "Invalid Option."
     return result
 
-def get_system_logs(command, IDRAC_INFO, root_uri):
+def get_logs(command, IDRAC_INFO, root_uri):
     if command == "GetSelog":
         result = send_get_request(IDRAC_INFO, root_uri + manager_uri + "/Logs/Sel")
     elif command == "GetLclog":
@@ -239,7 +239,7 @@ def get_system_logs(command, IDRAC_INFO, root_uri):
         result = "Invalid Option."
     return result
 
-def get_system_information(command, IDRAC_INFO, root_uri):
+def get_inventory(command, IDRAC_INFO, root_uri):
     if command == "ServerStatus":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'Status'][u'Health']
@@ -380,10 +380,10 @@ def main():
                  }
 
     # Execute based on what we want
-    if category == "SysInfo":
-        result = get_system_information(command, IDRAC_INFO, root_uri)
+    if category == "Inventory":
+        result = get_inventory(command, IDRAC_INFO, root_uri)
     elif category == "Logs":
-        result = get_system_logs(command, IDRAC_INFO, root_uri)
+        result = get_logs(command, IDRAC_INFO, root_uri)
     elif category == "Users":
         result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri)
     elif category == "Power":

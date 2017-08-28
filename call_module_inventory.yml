@@ -2,7 +2,7 @@
 
   - name: "Get data: {{ action }}"
     local_action: >
-       idrac category=SysInfo command={{ action }} idracip={{ idracip }}
+       idrac category=Inventory command={{ action }} idracip={{ idracip }}
             idracuser={{ idracuser }} idracpswd={{ idracpswd }}
     register: result
 

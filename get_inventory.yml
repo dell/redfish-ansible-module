@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC Get System Information
+  name: PowerEdge iDRAC Get System Inventory
   gather_facts: False
 
   # Here we define global variables, but if some servers have different
@@ -18,7 +18,7 @@
     set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
 
   - name: Set temporary file to place results
-    set_fact: outfile={{rootdir}}/{{host}}/{{host}}_sysinfo_{{timestamp}}
+    set_fact: outfile={{rootdir}}/{{host}}/{{host}}_inventory_{{timestamp}}
 
   - name: Set system information items array
     set_fact: sys_info_items="[ 'ServerStatus', 'ServerModel', 'BiosVersion', 'AssetTag', 'ServiceTag', 'SerialNumber', 'MemoryGiB', 'MemoryHealth', 'CPUModel', 'CPUHealth', 'CPUCount', 'PowerState', 'ConsumedWatts', 'IdracFirmwareVersion', 'IdracHealth', 'BootSourceOverrideMode' ]"
@@ -31,28 +31,28 @@
     when: csvformat == True
 
   - name: Get system information
-    include: call_module_sysinfo.yml action={{item}}
+    include: call_module_inventory.yml action={{item}}
     with_items: "{{ sys_info_items }}"
 
   - local_action: shell echo "" >> {{ outfile }}.csv
     when: csvformat == True
 
-  - local_action: shell echo -n "Host," >> {{ rootdir }}/allhosts_sysinfo_{{timestamp}}.csv
+  - local_action: shell echo -n "Host," >> {{ rootdir }}/allhosts_inventory_{{timestamp}}.csv
     run_once: true  # task runs only once
     when: csvformat == True
 
   - name: Add header row to system information CSV file
-    local_action: shell echo -n "{{item}}," >> {{ rootdir }}/allhosts_sysinfo_{{timestamp}}.csv
+    local_action: shell echo -n "{{item}}," >> {{ rootdir }}/allhosts_inventory_{{timestamp}}.csv
     run_once: true
     with_items: "{{ sys_info_items }}"
     when: csvformat == True
 
-  - local_action: shell echo "" >> {{ rootdir }}/allhosts_sysinfo_{{timestamp}}.csv
+  - local_action: shell echo "" >> {{ rootdir }}/allhosts_inventory_{{timestamp}}.csv
     run_once: true
     when: csvformat == True
 
   - name: Combine all host outputs to one CSV file
-    local_action: shell cat {{ outfile }}.csv >> {{ rootdir }}/allhosts_sysinfo_{{timestamp}}.csv
+    local_action: shell cat {{ outfile }}.csv >> {{ rootdir }}/allhosts_inventory_{{timestamp}}.csv
     when: csvformat == True
 
   - name: Remove temporary results file

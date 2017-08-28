@@ -73,8 +73,8 @@ You will see the usual task execution output, but please note that all server in
 ```bash
 $ cd <rootdir>/webserver1
 $ ls
-webserver1_sysinfo_20170728_142202.info
-$ cat webserver1_sysinfo_20170728_142202.info
+webserver1_inventory_20170728_142202.info
+$ cat webserver1_inventory_20170728_142202.info
 ServerHealth: OK
 ServerModel: PowerEdge R630
 BiosVersion: 2.4.3
@@ -94,7 +94,7 @@ IdracHealth: Ok
 
 These files are in the format *{{host}}_{{datatype}}_{{datestamp}}* and each contains valuable server information. 
 
-All server data is returned in JSON format and where appropriate it is extracted into an easy-to-read format. In this case, the file *webserver1_sysinfo_20170728_142202.txt* contains server data that has already been parsed for consumption.
+All server data is returned in JSON format and where appropriate it is extracted into an easy-to-read format. In this case, the file *webserver1_inventory_20170728_142202.txt* contains server data that has already been parsed for consumption.
 
 With the idrac_logs module, the SELogs file is in JSON format but its relevant data can be easily read with any JSON parser. For example, using the [jq](https://stedolan.github.io/jq/) parser:
 
