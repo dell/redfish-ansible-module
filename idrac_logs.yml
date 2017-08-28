@@ -12,8 +12,8 @@
      idracpswd: calvin
 
   # Logs available:
-  #   Selog	System Event Log
-  #   Lclog	Lifecycle Log (coming soon)
+  #   GetSelog	System Event Log
+  #   GetLclog	Lifecycle Log (coming soon)
 
   tasks:
 
@@ -25,8 +25,8 @@
 
   - name: Get SE Logs
     local_action: >
-       idrac_logs choice=Selog idracip={{ idracip }} idracuser={{ idracuser }}
-            idracpswd={{ idracpswd }}
+       idrac category=Logs command=GetSelog idracip={{ idracip }}
+            idracuser={{ idracuser }} idracpswd={{ idracpswd }}
     register: result
 
   - name: Place SE Logs in file
@@ -35,8 +35,8 @@
 
   - name: Get LC Logs
     local_action: >
-       idrac_logs choice=Lclog idracip={{ idracip }} idracuser={{ idracuser }}
-            idracpswd={{ idracpswd }}
+       idrac category=Logs command=GetLclog idracip={{ idracip }}
+            idracuser={{ idracuser }} idracpswd={{ idracpswd }}
     register: result
 
   - name: Place LC Logs in file

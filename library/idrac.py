@@ -25,7 +25,7 @@ ANSIBLE_METADATA = {'status': ['preview'],
 DOCUMENTATION = """
 module: idrac
 version_added: "2.3"
-short_description: Use iDRAC Redfish APIs to get system information.
+short_description: Manage Dell EMC hardware through iDRAC Redfish APIs
 options:
   category:
     required: true
@@ -70,88 +70,77 @@ eventsvc_uri = "/EventService"
 session_uri  = "/Sessions"
 tasksvc_uri  = "/TaskService"
 
-def execute_sysinfo(command, IDRAC_INFO, root_uri):
- 
+def get_system_logs(command, IDRAC_INFO, root_uri):
+    if command == "GetSelog":
+        result = send_get_request(IDRAC_INFO, root_uri + manager_uri + "/Logs/Sel")
+    elif command == "GetLclog":
+        result = send_get_request(IDRAC_INFO, root_uri + manager_uri + "/Logs/Lclog")
+    else:
+        result = "Invalid Option."
+    return result
+
+def get_system_information(command, IDRAC_INFO, root_uri):
     if command == "ServerStatus":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'Status'][u'Health']
-
     elif command == "ServerModel":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'Model']
-
     elif command == "BiosVersion":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'BiosVersion']
-
     elif command == "ServerManufacturer":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'Manufacturer']
-
     elif command == "ServerPartNumber":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'PartNumber']
-
     elif command == "SystemType":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'SystemType']
-
     elif command == "AssetTag":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'AssetTag']
-
     elif command == "MemoryGiB":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'MemorySummary'][u'TotalSystemMemoryGiB']
-
     elif command == "MemoryHealth":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'MemorySummary'][u'Status'][u'Health']
-
     elif command == "CPUModel":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'ProcessorSummary'][u'Model']
-
     elif command == "CPUHealth":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'ProcessorSummary'][u'Status'][u'Health']
-
     elif command == "CPUCount":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'ProcessorSummary'][u'Count']
-
     elif command == "ConsumedWatts":
         power = send_get_request(IDRAC_INFO, root_uri + chassis_uri + "/Power/PowerControl")
         result = power[u'PowerConsumedWatts']
-
     elif command == "PowerState":
         power = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = power[u'PowerState']
-
     elif command == "ServiceTag":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'SKU']
-
     elif command == "SerialNumber":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         result = system[u'SerialNumber']
-
     elif command == "IdracFirmwareVersion":
         system = send_get_request(IDRAC_INFO, root_uri + manager_uri)
         result = system[u'FirmwareVersion']
-
     elif command == "IdracHealth":
         system = send_get_request(IDRAC_INFO, root_uri + manager_uri)
         result = system[u'Status'][u'Health']
-
     elif command == "BootSourceOverrideMode":
         system = send_get_request(IDRAC_INFO, root_uri + system_uri)
         systemdict = system[u'Boot']
         if 'BootSourceOverrideMode' in systemdict.keys():
-                result = system[u'Boot'][u'BootSourceOverrideMode']
+            result = system[u'Boot'][u'BootSourceOverrideMode']
         else:
-                result = "14G only."
-
+            result = "14G only."
     else:
         result = "Invalid Command."
 
@@ -194,7 +183,9 @@ def main():
 
     # Execute based on what we want
     if category == "SysInfo":
-        result = execute_sysinfo(command, IDRAC_INFO, root_uri)
+        result = get_system_information(command, IDRAC_INFO, root_uri)
+    elif category == "Logs":
+        result = get_system_logs(command, IDRAC_INFO, root_uri)
     else:
         result = "Invalid Category"
 
