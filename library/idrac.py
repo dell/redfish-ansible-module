@@ -72,6 +72,26 @@ options:
     default: None
     description:
       - role of iDRAC user to add/delete/modify
+  sharehost:
+    required: false
+    default: None
+    description:
+      - CIFS/SMB share hostname for managing SCP files
+  sharename:
+    required: false
+    default: None
+    description:
+      - CIFS/SMB share name for managing SCP files
+  shareuser:
+    required: false
+    default: None
+    description:
+      - CIFS/SMB share user for managing SCP files
+  sharepswd:
+    required: false
+    default: None
+    description:
+      - CIFS/SMB share user password for managing SCP files
 
 author: "jose.delarosa@dell.com"
 """
@@ -90,6 +110,35 @@ manager_uri  = "/Managers/iDRAC.Embedded.1"
 eventsvc_uri = "/EventService"
 session_uri  = "/Sessions"
 tasksvc_uri  = "/TaskService"
+
+def manage_scp(command, hostname, IDRAC_INFO, SHARE_INFO, root_uri):
+    if command == "ExportSCP":
+        # timestamp to add to SCP XML file name
+        ts = str(datetime.strftime(datetime.now(), "_%Y%m%d_%H%M%S"))
+        scpuri = root_uri + manager_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
+        headers = {'content-type': 'application/json'}
+        payload = { "ExportFormat" : "XML",
+                    "ShareParameters" : { "Target" : "ALL",
+                         "ShareType" : "CIFS",
+                         "IPAddress" : SHARE_INFO['host'],
+                         "ShareName" : SHARE_INFO['name'],
+                         "UserName"  : SHARE_INFO['user'],
+                         "Password"  : SHARE_INFO['pswd'],
+                         "FileName"  : "SCP_" + hostname + ts + ".xml"}
+                  }
+        (response, statusCode) = send_post_request(IDRAC_INFO, scpuri, payload, headers)
+
+        response_output = response.__dict__
+        job_id = response_output["headers"]["Location"]
+        # This returns the iDRAC Job ID: a string
+        result = re.search("JID_.+", job_id).group()
+
+    elif command == "ImportSCP":
+        result = "Import option not yet implemented."
+
+    else:
+        result = "Invalid Option."
+    return result
 
 def manage_storage(command, IDRAC_INFO, root_uri):
     storageuri = root_uri + system_uri + "/Storage/Controllers/"
@@ -133,19 +182,24 @@ def manage_power(command, IDRAC_INFO, root_uri):
         result = power[u'PowerState']
     elif command == "PowerOn":
         payload = {'ResetType': 'On'}
-        result = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+        (response, statusCode) = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+        result = statusCode
     elif command == "PowerOff":
         payload = {'ResetType': 'ForceOff'}
-        result = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+        (response, statusCode) = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+        result = statusCode
     elif command == "GracefulRestart":
         payload = {'ResetType': 'GracefulRestart'}
-        result = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+        (response, statusCode) = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+        result = statusCode
     elif command == "GracefulShutdown":
         payload = {'ResetType': 'GracefulShutdown'}
-        result = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+        (response, statusCode) = send_post_request(IDRAC_INFO, reseturi, payload, headers)
+        result = statusCode
     elif command == "IdracGracefulRestart":
         payload = {'ResetType': 'GracefulRestart'}
-        result = send_post_request(IDRAC_INFO, idracreseturi, payload, headers)
+        (response, statusCode) = send_post_request(IDRAC_INFO, idracreseturi, payload, headers)
+        result = statusCode
     else:
         result = "Invalid Option."
     return result
@@ -267,7 +321,7 @@ def send_post_request(idrac, uri, pyld, hdrs):
         statusCode = response.status_code
     except:
         raise
-    return statusCode
+    return (response, statusCode)
 
 def send_patch_request(idrac, uri, pyld, hdrs):
     try:
@@ -290,6 +344,11 @@ def main():
             username = dict(required=False, type='str', default=None),
             userpswd = dict(required=False, type='str', default=None),
             userrole = dict(required=False, type='str', default=None),
+            hostname  = dict(required=False, type='str', default=None),
+            sharehost = dict(required=False, type='str', default=None),
+            sharename = dict(required=False, type='str', default=None),
+            shareuser = dict(required=False, type='str', default=None),
+            sharepswd = dict(required=False, type='str', default=None),
         ),
         supports_check_mode=True
     )
@@ -297,6 +356,7 @@ def main():
     params = module.params
     category = params['category']
     command  = params['command']
+    hostname = params['hostname']
 
     # Build initial URI
     root_uri = ''.join(["https://%s" % params['idracip'], "/redfish/v1"])
@@ -308,6 +368,11 @@ def main():
                    'user' : params['idracuser'],
                    'pswd' : params['idracpswd']
                  } 
+    SHARE_INFO = { 'host' : params['sharehost'],
+                   'name' : params['sharename'],
+                   'user' : params['shareuser'],
+                   'pswd' : params['sharepswd']
+                 }
     USER_INFO = { 'userid'   : params['userid'],
                   'username' : params['username'],
                   'userpswd' : params['userpswd'],
@@ -325,6 +390,8 @@ def main():
         result = manage_power(command, IDRAC_INFO, root_uri)
     elif category == "Storage":
         result = manage_storage(command, IDRAC_INFO, root_uri)
+    elif category == "SCP":
+        result = manage_scp(command, hostname, IDRAC_INFO, SHARE_INFO, root_uri)
     else:
         result = "Invalid Category"
 
