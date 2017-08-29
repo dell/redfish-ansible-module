@@ -22,7 +22,7 @@
     set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
 
   - name: Set temporary file to place results
-    set_fact: outfile={{rootdir}}/{{host}}/{{host}}_storageinfo_{{timestamp}}
+    set_fact: outfile={{rootdir}}/{{host}}/{{host}}_storage_{{timestamp}}
 
   - name: Create dropoff directory for host if needed
     local_action: file path={{rootdir}}/{{host}} state=directory
@@ -41,7 +41,7 @@
     when: csvformat == True
 
   - name: Combine all host outputs to one CSV file
-    local_action: shell cat {{outfile}}.csv >> {{rootdir}}/allhosts_storageinfo_{{timestamp}}.csv
+    local_action: shell cat {{outfile}}.csv >> {{rootdir}}/allhosts_storage_{{timestamp}}.csv
     when: csvformat == True
 
   - name: Remove temporary results file
