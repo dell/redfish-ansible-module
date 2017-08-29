@@ -28,7 +28,7 @@
     local_action: file path={{rootdir}}/{{host}} state=directory
 
   - name: Prepend Hostname at the beginning of each line
-    local_action: shell echo -n {{ host }}"," >> {{ outfile }}.csv
+    local_action: shell echo -n {{host}}"," >> {{outfile}}.csv
     when: csvformat == True
 
   - name: Get storage information
@@ -37,12 +37,12 @@
   - name: Get storage information
     include: storage_getdata.yml action=ListDevices
 
-  - local_action: shell echo "" >> {{ outfile }}.csv
+  - local_action: shell echo "" >> {{outfile}}.csv
     when: csvformat == True
 
   - name: Combine all host outputs to one CSV file
-    local_action: shell cat {{ outfile }}.csv >> {{ rootdir }}/allhosts_storageinfo_{{timestamp}}.csv
+    local_action: shell cat {{outfile}}.csv >> {{rootdir}}/allhosts_storageinfo_{{timestamp}}.csv
     when: csvformat == True
 
   - name: Remove temporary results file
-    local_action: file path={{ outfile }} state=absent
+    local_action: file path={{outfile}} state=absent
