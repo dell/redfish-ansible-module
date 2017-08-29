@@ -32,10 +32,10 @@
     when: csvformat == True
 
   - name: Get storage information
-    include: call_module_storage.yml action=GetStorageInfo
+    include: storage_getdata.yml action=GetStorageInfo
 
   - name: Get storage information
-    include: call_module_storage.yml action=ListDevices
+    include: storage_getdata.yml action=ListDevices
 
   - local_action: shell echo "" >> {{ outfile }}.csv
     when: csvformat == True

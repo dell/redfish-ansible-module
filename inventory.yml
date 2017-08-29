@@ -31,7 +31,7 @@
     when: csvformat == True
 
   - name: Get system information
-    include: call_module_inventory.yml action={{item}}
+    include: inventory_getdata.yml action={{item}}
     with_items: "{{ sys_info_items }}"
 
   - local_action: shell echo "" >> {{ outfile }}.csv
