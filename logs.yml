@@ -3,14 +3,6 @@
   name: PowerEdge iDRAC Logs
   gather_facts: False
 
-  # Here we define global variables, but if some servers have different
-  # credentials, then place these variables in /etc/ansible/hosts to override
-  # for each host
-  vars:
-     rootdir: /root			# where I place all results 
-     idracuser: root
-     idracpswd: calvin
-
   # Logs available:
   #   GetSelog	System Event Log
   #   GetLclog	Lifecycle Log (coming soon)

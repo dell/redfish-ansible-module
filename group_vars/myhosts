@@ -1,0 +1,25 @@
+---
+
+# Here we define global variables for our server group, but if some servers
+# require custom values place these variables in /etc/ansible/hosts to override
+# for each individual host
+
+# iDRAC credentials (using default values)
+idracuser: root
+idracpswd: calvin
+
+rootdir: /root             # local directory where all results are placed
+csvformat: True            # True if we want results to be comma-separated
+
+# For SCP files
+sharehost: 10.9.165.171
+sharename: share2
+shareuser: dell
+sharepswd: 111111
+
+# For managing users
+userid: 3                  # user id of user to add/delete/modify (1-16)
+                           # userid 2 is default root user, be mindful!
+username: user3            # user name to add/delete/modify
+userpswd: mypassword       # user password to add/delete/modify
+userrole: Operator         # user role to add/delete/modify

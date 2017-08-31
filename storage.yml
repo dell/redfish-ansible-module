@@ -3,15 +3,6 @@
   name: PowerEdge storage status and configuration
   gather_facts: False
 
-  # Here we define global variables, but if some servers have different
-  # credentials, then place these variables in /etc/ansible/hosts to override
-  # for each host
-  vars:
-     rootdir: /root			# where I place all results 
-     idracuser: root
-     idracpswd: calvin
-     csvformat: False			# True if we want it comma-separated
-
   # Commands available:
   #   GetStorageInfo        Get storage controller information
   #   ListDevices           List all storage devices

@@ -4,14 +4,6 @@
   name: PowerEdge iDRAC Manage System Power
   gather_facts: False
 
-  # Here we define global variables, but if some servers have different
-  # credentials, then place these variables in /etc/ansible/hosts to override
-  # for each host
-  vars:
-     rootdir: /root
-     idracuser: root
-     idracpswd: calvin
-
   # Commands available:
   #   PowerState	Check system power
   #   PowerOn		Turn system power on

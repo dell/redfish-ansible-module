@@ -3,17 +3,6 @@
   name: PowerEdge iDRAC Manage SCP
   gather_facts: False
 
-  # Here we define global variables, but if some servers have different
-  # credentials, then place these variables in /etc/ansible/hosts to override
-  # for each host
-  vars:
-     idracuser: root
-     idracpswd: calvin
-     sharehost: 10.9.165.171
-     sharename: share2
-     shareuser: dell
-     sharepswd: 111111
-
   # Options available:
   #   ExportSCP 	Export Server Configuration Profile (SCP)
   #   ImportSCP		Import Server Configuration Profile (SCP)
