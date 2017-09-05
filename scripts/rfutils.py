@@ -9,7 +9,8 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 user_def = "root"
 pswd_def = "calvin"
 
-class Common:
+# As in "(r)ed(f)ish utilites". Should probably name it something better.
+class rfutils:
 
     def __init__ (self):
         return
