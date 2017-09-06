@@ -1,0 +1,46 @@
+---
+- hosts: myhosts
+  name: PowerEdge iDRAC Get System Firmware Inventory
+  gather_facts: False
+
+# NOT YET IMPLEMENTED
+
+  tasks:
+
+  - name: Set timestamp
+    set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
+
+  - name: Set name of temp file to place results
+    set_fact: outfile={{rootdir}}/{{host}}/{{host}}_inventory_fw_{{timestamp}}
+
+  - name: Create dropoff directory for host if needed
+    local_action: file path={{rootdir}}/{{host}} state=directory
+
+  - name: Prepend Hostname at the beginning of each line
+    local_action: shell echo -n {{host}}"," >> {{outfile}}.csv
+    when: csvformat == True
+
+#---------------------------------------------------------
+  - local_action: >
+       idrac category=Firmware command=GetInventory idracip={{idracip}}
+       idracuser={{idracuser}} idracpswd={{idracpswd}}
+    register: result
+
+  - local_action: copy content={{ result | to_nice_json }} dest={{outfile}}
+
+  # JSON parser jq (https://stedolan.github.io/jq/)
+  - set_fact: result="{{ lookup('pipe', 'jq .result {{outfile}}') }}"
+
+  - local_action: shell echo -n {{result}}"," >> {{outfile}}.csv
+    when: csvformat == True
+
+  - local_action: shell echo {{action}}":" {{result}} >> {{outfile}}.info
+    when: csvformat != True
+#---------------------------------------------------------
+
+  - name: Put in CSV format
+    include: inventory_csv.yml
+    when: csvformat == True
+
+  - name: Remove temporary results file
+    local_action: file path={{outfile}} state=absent

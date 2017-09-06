@@ -8,11 +8,11 @@
   - name: Set timestamp
     set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
 
+  - name: Set name of temp file to place results
+    set_fact: outfile={{rootdir}}/{{host}}/{{host}}_inventory_{{timestamp}}
+
   - name: Create dropoff directory for host if needed
     local_action: file path={{rootdir}}/{{host}} state=directory
-
-  - name: Set temporary file to place results
-    set_fact: outfile={{rootdir}}/{{host}}/{{host}}_inventory_{{timestamp}}
 
   - name: Set system information items array
     set_fact: inventory_items="[ 'ServerStatus', 'ServerModel', 'BiosVersion', 'AssetTag', 'ServiceTag', 'SerialNumber', 'MemoryGiB', 'MemoryHealth', 'CPUModel', 'CPUHealth', 'CPUCount', 'PowerState', 'ConsumedWatts', 'IdracFirmwareVersion', 'IdracHealth', 'BootSourceOverrideMode' ]"

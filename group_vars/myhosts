@@ -18,8 +18,8 @@ shareuser: dell
 sharepswd: 111111
 
 # For managing users
-userid: 3                  # user id of user to add/delete/modify (1-16)
+userid: 5                  # user id of user to add/delete/modify (1-16)
                            # userid 2 is default root user, be mindful!
-username: user3            # user name to add/delete/modify
+username: user5            # user name to add/delete/modify
 userpswd: mypassword       # user password to add/delete/modify
 userrole: Operator         # user role to add/delete/modify
