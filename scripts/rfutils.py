@@ -1,6 +1,5 @@
-#!/usr/bin/env python
-
-import sys, os
+import sys
+import os
 import requests
 import json
 # http://bit.ly/2iGTEGS
@@ -20,17 +19,17 @@ class rfutils:
         print("  ip:       iDRAC IP address")
         print("  user:     iDRAC login      (default: %s)" % user_def)
         print("  password: iDRAC password   (default: %s)" % pswd_def)
-        sys.exit(1)
+        exit(0)
 
     def die(self, msg):
-        print >>sys.stderr, msg
-        os._exit(1)
+        print(msg)
+        exit(1)
 
     def check_args(self, args):
         # This could use better logic, maybe use argparse. But will do for now
+        # If we don't provide credentials then it will use defaults above
         idrac = {}
-
-        if len(sys.argv) < 2:       # must pass iDRAC IP
+        if len(sys.argv) < 2:       	# must provide iDRAC IP address
             self.usage(args.argv[0])
         if len(args.argv) == 2:
             if (args.argv[1]) == "--help" or (args.argv[1]) == "-h":
@@ -41,17 +40,19 @@ class rfutils:
         else: idrac["user"] = user_def
         if len(args.argv) == 4: idrac["pswd"] = args.argv[3]
         else: idrac["pswd"] = pswd_def
-        print("ip=%s, id=%s, pw=%s" % (idrac["ip"],idrac["user"],idrac["pswd"]))
+        print("-"*65)
+        print("idracip=%s, user=%s, pass=%s" %
+                               (idrac["ip"],idrac["user"],idrac["pswd"]))
         return idrac
 
-    def get_info(self, u, p, str):
+    def send_get_request(self, u, p, str):
         print("uri=%s" % str)
+        print("-"*65)
         try:
             # Disable insecure-certificate-warning message
             requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-            system = requests.get(str, verify=False, auth=(u,p))
-            systemData = system.json()
+            response = requests.get(str, verify=False, auth=(u,p))
         except:
-            raise
             # self.die("Error! Verify Redfish support or credentials.")
-        return systemData
+            raise
+        return response
