@@ -1,50 +1,48 @@
-#!/usr/bin/env python
-
 import rfutils
+import json
+import requests
 import sys
-import signal
+import re
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 rf = rfutils.rfutils()
 
-def sig_handler(signum, frame):
-    # should this do something else?
-    print("Received Signal:", signum)
-    exit(1)
+def get_inventory(idrac, base_uri, rf_uri):
+    response = rf.send_get_request(idrac, base_uri + rf_uri)
+    rf.print_bold("status_code: %s" % response.status_code)
+    if response.status_code == 400:
+        rf.print_red("Something went wrong.")
+        exit(1)
 
-def print_results(response):
-    i = response.json() 
-    print("Model:         {}").format(i[u'Model'])
-    print("Mfg:           {}").format(i[u'Manufacturer'])
-    print("Part Number:   {}").format(i[u'PartNumber'])
-    print("System Type:   {}").format(i[u'SystemType'])
-    print("Asset tag:     {}").format(i[u'AssetTag'])
-    print("Service tag:   {}").format(i[u'SKU'])
-    print("Serial Number: {}").format(i[u'SerialNumber'])
-    print("BIOS:          {}").format(i[u'BiosVersion'])
-    print("Hostname:      {}").format(i[u'HostName'])
-    print("Power state:   {}").format(i[u'PowerState'])
-    print("Memory:        {}").format(i[u'MemorySummary'][u'TotalSystemMemoryGiB'])
-    print("Memory health: {}").format(i[u'MemorySummary'][u'Status'][u'Health'])
-    print("CPU count:     {}").format(i[u'ProcessorSummary'][u'Count'])
-    print("CPU model:     {}").format(i[u'ProcessorSummary'][u'Model'])
-    print("CPU health:    {}").format(i[u'ProcessorSummary'][u'Status'][u'Health'])
-    print("Status:        {}").format(i[u'Status'][u'Health'])
+    data = response.json()
+    # print(json.dumps(data, separators=(',', ':')))
+    print("Model:       %s" % data[u'Model'])
+    print("Mfg:         %s" % data[u'Manufacturer'])
+    print("Part Number: %s" % data[u'PartNumber'])
+    print("System Type: %s" % data[u'SystemType'])
+    print("Asset tag:   %s" % data[u'AssetTag'])
+    print("Service tag: %s" % data[u'SKU'])
+    print("Serial No.:  %s" % data[u'SerialNumber'])
+    print("BIOS:        %s" % data[u'BiosVersion'])
+    print("Hostname:    %s" % data[u'HostName'])
+    print("Power state: %s" % data[u'PowerState'])
+    print("Memory:      %s" % data[u'MemorySummary'][u'TotalSystemMemoryGiB'])
+    print("CPU count:   %s" % data[u'ProcessorSummary'][u'Count'])
+    print("CPU model:   %s" % data[u'ProcessorSummary'][u'Model'])
+    print("CPU health   %s" % data[u'ProcessorSummary'][u'Status'][u'Health'])
+    print("Status:      %s" % data[u'Status'][u'Health'])
+
     return
 
-def mymain():
+def main():
     idrac = rf.check_args(sys)
 
-    uri = ''.join(["https://%s" % idrac["ip"],
-          "/redfish/v1/Systems/System.Embedded.1"])
+    # Disable insecure-certificate-warning message
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    base_uri = "https://" + idrac['ip']
+    rf_uri = "/redfish/v1/Systems/System.Embedded.1"
 
-    response = rf.send_get_request(idrac["user"], idrac["pswd"], uri)
-    if response.status_code == 400:
-        print("Error detected!")
-    else:
-        print_results(response)
+    # Get system inventory
+    get_inventory(idrac, base_uri, rf_uri)
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGTERM, sig_handler)
-    try:
-        mymain()
-    except KeyboardInterrupt:
-        rf.die("Interrupt detected, exiting.")
+    main()

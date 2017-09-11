@@ -43,7 +43,7 @@ Get power usage during last hour:
 # Using provided scripts
 
 ```
-$ get-system-inventory.py 192.168.0.53
+$ python get-system-inventory.py 192.168.0.53
 Model:       PowerEdge R630
 Mfg:         Dell Inc.
 BIOS:        2.4.2
@@ -57,13 +57,13 @@ CPUs:        2
 CPU type:    Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
 Status:      OK
 
-$ get-system-power.py 192.168.0.53
+$ python get-system-power.py 192.168.0.53
 Power Monitoring - Historical Trends - Last Hour
 Average Usage:  157 W
 Max Peak:       176 W
 Min Peak:       156 W
 
-$ get-system-se-logs.py 192.168.0.53
+$ python get-system-selogs.py 192.168.0.53
  Log Entry 5: 2017-02-13T22:55:11-06:00
  Drive 4 is installed in disk drive bay 1.
 
