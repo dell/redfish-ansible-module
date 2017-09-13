@@ -9,11 +9,8 @@
 
   tasks:
 
-  - name: Set timestamp variable
-    set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
-
-  - name: Create dropoff dir for host if needed
-    local_action: file path={{rootdir}}/{{host}} state=directory
+  - name: Prepare output file
+    include: setup_outputfile.yml
 
   - name: Get SE Logs
     local_action: >
@@ -23,7 +20,7 @@
 
   - name: Place SE Logs in file
     local_action: copy content={{ result | to_nice_json }}
-             dest={{rootdir}}/{{host}}/{{host}}_SELogs_{{timestamp}}.json
+             dest={{template}}_SELog.json
 
   - name: Get LC Logs
     local_action: >
@@ -33,4 +30,4 @@
 
   - name: Place LC Logs in file
     local_action: copy content={{ result | to_nice_json }}
-             dest={{rootdir}}/{{host}}/{{host}}_LCLogs_{{timestamp}}.json
+             dest={{template}}_LCLog.json

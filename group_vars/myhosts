@@ -8,18 +8,17 @@
 idracuser: root
 idracpswd: calvin
 
+# Misc
 rootdir: /root             # local directory where all results are placed
-csvformat: True            # True if we want results to be comma-separated
 
 # For SCP files
-sharehost: 10.9.165.171
+sharehost: 192.168.0.200
 sharename: share2
-shareuser: dell
-sharepswd: 111111
+shareuser: joe
+sharepswd: 123456
 
-# For managing users
-userid: 5                  # user id of user to add/delete/modify (1-16)
-                           # userid 2 is default root user, be mindful!
-username: user5            # user name to add/delete/modify
+# For managing users - userid 2 is default root user, be mindful!
+userid: 3                  # user id of user to add/delete/modify (1-16)
+username: user3            # user name to add/delete/modify
 userpswd: mypassword       # user password to add/delete/modify
 userrole: Operator         # user role to add/delete/modify

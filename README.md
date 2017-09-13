@@ -37,7 +37,7 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
 ...
 ```
 
-## Categories
+## Functionality Categories
 
   - Inventory: Collects System Information (Health, CPUs, RAM, etc.)
   - Logs: Collect System Event and Lifecycle Controller Logs
@@ -57,67 +57,80 @@ Clone this repository. The idrac module is in the *library* directory, it can be
 ```bash
 $ export ANSIBLE_LIBRARY=<directory-with-module>
 
-$ ansible-playbook get_inventory.yml
+$ ansible-playbook <playbook>.yml
   ...
-PLAY [PowerEdge iDRAC Get System Information] **********************************
+PLAY [PowerEdge iDRAC Get System Inventory] ************************************
 
-TASK [Set timestamp ] **********************************************************
+TASK [Define timestamp] ********************************************************
 ok: [webserver1]
 ok: [webserver2]
 ok: [dbserver1]
   --- snip ---
 ```
 
-You will see the usual task execution output, but please note that all server information retrieved is collected and put into text files defined by the *rootdir* variable in the playbook. The playbook creates a directory per server and places files there. For example:
+You will see the usual task execution output. Playbooks that collect system information will place it in files in JSON format in a directory defined by the *rootdir* variable in file *group_vars/myhosts*. The playbook creates a directory for each server and places files there. For example:
 
 ```bash
 $ cd <rootdir>/webserver1
 $ ls
-webserver1_inventory_20170728_142202.info
-$ cat webserver1_inventory_20170728_142202.info
-ServerHealth: OK
-ServerModel: PowerEdge R630
-BiosVersion: 2.4.3
-AssetTag:
-ServiceTag: XYZ1234
-SerialNumber: CNxxxxxxxMyyyy
-MemoryGiB: 128
-MemoryHealth: OK
-CPUType: Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
-CPUHealth: OK
-CPUCount: 2
-PowerState: On
-ConsumedWatts: 122
-IdracFirmwareVersion: 2.41.40.40
-IdracHealth: Ok
-```
-
-These files are in the format *{{host}}_{{datatype}}_{{datestamp}}* and each contains valuable server information. 
-
-All server data is returned in JSON format and where appropriate it is extracted into an easy-to-read format. In this case, the file *webserver1_inventory_20170728_142202.txt* contains server data that has already been parsed for consumption.
-
-With the idrac_logs module, the SELogs file is in JSON format but its relevant data can be easily read with any JSON parser. For example, using the [jq](https://stedolan.github.io/jq/) parser:
-
-```
-$ jq '.result.Members[] | {Date: .Created, Message: .Message}' webserver1_SELogs_20170615_132201.json
+webserver1_20170912_104953_inventory.json
+webserver1_20170912_103733_storagecontrollers.json
+$ cat webserver1_20170912_104953_inventory.json
 {
-  "Date": "2017-05-22T19:12:57-05:00",
-  "Message": "The system halted because system power exceeds capacity."
+    "changed": false,
+    "result": {
+        "AssetTag": "",
+        "BiosVersion": "2.4.3",
+        "BootSourceOverrideMode": "14G only.",
+        "CpuCount": 2,
+        "CpuHealth": "OK",
+        "CpuModel": "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz",
+        "HostName": "webserver1.lab.dell.com",
+        "Manufacturer": "Dell Inc.",
+        "MemoryHealth": "OK",
+        "MemoryTotal": 128.0,
+        "Model": "PowerEdge R630",
+        "PartNumber": "0CNCJWA00",
+        "PowerState": "On",
+        "SerialNumber": "CN74YYYYYXXXXX",
+        "ServiceTag": "XXXYYYY",
+        "Status": "OK",
+        "SystemType": "Physical"
+    }
 }
+$ cat webserver1_20170912_103733_storagecontrollers.json
 {
-  "Date": "2017-01-05T18:50:43-06:00",
-  "Message": "The process of installing an operating system or hypervisor is successfully completed."
+    "changed": false,
+    "result": [
+        {
+            "Health": "OK",
+            "Name": "PERC H330 Mini"
+        },
+        {
+            "Health": "OK",
+            "Name": "PCIe Extender 1"
+        },
+        {
+            "Health": null,
+            "Name": "C610/X99 series chipset sSATA Controller [AHCI mode]"
+        },
+        {
+            "Health": null,
+            "Name": "C610/X99 series chipset 6-Port SATA Controller [AHCI mode]"
+        }
+    ]
 }
-  --- snip ---
-
 ```
 
-## Prerequisites
+These files are in the format *{{host}}_{timestamp}}_{{datatype}}* and each contains valuable server information. 
 
-  - PowerEdge 12G/13G servers only (not fully tested with 14G yet)
-  - Minimum iDRAC 7/8 FW 2.40.40.40
+We will be providing scripts to easily parse through these JSON files and consolidate all server information in easy-to-read formats, including in CSV format for easy import into spreadsheets.
+
+## Requirements
+
+  - PowerEdge 12G/13G/14G servers
+  - Minimum iDRAC 7/8/9 FW 2.40.40.40
   - SMB share to place SCP files
-  - [jq](https://stedolan.github.io/jq/) JSON parser
 
 ## Support
 

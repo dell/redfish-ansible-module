@@ -104,19 +104,12 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from ansible.module_utils.basic import AnsibleModule
 
-system_uri   = "/Systems/System.Embedded.1" 
-chassis_uri  = "/Chassis/System.Embedded.1" 
-manager_uri  = "/Managers/iDRAC.Embedded.1"
-eventsvc_uri = "/EventService"
-session_uri  = "/Sessions"
-tasksvc_uri  = "/TaskService"
-
 def send_get_request(idrac, uri):
     result = {}
     try:
         response = requests.get(uri, verify=False, auth=(idrac['user'], idrac['pswd']))
     except:
-        raise
+        raise			# Do we let module exit or should we return an error value?
     return response
 
 def send_post_request(idrac, uri, pyld, hdrs):
@@ -125,7 +118,7 @@ def send_post_request(idrac, uri, pyld, hdrs):
         response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,
                            verify=False, auth=(idrac['user'], idrac['pswd']))
     except:
-        raise
+        raise			# Do we let module exit or should we return an error value?
     return response
 
 def send_patch_request(idrac, uri, pyld, hdrs):
@@ -134,14 +127,14 @@ def send_patch_request(idrac, uri, pyld, hdrs):
         response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,
                            verify=False, auth=(idrac['user'], idrac['pswd']))
     except:
-        raise
+        raise			# Do we let module exit or should we return an error value?
     return response
 
 def manage_scp(command, hostname, IDRAC_INFO, SHARE_INFO, root_uri):
     if command == "ExportSCP":
         # timestamp to add to SCP XML file name
         ts = str(datetime.strftime(datetime.now(), "_%Y%m%d_%H%M%S"))
-        scpuri = root_uri + manager_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
+        scpuri = root_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
         headers = {'content-type': 'application/json'}
         payload = { "ExportFormat" : "XML",
                     "ShareParameters" : { "Target" : "ALL",
@@ -156,85 +149,99 @@ def manage_scp(command, hostname, IDRAC_INFO, SHARE_INFO, root_uri):
         data_dict = response.__dict__
 
         job_id = data_dict["headers"]["Location"]
-        # This returns the iDRAC Job ID: a string
-        result = re.search("JID_.+", job_id).group()
+        result = re.search("JID_.+", job_id).group()	# Returns Job ID
 
     elif command == "ImportSCP":
-        result = "Import option not yet implemented."
+        result = "Not yet implemented."
 
     else:
         result = "Invalid Option."
     return result
 
-def manage_storage(command, IDRAC_INFO, root_uri):
-    storageuri = root_uri + system_uri + "/Storage/Controllers/"
+def manage_storage(command, IDRAC_INFO, root_uri, rf_uri):
+    result = []
 
     # Get a list of all storage controllers and build respective URIs
-    controller_list={}
-    list_of_uris=[]
-    response = send_get_request(IDRAC_INFO, storageuri)
+    controllers = []
+    response = send_get_request(IDRAC_INFO, root_uri + rf_uri)
     data = response.json()
 
-    for controller in data["Members"]:
-        for controller_name in controller.items():
-            list_of_uris.append(storageuri + controller_name[1].split("/")[-1])
+    for controller in data[u'Members']:
+        c = controller[u'@odata.id']
+        controllers.append(c)
 
-    # for each controller, get name and status
-    for storuri in list_of_uris:
-        response = send_get_request(IDRAC_INFO, storuri)
+    for c in controllers:
+        uri = root_uri + c
+        response = send_get_request(IDRAC_INFO, uri)
         data = response.json()
 
-        # Execute based on what we want
-        if command == "GetStorageInfo":
-            # Returns a list of all controllers along with status
-            controller_list[data['Name']] = data['Status']['Health']
-        elif command == "ListDevices":
-            # Returns a list of all controllers along with devices. Messy, clean up.
-            controller_list[data['Name']] = data['Devices']
-        else:
-            controller_list['Invalid'] = "Invalid Option"
-            break
+        if command == "GetControllerInfo":
+            controller = {}
+            controller['Name']   = data[u'Name']	# Name of storage controller
+            controller['Health'] = data[u'Status'][u'Health']
+            result.append(controller)
 
-    # Returning a list of all controllers along with status
-    result = json.dumps(controller_list)
+        elif command == "GetDiskInfo":
+            for device in data[u'Devices']:
+                disk = {}
+                disk['Controller']   = data[u'Name']	# Name of storage controller
+                disk['Name']         = device[u'Name']
+                disk['Manufacturer'] = device[u'Manufacturer']
+                disk['Model']        = device[u'Model']
+                disk['State']        = device[u'Status'][u'State']
+                disk['Health']       = device[u'Status'][u'Health']
+                result.append(disk)
+
+        else:
+            result = "Invalid Option."
+
     return result
 
-def manage_power(command, IDRAC_INFO, root_uri):
+def manage_idrac_power(command, IDRAC_INFO, root_uri):
     headers = {'content-type': 'application/json'}
-    reseturi = root_uri + system_uri + "/Actions/ComputerSystem.Reset"
-    idracreseturi = root_uri + manager_uri + "/Actions/Manager.Reset"
+    uri = root_uri + "/Actions/Manager.Reset"
 
-    if command == "PowerState":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'PowerState']
-    elif command == "PowerOn":
+    if command == "IdracGracefulRestart":
+        payload = {'ResetType': 'GracefulRestart'}
+        response = send_post_request(IDRAC_INFO, uri, payload, headers)
+        result = response.status_code
+
+    else:
+        result = "Invalid Option."
+
+    return
+
+def manage_system_power(command, IDRAC_INFO, root_uri):
+    headers = {'content-type': 'application/json'}
+    uri = root_uri + "/Actions/ComputerSystem.Reset"
+
+    if command == "PowerOn":
         payload = {'ResetType': 'On'}
-        data = send_post_request(IDRAC_INFO, reseturi, payload, headers)
-        result = data["statusCode"]
+        response = send_post_request(IDRAC_INFO, uri, payload, headers)
+        result = response.status_code
+
     elif command == "PowerOff":
         payload = {'ResetType': 'ForceOff'}
-        data = send_post_request(IDRAC_INFO, reseturi, payload, headers)
-        result = data["statusCode"]
+        response = send_post_request(IDRAC_INFO, uri, payload, headers)
+        result = response.status_code
+
     elif command == "GracefulRestart":
         payload = {'ResetType': 'GracefulRestart'}
-        data = send_post_request(IDRAC_INFO, reseturi, payload, headers)
-        result = data["statusCode"]
+        response = send_post_request(IDRAC_INFO, uri, payload, headers)
+        result = response.status_code
+
     elif command == "GracefulShutdown":
         payload = {'ResetType': 'GracefulShutdown'}
-        data = send_post_request(IDRAC_INFO, reseturi, payload, headers)
-        result = data["statusCode"]
-    elif command == "IdracGracefulRestart":
-        payload = {'ResetType': 'GracefulRestart'}
-        data = send_post_request(IDRAC_INFO, idracreseturi, payload, headers)
-        result = data["statusCode"]
+        response = send_post_request(IDRAC_INFO, uri, payload, headers)
+        result = response.status_code
+
     else:
         result = "Invalid Option."
     return result
 
 def manage_users(command, IDRAC_INFO, USER_INFO, root_uri):
     headers = {'content-type': 'application/json'}
-    uri = root_uri + manager_uri + "/Accounts/" + USER_INFO['userid']
+    uri = root_uri + "/Accounts/" + USER_INFO['userid']
 
     if command == "AddUser":
         plUserName = {'UserName': USER_INFO['username']}
@@ -262,12 +269,29 @@ def manage_users(command, IDRAC_INFO, USER_INFO, root_uri):
     return result
 
 def get_logs(command, IDRAC_INFO, root_uri):
-    if command == "GetSelog":
-        response = send_get_request(IDRAC_INFO, root_uri + manager_uri + "/Logs/Sel")
-        result = response.json()
-    elif command == "GetLclog":
-        response = send_get_request(IDRAC_INFO, root_uri + manager_uri + "/Logs/Lclog")
-        result = response.json()
+    result = []
+    if command == "GetSelog":			# System Event logs
+        response = send_get_request(IDRAC_INFO, root_uri + "/Logs/Sel")
+        data = response.json()
+        # I only extract some parameters, not all
+        for logEntry in data[u'Members']:
+            entry = {}
+            entry['Name']    = logEntry[u'Name']
+            entry['Created'] = logEntry[u'Created']
+            entry['Message'] = logEntry[u'Message']
+            result.append(entry)
+
+    elif command == "GetLclog":			# Lifecycle controller logs
+        response = send_get_request(IDRAC_INFO, root_uri + "/Logs/Lclog")
+        data = response.json()
+        # I only extract some parameters, not all
+        for logEntry in data[u'Members']:
+            entry = {}
+            entry['Name']     = logEntry[u'Name']
+            entry['Created']  = logEntry[u'Created']
+            entry['Message']  = logEntry[u'Message']
+            entry['Severity'] = logEntry[u'Severity']
+            result.append(entry)
     else:
         result = "Invalid Option."
     return result
@@ -278,90 +302,38 @@ def get_firmware_inventory(command, IDRAC_INFO, root_uri):
         result = response.json()
 
     result = "Not implemented yet"
-
     return result 
 
 def get_inventory(command, IDRAC_INFO, root_uri):
-    if command == "ServerStatus":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
+    result = {}
+    if command == "GetInventory":
+        response = send_get_request(IDRAC_INFO, root_uri)
         data = response.json()
-        result = data[u'Status'][u'Health']
-    elif command == "ServerModel":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'Model']
-    elif command == "BiosVersion":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'BiosVersion']
-    elif command == "ServerManufacturer":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'Manufacturer']
-    elif command == "ServerPartNumber":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'PartNumber']
-    elif command == "SystemType":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'SystemType']
-    elif command == "AssetTag":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'AssetTag']
-    elif command == "MemoryGiB":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'MemorySummary'][u'TotalSystemMemoryGiB']
-    elif command == "MemoryHealth":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'MemorySummary'][u'Status'][u'Health']
-    elif command == "CPUModel":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'ProcessorSummary'][u'Model']
-    elif command == "CPUHealth":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'ProcessorSummary'][u'Status'][u'Health']
-    elif command == "CPUCount":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'ProcessorSummary'][u'Count']
-    elif command == "ConsumedWatts":
-        response = send_get_request(IDRAC_INFO, root_uri + chassis_uri + "/Power/PowerControl")
-        data = response.json()
-        result = data[u'PowerConsumedWatts']
-    elif command == "PowerState":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'PowerState']
-    elif command == "ServiceTag":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'SKU']
-    elif command == "SerialNumber":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
-        result = data[u'SerialNumber']
-    elif command == "IdracFirmwareVersion":
-        response = send_get_request(IDRAC_INFO, root_uri + manager_uri)
-        data = response.json()
-        result = data[u'FirmwareVersion']
-    elif command == "IdracHealth":
-        response = send_get_request(IDRAC_INFO, root_uri + manager_uri)
-        data = response.json()
-        result = data[u'Status'][u'Health']
-    elif command == "BootSourceOverrideMode":
-        response = send_get_request(IDRAC_INFO, root_uri + system_uri)
-        data = response.json()
+
+        # There could be more information to extract
+        result['Status']       = data[u'Status'][u'Health']
+        result['HostName']     = data[u'HostName']
+        result['PowerState']   = data[u'PowerState']
+        result['Model']        = data[u'Model']
+        result['Manufacturer'] = data[u'Manufacturer']
+        result['PartNumber']   = data[u'PartNumber']
+        result['SystemType']   = data[u'SystemType']
+        result['AssetTag']     = data[u'AssetTag']
+        result['ServiceTag']   = data[u'SKU']
+        result['SerialNumber'] = data[u'SerialNumber']
+        result['BiosVersion']  = data[u'BiosVersion']
+        result['MemoryTotal']  = data[u'MemorySummary'][u'TotalSystemMemoryGiB']
+        result['MemoryHealth'] = data[u'MemorySummary'][u'Status'][u'Health']
+        result['CpuCount']     = data[u'ProcessorSummary'][u'Count']
+        result['CpuModel']     = data[u'ProcessorSummary'][u'Model']
+        result['CpuHealth']    = data[u'ProcessorSummary'][u'Status'][u'Health']
+
         datadict = data[u'Boot']
         if 'BootSourceOverrideMode' in datadict.keys():
-            result = data[u'Boot'][u'BootSourceOverrideMode']
+            result['BootSourceOverrideMode'] = data[u'Boot'][u'BootSourceOverrideMode']
         else:
-            result = "14G only."
+            result['BootSourceOverrideMode'] = "14G only."
+
     else:
         result = "Invalid Command."
 
@@ -393,9 +365,6 @@ def main():
     command  = params['command']
     hostname = params['hostname']
 
-    # Build initial URI
-    root_uri = ''.join(["https://%s" % params['idracip'], "/redfish/v1"])
-
     # Disable insecure-certificate-warning message
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -414,21 +383,42 @@ def main():
                   'userrole' : params['userrole']
                  }
 
+    # Build initial URI
+    root_uri = "https://" + params['idracip']
+
     # Execute based on what we want
     if category == "Inventory":
-        result = get_inventory(command, IDRAC_INFO, root_uri)
+        rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
+        result = get_inventory(command, IDRAC_INFO, root_uri + rf_uri)
+
     elif category == "Firmware":
-        result = get_firmware_inventory(command, IDRAC_INFO, root_uri)
+        # rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
+        result = get_firmware_inventory(command, IDRAC_INFO, root_uri + rf_uri)
+
     elif category == "Logs":
-        result = get_logs(command, IDRAC_INFO, root_uri)
+        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
+        result = get_logs(command, IDRAC_INFO, root_uri + rf_uri)
+
     elif category == "Users":
-        result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri)
-    elif category == "Power":
-        result = manage_power(command, IDRAC_INFO, root_uri)
+        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/"
+        result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri + rf_uri)
+
+    elif category == "SystemPower":
+        rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
+        result = manage_system_power(command, IDRAC_INFO, root_uri + rf_uri)
+
+    elif category == "IdracPower":
+        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
+        result = manage_idrac_power(command, IDRAC_INFO, root_uri + rf_uri)
+
     elif category == "Storage":
-        result = manage_storage(command, IDRAC_INFO, root_uri)
+        rf_uri = "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/"
+        result = manage_storage(command, IDRAC_INFO, root_uri, rf_uri)
+
     elif category == "SCP":
-        result = manage_scp(command, hostname, IDRAC_INFO, SHARE_INFO, root_uri)
+        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
+        result = manage_scp(command, hostname, IDRAC_INFO, SHARE_INFO, root_uri + rf_uri)
+
     else:
         result = "Invalid Category"
 

@@ -1,0 +1,9 @@
+---
+  - name: Define timestamp
+    set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
+
+  - name: Define file to place results
+    set_fact: template={{rootdir}}/{{host}}/{{host}}_{{timestamp}}
+
+  - name: Create dropoff directory for host
+    local_action: file path={{rootdir}}/{{host}} state=directory
