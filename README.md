@@ -1,4 +1,4 @@
-# Ansible module for Dell EMC PowerEdge iDRAC (using Redfish APIs)
+# Ansible module for Dell EMC PowerEdge iDRAC using Redfish APIs
 
 Ansible module and playbooks that use the Redfish API to manage PowerEdge servers via the integrated Dell Remote Access Controller (iDRAC). For more details, see these [slides](https://www.slideshare.net/JoseDeLaRosa7/s111013-delarosa).
 
@@ -14,7 +14,7 @@ Redfish is an open industry-standard specification and schema designed for moder
 
 To learn more about Redfish, click [here](https://www.dmtf.org/standards/redfish).
 
-To learn more about the Redfish APIs available in the PowerEdge iDRAC, click [here](http://en.community.dell.com/techcenter/extras/m/white_papers/20443207).
+To learn more about the Redfish APIs available in iDRAC, click [here](http://topics-cdn.dell.com/pdf/iDRAC9-lifecycle-controller-v3.00.00.00_API%20Guide_en-us.pdf).
 
 ## Ansible and Redfish together
 
