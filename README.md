@@ -45,10 +45,10 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
   - Users: Manages iDRAC users (add/delete/update)
   - Power: Manages system power (status/on/off/restart)
   - Storage: Manages storage controllers
+  - Bios: Manages BIOS settings
   - Configuration (coming soon): Manages iDRAC configuration
   - License (coming soon): Manages iDRAC licenses
-  - Provision (coming soon): Manages OS provisioning
-  - Firmware (coming soon): Manages Firmware updates
+  - Firmware (coming soon): Manages devices' firmware
 
 ## Example
 

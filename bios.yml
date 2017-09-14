@@ -1,0 +1,17 @@
+---
+- hosts: myhosts
+  name: PowerEdge BIOS
+  gather_facts: False
+
+  tasks:
+
+  - name: Prepare output file
+    include: setup_outputfile.yml
+
+  - local_action: >
+       idrac category=Bios command=GetAttributes idracip={{idracip}}
+       idracuser={{idracuser}} idracpswd={{idracpswd}}
+    register: result
+
+  - local_action: copy content={{ result | to_nice_json }}
+       dest={{template}}_bios_attributes.json
