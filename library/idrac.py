@@ -155,7 +155,7 @@ def manage_scp(command, hostname, IDRAC_INFO, SHARE_INFO, root_uri):
         result = "Not yet implemented."
 
     else:
-        result = "Invalid Option."
+        result = "Invalid Command."
     return result
 
 def manage_storage(command, IDRAC_INFO, root_uri, rf_uri):
@@ -193,7 +193,7 @@ def manage_storage(command, IDRAC_INFO, root_uri, rf_uri):
                 result.append(disk)
 
         else:
-            result = "Invalid Option."
+            result = "Invalid Command."
 
     return result
 
@@ -207,7 +207,7 @@ def manage_idrac_power(command, IDRAC_INFO, root_uri):
         result = response.status_code
 
     else:
-        result = "Invalid Option."
+        result = "Invalid Command."
 
     return
 
@@ -236,7 +236,7 @@ def manage_system_power(command, IDRAC_INFO, root_uri):
         result = response.status_code
 
     else:
-        result = "Invalid Option."
+        result = "Invalid Command."
     return result
 
 def manage_users(command, IDRAC_INFO, USER_INFO, root_uri):
@@ -265,7 +265,7 @@ def manage_users(command, IDRAC_INFO, USER_INFO, root_uri):
         result = "Not yet implemented."
 
     else:
-        result = "Invalid Option."
+        result = "Invalid Command."
     return result
 
 def get_logs(command, IDRAC_INFO, root_uri):
@@ -293,22 +293,41 @@ def get_logs(command, IDRAC_INFO, root_uri):
             entry['Severity'] = logEntry[u'Severity']
             result.append(entry)
     else:
-        result = "Invalid Option."
+        result = "Invalid Command."
     return result
 
-def get_firmware_inventory(command, IDRAC_INFO, root_uri):
+def get_firmware_inventory(command, IDRAC_INFO, root_uri, rf_uri):
+    result = {}
+    devices = []
     if command == "GetInventory":
-        response = send_get_request(IDRAC_INFO, root_uri + "/UpdateService/FirmwareInventory/")
-        data = response.json()
+        response = send_get_request(IDRAC_INFO, root_uri + rf_uri)
+        if response.status_code == 200:		# success
+            data = response.json()
+            for device in data[u'Members']:
+                d = device[u'@odata.id']
+                d = d.replace(rf_uri, "")	# leave just device name
+                if "Installed" in d:
+                    # Get details for each device that is relevant
+                    uri = root_uri + rf_uri + d
+                    response = send_get_request(IDRAC_INFO, uri)
+                    if response.status_code == 200:	# success
+                        data = response.json()
+                        result[data[u'Name']] = data[u'Version']
 
-    result = "Not implemented yet"
+        # PropertyValueTypeError
+        elif response.status_code == 400:
+            result = "14G only"
+        else:
+            result = "error code %s" % response.status_code 
+    else:
+        result = "Invalid Command."
     return result 
 
 def manage_bios(command, IDRAC_INFO, root_uri):
     result = {}
     if command == "GetAttributes":
         response = send_get_request(IDRAC_INFO, root_uri)
-        if response.status_code == 200:
+        if response.status_code == 200:		# success
             data = response.json()
             for attribute in data[u'Attributes'].items():
                 result[attribute[0]] = attribute[1]
@@ -318,7 +337,7 @@ def manage_bios(command, IDRAC_INFO, root_uri):
         else:
             result = "error code %s" % response.status_code 
     else:
-        result = "Invalid Option."
+        result = "Invalid Command."
     return result 
 
 def get_inventory(command, IDRAC_INFO, root_uri):
@@ -349,7 +368,7 @@ def get_inventory(command, IDRAC_INFO, root_uri):
         if 'BootSourceOverrideMode' in datadict.keys():
             result['BootSourceOverrideMode'] = data[u'Boot'][u'BootSourceOverrideMode']
         else:
-            result['BootSourceOverrideMode'] = "14G only."
+            result['BootSourceOverrideMode'] = "14G only"
 
     else:
         result = "Invalid Command."
@@ -411,8 +430,8 @@ def main():
         result = get_inventory(command, IDRAC_INFO, root_uri + rf_uri)
 
     elif category == "Firmware":
-        # rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
-        result = get_firmware_inventory(command, IDRAC_INFO, root_uri + rf_uri)
+        rf_uri = "/redfish/v1/UpdateService/FirmwareInventory/"
+        result = get_firmware_inventory(command, IDRAC_INFO, root_uri, rf_uri)
 
     elif category == "Logs":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"

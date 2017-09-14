@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC Get System Inventory
+  name: PowerEdge iDRAC Device Firmware Inventory
   gather_facts: False
 
   tasks:
@@ -9,9 +9,9 @@
     include: setup_outputfile.yml
 
   - local_action: >
-       idrac category=Inventory command=GetInventory idracip={{idracip}}
+       idrac category=Firmware command=GetInventory idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
 
   - local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_inventory.json
+       dest={{template}}_firmware_inventory.json
