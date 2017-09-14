@@ -299,9 +299,26 @@ def get_logs(command, IDRAC_INFO, root_uri):
 def get_firmware_inventory(command, IDRAC_INFO, root_uri):
     if command == "GetInventory":
         response = send_get_request(IDRAC_INFO, root_uri + "/UpdateService/FirmwareInventory/")
-        result = response.json()
+        data = response.json()
 
     result = "Not implemented yet"
+    return result 
+
+def manage_bios(command, IDRAC_INFO, root_uri):
+    result = {}
+    if command == "GetAttributes":
+        response = send_get_request(IDRAC_INFO, root_uri)
+        if response.status_code == 200:
+            data = response.json()
+            for attribute in data[u'Attributes'].items():
+                result[attribute[0]] = attribute[1]
+        # PropertyValueTypeError
+        elif response.status_code == 400:
+            result = "14G only"
+        else:
+            result = "error code %s" % response.status_code 
+    else:
+        result = "Invalid Option."
     return result 
 
 def get_inventory(command, IDRAC_INFO, root_uri):
@@ -386,7 +403,9 @@ def main():
     # Build initial URI
     root_uri = "https://" + params['idracip']
 
-    # Execute based on what we want
+    # Execute based on what we want. Notice that some rf_uri values have an
+    # ending slash ('/') and other don't. It's all by design and depends on
+    # how the URI is used in each function.
     if category == "Inventory":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
         result = get_inventory(command, IDRAC_INFO, root_uri + rf_uri)
@@ -418,6 +437,10 @@ def main():
     elif category == "SCP":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         result = manage_scp(command, hostname, IDRAC_INFO, SHARE_INFO, root_uri + rf_uri)
+
+    elif category == "Bios":
+        rf_uri = "/redfish/v1/Systems/System.Embedded.1/Bios"
+        result = manage_bios(command, IDRAC_INFO, root_uri + rf_uri)
 
     else:
         result = "Invalid Category"
