@@ -326,11 +326,33 @@ def get_firmware_inventory(command, IDRAC_INFO, root_uri, rf_uri):
 def manage_bios(command, IDRAC_INFO, root_uri):
     result = {}
     if command == "GetAttributes":
-        response = send_get_request(IDRAC_INFO, root_uri)
+        response = send_get_request(IDRAC_INFO, root_uri + "/Bios")
         if response.status_code == 200:		# success
             data = response.json()
             for attribute in data[u'Attributes'].items():
                 result[attribute[0]] = attribute[1]
+        # PropertyValueTypeError
+        elif response.status_code == 400:
+            result = "14G only"
+        else:
+            result = "error code %s" % response.status_code 
+
+    elif command == "GetBootOrder":
+        # Get boot mode first as it will determine what attribute to read
+        response = send_get_request(IDRAC_INFO, root_uri + "/Bios")
+        if response.status_code == 200:		# success
+            data = response.json()
+            boot_mode = data[u'Attributes']["BootMode"]
+            response = send_get_request(IDRAC_INFO, root_uri + "/BootSources")
+            if response.status_code == 200:		# success
+                data = response.json()
+                if boot_mode == "Uefi":
+                    boot_seq = "UefiBootSeq"
+                else:
+                    boot_seq = "BootSeq"
+                boot_devices = data[u'Attributes'][boot_seq]
+                for b in boot_devices:
+                    result["device%s" % b[u'Index']] = b[u'Name']
         # PropertyValueTypeError
         elif response.status_code == 400:
             result = "14G only"
@@ -458,7 +480,7 @@ def main():
         result = manage_scp(command, hostname, IDRAC_INFO, SHARE_INFO, root_uri + rf_uri)
 
     elif category == "Bios":
-        rf_uri = "/redfish/v1/Systems/System.Embedded.1/Bios"
+        rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         result = manage_bios(command, IDRAC_INFO, root_uri + rf_uri)
 
     else:

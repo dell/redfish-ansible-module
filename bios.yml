@@ -15,3 +15,11 @@
 
   - local_action: copy content={{ result | to_nice_json }}
        dest={{template}}_bios_attributes.json
+
+  - local_action: >
+       idrac category=Bios command=GetBootOrder idracip={{idracip}}
+       idracuser={{idracuser}} idracpswd={{idracpswd}}
+    register: result
+
+  - local_action: copy content={{ result | to_nice_json }}
+       dest={{template}}_bios_bootorder.json
