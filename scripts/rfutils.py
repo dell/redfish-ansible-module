@@ -2,7 +2,7 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,6 +25,8 @@ pswd_def = "calvin"
 class rfutils:
 
     def __init__ (self):
+        # Disable insecure-certificate-warning message
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         return
 
     def usage(self, me):
@@ -32,40 +34,62 @@ class rfutils:
         print("  ip:       iDRAC IP address")
         print("  user:     iDRAC login      (default: %s)" % user_def)
         print("  password: iDRAC password   (default: %s)" % pswd_def)
-        exit(0)
-
-    def die(self, msg):
-        print(msg)
         exit(1)
 
+    def print_bold(self, str):
+        bold="\033[1m"
+        end="\033[0m"
+        print(bold + str + end)
+        return
+
+    def print_green(self, str):
+        green="\033[92m"
+        end="\033[0m"
+        print(green + str + end) 	# adding a coma prevents a newline
+        return
+
+    def print_red(self, str):
+        red="\033[91m"
+        end="\033[0m"
+        print(red + str + end)
+        return
+
+    def send_get_request(self, idrac, uri):
+        try:
+            response = requests.get(uri, verify=False, auth=(idrac['user'],
+                                                       idrac['pswd']))
+        except: raise
+        return response
+
+    def send_post_request(self, idrac, uri, payload, headers):
+        try:
+            response = requests.post(uri, payload, headers=headers,
+                           verify=False, auth=(idrac['user'], idrac['pswd']))
+        except: raise
+        return response
+
+    def send_patch_request(self, idrac, uri, payload, headers):
+        try:
+            response = requests.patch(uri, payload, headers=headers,
+                           verify=False, auth=(idrac['user'], idrac['pswd']))
+        except: raise
+        return response
+
     def check_args(self, args):
-        # This could use better logic, maybe use argparse. But will do for now
-        # If we don't provide credentials then it will use defaults above
+        # This could use better logic (argparse?) but should do for now
         idrac = {}
-        if len(sys.argv) < 2:       	# must provide iDRAC IP address
+        if len(sys.argv) < 2:       # must pass iDRAC IP
             self.usage(args.argv[0])
         if len(args.argv) == 2:
             if (args.argv[1]) == "--help" or (args.argv[1]) == "-h":
                 self.usage(args.argv[0])
             else: idrac["ip"] = args.argv[1]
         else: idrac["ip"] = addr_def
+
         if len(args.argv) == 3: idrac["user"] = args.argv[2]
         else: idrac["user"] = user_def
         if len(args.argv) == 4: idrac["pswd"] = args.argv[3]
         else: idrac["pswd"] = pswd_def
-        print("-"*65)
-        print("idracip=%s, user=%s, pass=%s" %
-                               (idrac["ip"],idrac["user"],idrac["pswd"]))
+        self.print_bold("ip=%s, id=%s, pw=%s" %
+                                (idrac["ip"], idrac["user"], idrac["pswd"]))
         return idrac
-
-    def send_get_request(self, u, p, str):
-        print("uri=%s" % str)
-        print("-"*65)
-        try:
-            # Disable insecure-certificate-warning message
-            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-            response = requests.get(str, verify=False, auth=(u,p))
-        except:
-            # self.die("Error! Verify Redfish support or credentials.")
-            raise
-        return response

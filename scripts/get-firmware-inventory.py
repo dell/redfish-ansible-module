@@ -11,29 +11,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Script used to retrieve device firmware inventory
+
 import rfutils
 import json
-import requests
 import sys
-import re
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 rf = rfutils.rfutils()
 
-def send_get_request(idrac, uri):
-    try:
-        response = requests.get(uri, verify=False, auth=(idrac['user'], idrac['pswd']))
-    except: raise
-    return response
-
 def get_list_of_devices(idrac, base_uri, rf_uri):
-    count = 0
     devices = []
-    response = send_get_request(idrac, base_uri + rf_uri)
+    response = rf.send_get_request(idrac, base_uri + rf_uri)
     rf.print_bold("status_code: %s" % response.status_code)
     if response.status_code == 400:
         rf.print_red("Only supported on 14G.")
         return 1
-
+    elif not response.status_code == 200:
+        rf.print_red("Something went wrong.")
+        return 1
     data = response.json()
     for device in data[u'Members']:
         d = device[u'@odata.id']
@@ -45,7 +39,7 @@ def get_fw_version(idrac, base_uri, rf_uri, devices):
     devices_details = []
     for d in devices:
         uri = base_uri + rf_uri + d
-        response = send_get_request(idrac, uri)
+        response = rf.send_get_request(idrac, uri)
         data = response.json()
 
         devices_details.append("Name: %s" % data[u'Name'])
@@ -53,14 +47,12 @@ def get_fw_version(idrac, base_uri, rf_uri, devices):
     return devices_details
 
 def main():
+    # Initialize iDRAC arguments
     idrac = rf.check_args(sys)
-
-    # Disable insecure-certificate-warning message
-    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
     base_uri = "https://" + idrac['ip']
-    rf_uri = "/redfish/v1/UpdateService/FirmwareInventory/"
 
     # Get all devices
+    rf_uri = "/redfish/v1/UpdateService/FirmwareInventory/"
     devices = get_list_of_devices(idrac, base_uri, rf_uri)
     if devices == 1: exit(1)
 
