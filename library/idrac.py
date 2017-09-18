@@ -239,11 +239,35 @@ def manage_system_power(command, IDRAC_INFO, root_uri):
         result = "Invalid Command."
     return result
 
-def manage_users(command, IDRAC_INFO, USER_INFO, root_uri):
+def manage_users(command, IDRAC_INFO, USER_INFO, root_uri, rf_uri):
+    result = []
     headers = {'content-type': 'application/json'}
-    uri = root_uri + "/Accounts/" + USER_INFO['userid']
+    # This URI is used with all commands except ListUsers, where I override it 
+    uri = root_uri + rf_uri + "/Accounts/" + USER_INFO['userid']
 
-    if command == "AddUser":
+    if command == "ListUsers":
+        uri = root_uri + rf_uri + "/Accounts/"
+        user_list = []
+        response = send_get_request(IDRAC_INFO, uri)
+        if response.status_code == 200:		# success
+            data = response.json()
+            for users in data[u'Members']:
+                user_list.append(users[u'@odata.id'])	# Here user_list[] are URIs
+
+            # for each user, get details
+            for uri in user_list:
+                response = send_get_request(IDRAC_INFO, root_uri + uri)
+                # check status_code?
+                data = response.json()
+                if not data[u'UserName'] == "": # only care if name is not empty
+                    user = {}
+                    user['Id']       = data[u'Id']
+                    user['Name']     = data[u'Name']
+                    user['UserName'] = data[u'UserName']
+                    user['RoleId']   = data[u'RoleId']
+                    result.append(user)
+
+    elif command == "AddUser":
         plUserName = {'UserName': USER_INFO['username']}
         plPass     = {'Password': USER_INFO['userpswd']}
         plRoleID   = {'RoleId': USER_INFO['userrole']}
@@ -400,15 +424,15 @@ def get_inventory(command, IDRAC_INFO, root_uri):
 def main():
     module = AnsibleModule(
         argument_spec = dict(
-            category = dict(required=True, type='str', default=None),
-            command = dict(required=True, type='str', default=None),
-            idracip = dict(required=True, type='str', default=None),
+            category  = dict(required=True, type='str', default=None),
+            command   = dict(required=True, type='str', default=None),
+            idracip   = dict(required=True, type='str', default=None),
             idracuser = dict(required=False, type='str', default='root'),
             idracpswd = dict(required=False, type='str', default='calvin'),
-            userid = dict(required=False, type='str', default=None),
-            username = dict(required=False, type='str', default=None),
-            userpswd = dict(required=False, type='str', default=None),
-            userrole = dict(required=False, type='str', default=None),
+            userid    = dict(required=False, type='str', default='16'),
+            username  = dict(required=False, type='str', default=None),
+            userpswd  = dict(required=False, type='str', default=None),
+            userrole  = dict(required=False, type='str', default=None),
             hostname  = dict(required=False, type='str', default=None),
             sharehost = dict(required=False, type='str', default=None),
             sharename = dict(required=False, type='str', default=None),
@@ -460,8 +484,8 @@ def main():
         result = get_logs(command, IDRAC_INFO, root_uri + rf_uri)
 
     elif category == "Users":
-        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/"
-        result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri + rf_uri)
+        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
+        result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri, rf_uri)
 
     elif category == "SystemPower":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
