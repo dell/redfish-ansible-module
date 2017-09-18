@@ -50,6 +50,12 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
   - License (coming soon): Manages iDRAC licenses
   - Firmware (coming soon): Manages devices' firmware
 
+## Requirements
+
+  - PowerEdge 12G/13G/14G servers
+  - Minimum iDRAC 7/8/9 FW 2.40.40.40
+  - SMB share to place SCP files
+
 ## Example
 
 Clone this repository. The idrac module is in the *library* directory, it can be left there or placed somewhere else. If you move it, be sure to define the ANSIBLE_LIBRARY environment variable.
@@ -126,11 +132,33 @@ These files are in the format *{{host}}_{timestamp}}_{{datatype}}* and each cont
 
 We will be providing scripts to easily parse through these JSON files and consolidate all server information in easy-to-read formats, including in CSV format for easy import into spreadsheets.
 
-## Requirements
+## Parsing through JSON files
 
-  - PowerEdge 12G/13G/14G servers
-  - Minimum iDRAC 7/8/9 FW 2.40.40.40
-  - SMB share to place SCP files
+All data collected from servers is returned in JSON format. Any JSON parser can then be used to extract the specific data you are looking for, which can come in handy since in some cases the amount of data collected can be more than you need.
+
+I found the [jq](https://stedolan.github.io/jq/) parser to be easy to install and use, here are some examples using the output files above:
+
+```bash
+$ jq .result.BiosVersion webserver1_20170912_104953_inventory.json 
+"2.4.3"
+
+jq '.result | {Manufacturer: .Manufacturer, Name: .Model}' webserver1_20170912_104953_inventory.json
+{
+  "Manufacturer": "Dell Inc.",
+  "Name": "PowerEdge R630"
+}
+
+$ jq .result.BiosVersion webserver1_20170912_104953_inventory.json 
+"2.4.3"
+
+$ jq '.result[] | .Health' webserver1_20170912_103733_storagecontrollers.json 
+"OK"
+"OK"
+null
+null
+```
+
+It should be straight-forward to extract the same data from hundreds of files using shell scripts and organize it accordingly. In the near future scripts will be made available to facilitate data orgnization. For additional help with qt, refer to this [manual](https://shapeshed.com/jq-json/). 
 
 ## Support
 
