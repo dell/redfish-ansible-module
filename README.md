@@ -142,14 +142,11 @@ I found the [jq](https://stedolan.github.io/jq/) parser to be easy to install an
 $ jq .result.BiosVersion webserver1_20170912_104953_inventory.json 
 "2.4.3"
 
-jq '.result | {Manufacturer: .Manufacturer, Name: .Model}' webserver1_20170912_104953_inventory.json
+$ jq '.result | {Manufacturer: .Manufacturer, Name: .Model}' webserver1_20170912_104953_inventory.json
 {
   "Manufacturer": "Dell Inc.",
   "Name": "PowerEdge R630"
 }
-
-$ jq .result.BiosVersion webserver1_20170912_104953_inventory.json 
-"2.4.3"
 
 $ jq '.result[] | .Health' webserver1_20170912_103733_storagecontrollers.json 
 "OK"
