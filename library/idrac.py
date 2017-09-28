@@ -488,7 +488,7 @@ def main():
         result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri, rf_uri)
 
     elif category == "SystemPower":
-        rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
+        rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         result = manage_system_power(command, IDRAC_INFO, root_uri + rf_uri)
 
     elif category == "IdracPower":
