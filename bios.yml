@@ -3,11 +3,20 @@
   name: PowerEdge BIOS
   gather_facts: False
 
+  # Commands available:
+  #   GetAttributes 	Get BIOS attributes
+  #   GetBootOrder 	Get device boot order
+  #   SetOneTimeBoot 	Set one-time boot device
+
+  # Note 1: not all commands implemented yet, more coming soon
+  # Note 2: Pick and choose tasks as needed 
+
   tasks:
 
   - name: Prepare output file
     include: setup_outputfile.yml
 
+  # Get BIOS Attributes
   - local_action: >
        idrac category=Bios command=GetAttributes idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
@@ -16,6 +25,7 @@
   - local_action: copy content={{ result | to_nice_json }}
        dest={{template}}_bios_attributes.json
 
+  # Get BIOS Boot Order
   - local_action: >
        idrac category=Bios command=GetBootOrder idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
@@ -23,3 +33,8 @@
 
   - local_action: copy content={{ result | to_nice_json }}
        dest={{template}}_bios_bootorder.json
+
+  # Set One-Time BIOS Boot Device (Not implemented yet)
+  - local_action: >
+       idrac category=Bios command=SetOneTimeBoot idracip={{idracip}}
+       idracuser={{idracuser}} idracpswd={{idracpswd}} bootdevice={{bootdevice}}

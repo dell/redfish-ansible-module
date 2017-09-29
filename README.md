@@ -41,14 +41,15 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
 
   - Inventory: Collects System Information (Health, CPUs, RAM, etc.)
   - Logs: Collect System Event and Lifecycle Controller Logs
+  - Power: Manages system power (status/on/off/restart)
+  - Storage: Manages storage controllers, HDDs and VDs
+  - Bios: Manages BIOS settings
   - SCP: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
   - Users: Manages iDRAC users (add/delete/update)
-  - Power: Manages system power (status/on/off/restart)
-  - Storage: Manages storage controllers
-  - Bios: Manages BIOS settings
-  - Configuration (coming soon): Manages iDRAC configuration
-  - License (coming soon): Manages iDRAC licenses
-  - Firmware (coming soon): Manages devices' firmware
+  - IdracSettings (coming soon): Manages iDRAC settings (network, time, etc.)
+  - Firmware (coming soon): Manages system firmware
+
+Note: Some of these categories might be combined later on (Users and IdracSettings, for example), but for the sake of simplicity they are listed separately for now.
 
 ## Requirements
 
@@ -63,7 +64,7 @@ Clone this repository. The idrac module is in the *library* directory, it can be
 ```bash
 $ export ANSIBLE_LIBRARY=<directory-with-module>
 
-$ ansible-playbook <playbook>.yml
+$ ansible-playbook system-inventory.yml
   ...
 PLAY [PowerEdge iDRAC Get System Inventory] ************************************
 
