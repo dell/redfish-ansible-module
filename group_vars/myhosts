@@ -10,7 +10,10 @@ idracpswd: calvin
 
 # Misc
 rootdir: /root             # local directory where all results are placed
-bootdevice: Hdd		   # device to boot from
+
+# Device to boot from. Options include: None, Pxe, Cd, Floppy, Hdd, BiosSetup,
+# Utilities, UefiTarget & SDCard
+bootdevice: Hdd
 
 # For SCP files
 sharehost: 10.9.165.171

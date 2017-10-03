@@ -526,7 +526,7 @@ def main():
             sharepswd  = dict(required=False, type='str', default=None),
             bootdevice = dict(required=False, type='str', default=None),
         ),
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     params = module.params
@@ -569,7 +569,7 @@ def main():
     elif category == "Firmware":
         rf_uri = "/redfish/v1/UpdateService/FirmwareInventory/"
         if command == "GetInventory":
-           result = get_firmware_inventory(command, IDRAC_INFO, root_uri, rf_uri)
+           result = get_firmware_inventory(IDRAC_INFO, root_uri, rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
