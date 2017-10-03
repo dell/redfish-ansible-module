@@ -130,266 +130,353 @@ def send_patch_request(idrac, uri, pyld, hdrs):
         raise			# Do we let module exit or should we return an error value?
     return response
 
-def manage_scp(command, hostname, IDRAC_INFO, SHARE_INFO, root_uri):
-    if command == "ExportSCP":
-        # timestamp to add to SCP XML file name
-        ts = str(datetime.strftime(datetime.now(), "_%Y%m%d_%H%M%S"))
-        scpuri = root_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
-        headers = {'content-type': 'application/json'}
-        payload = { "ExportFormat" : "XML",
-                    "ShareParameters" : { "Target" : "ALL",
-                         "ShareType" : "CIFS",
-                         "IPAddress" : SHARE_INFO['host'],
-                         "ShareName" : SHARE_INFO['name'],
-                         "UserName"  : SHARE_INFO['user'],
-                         "Password"  : SHARE_INFO['pswd'],
-                         "FileName"  : "SCP_" + hostname + ts + ".xml"}
-                  }
-        response = send_post_request(IDRAC_INFO, scpuri, payload, headers)
+def export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri):
+    result = {} 
+    # timestamp to add to SCP XML file name
+    ts = str(datetime.strftime(datetime.now(), "_%Y%m%d_%H%M%S"))
+    scp_uri = root_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
+    headers = {'content-type': 'application/json'}
+    payload = { "ExportFormat" : "XML",
+                "ShareParameters" : { "Target" : "ALL",
+                     "ShareType" : "CIFS",
+                     "IPAddress" : SHARE_INFO['host'],
+                     "ShareName" : SHARE_INFO['name'],
+                     "UserName"  : SHARE_INFO['user'],
+                     "Password"  : SHARE_INFO['pswd'],
+                     "FileName"  : "SCP_" + hostname + ts + ".xml"}
+              }
+    response = send_post_request(IDRAC_INFO, scp_uri, payload, headers)
+    if response.status_code == 202:		# success
+        result['ret'] = True
+        # Getting Job ID, but not really doing anything with it
         data_dict = response.__dict__
-
-        job_id = data_dict["headers"]["Location"]
-        result = re.search("JID_.+", job_id).group()	# Returns Job ID
-
-    elif command == "ImportSCP":
-        result = "Not yet implemented."
-
+        job_id_full = data_dict["headers"]["Location"]
+        job_id = re.search("JID_.+", job_id_full).group()
     else:
-        result = "Invalid Command."
+        result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
     return result
 
-def manage_storage(command, IDRAC_INFO, root_uri, rf_uri):
-    result = []
+def get_stor_cont_info(IDRAC_INFO, root_uri, rf_uri):
+    result = {}
+    controllers_details = []
 
     # Get a list of all storage controllers and build respective URIs
-    controllers = []
+    controller_list = []
     response = send_get_request(IDRAC_INFO, root_uri + rf_uri)
-    data = response.json()
-
-    for controller in data[u'Members']:
-        c = controller[u'@odata.id']
-        controllers.append(c)
-
-    for c in controllers:
-        uri = root_uri + c
-        response = send_get_request(IDRAC_INFO, uri)
+    if response.status_code == 200:             # success
+        result['ret'] = True
         data = response.json()
 
-        if command == "GetControllerInfo":
-            controller = {}
-            controller['Name']   = data[u'Name']	# Name of storage controller
-            controller['Health'] = data[u'Status'][u'Health']
-            result.append(controller)
+        for controller in data[u'Members']:
+            controller_list.append(controller[u'@odata.id'])
 
-        elif command == "GetDiskInfo":
-            for device in data[u'Devices']:
-                disk = {}
-                disk['Controller']   = data[u'Name']	# Name of storage controller
-                disk['Name']         = device[u'Name']
-                disk['Manufacturer'] = device[u'Manufacturer']
-                disk['Model']        = device[u'Model']
-                disk['State']        = device[u'Status'][u'State']
-                disk['Health']       = device[u'Status'][u'Health']
-                result.append(disk)
+        for c in controller_list:
+            uri = root_uri + c
+            response = send_get_request(IDRAC_INFO, uri)
+            if response.status_code == 200:             # success
+                data = response.json()
 
-        else:
-            result = "Invalid Command."
+                controller = {}
+                controller['Name']   = data[u'Name']	# Name of storage controller
+                controller['Health'] = data[u'Status'][u'Health']
+                controllers_details.append(controller)
+            else:
+                result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+                return result		# no need to go through the whole loop
 
+        result["entries"] = controllers_details
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     return result
 
-def manage_idrac_power(command, IDRAC_INFO, root_uri):
-    headers = {'content-type': 'application/json'}
-    uri = root_uri + "/Actions/Manager.Reset"
+def get_disk_info(IDRAC_INFO, root_uri, rf_uri):
+    result = {}
+    disks_details = []
 
-    if command == "IdracGracefulRestart":
-        payload = {'ResetType': 'GracefulRestart'}
-        response = send_post_request(IDRAC_INFO, uri, payload, headers)
-        result = response.status_code
+    # Get a list of all storage controllers and build respective URIs
+    controller_list = []
+    response = send_get_request(IDRAC_INFO, root_uri + rf_uri)
+    if response.status_code == 200:             # success
+        result['ret'] = True
+        data = response.json()
 
+        for controller in data[u'Members']:
+            controller_list.append(controller[u'@odata.id'])
+
+        for c in controller_list:
+            uri = root_uri + c
+            response = send_get_request(IDRAC_INFO, uri)
+            if response.status_code == 200:             # success
+                data = response.json()
+
+                for device in data[u'Devices']:
+                    disk = {}
+                    disk['Controller']   = data[u'Name']	# Name of storage controller
+                    disk['Name']         = device[u'Name']
+                    disk['Manufacturer'] = device[u'Manufacturer']
+                    disk['Model']        = device[u'Model']
+                    disk['State']        = device[u'Status'][u'State']
+                    disk['Health']       = device[u'Status'][u'Health']
+                    disks_details.append(disk)
+            else:
+                result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+                return result		# no need to go through the whole loop
+
+        result["entries"] = disks_details
     else:
-        result = "Invalid Command."
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+    return result
 
-    return
+def restart_idrac_gracefully(IDRAC_INFO, root_uri):
+    result = {}
+    uri = root_uri + "/Actions/Manager.Reset"
+    headers = {'content-type': 'application/json'}
+    payload = {'ResetType': 'GracefulRestart'}
+    response = send_post_request(IDRAC_INFO, uri, payload, headers)
+    if response.status_code == 204:		# success
+        result['ret'] = True
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+    return result
 
 def manage_system_power(command, IDRAC_INFO, root_uri):
+    result = {}
     headers = {'content-type': 'application/json'}
     uri = root_uri + "/Actions/ComputerSystem.Reset"
 
     if command == "PowerOn":
         payload = {'ResetType': 'On'}
         response = send_post_request(IDRAC_INFO, uri, payload, headers)
-        result = response.status_code
 
     elif command == "PowerOff":
         payload = {'ResetType': 'ForceOff'}
         response = send_post_request(IDRAC_INFO, uri, payload, headers)
-        result = response.status_code
 
     elif command == "GracefulRestart":
         payload = {'ResetType': 'GracefulRestart'}
         response = send_post_request(IDRAC_INFO, uri, payload, headers)
-        result = response.status_code
 
     elif command == "GracefulShutdown":
         payload = {'ResetType': 'GracefulShutdown'}
         response = send_post_request(IDRAC_INFO, uri, payload, headers)
-        result = response.status_code
 
     else:
-        result = "Invalid Command."
+        result = { 'ret': False, 'msg': 'Invalid Command'}
+
+    if response.status_code == 204:		# success
+        result['ret'] = True
+    elif response.status_code == 400:
+        result = { 'ret': False, 'msg': '14G only'}
+    elif response.status_code == 405:
+        result = { 'ret': False, 'msg': "Resource not supported" }
+    elif response.status_code == 409:		# verify this
+        result = { 'ret': False, 'msg': "Action already implemented" }
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+    return result
+
+def list_users(IDRAC_INFO, USER_INFO, root_uri, rf_uri):
+    result = {}
+    uri = root_uri + rf_uri + "/Accounts/"
+    allusers = []
+    allusers_details = []
+
+    response = send_get_request(IDRAC_INFO, uri)
+    if response.status_code == 200:		# success
+        result['ret'] = True
+        data = response.json()
+        for users in data[u'Members']:
+            allusers.append(users[u'@odata.id'])	# Here user_list[] are URIs
+
+        # for each user, get details
+        for uri in allusers:
+            response = send_get_request(IDRAC_INFO, root_uri + uri)
+            # check status_code again?
+            data = response.json()
+            if not data[u'UserName'] == "": # only care if name is not empty
+                user = {}
+                user['Id']       = data[u'Id']
+                user['Name']     = data[u'Name']
+                user['UserName'] = data[u'UserName']
+                user['RoleId']   = data[u'RoleId']
+                allusers_details.append(user)
+            result["entries"] = allusers_details
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     return result
 
 def manage_users(command, IDRAC_INFO, USER_INFO, root_uri, rf_uri):
-    result = []
+    result = {}
     headers = {'content-type': 'application/json'}
-    # This URI is used with all commands except ListUsers, where I override it 
     uri = root_uri + rf_uri + "/Accounts/" + USER_INFO['userid']
 
-    if command == "ListUsers":
-        uri = root_uri + rf_uri + "/Accounts/"
-        user_list = []
-        response = send_get_request(IDRAC_INFO, uri)
-        if response.status_code == 200:		# success
-            data = response.json()
-            for users in data[u'Members']:
-                user_list.append(users[u'@odata.id'])	# Here user_list[] are URIs
-
-            # for each user, get details
-            for uri in user_list:
-                response = send_get_request(IDRAC_INFO, root_uri + uri)
-                # check status_code?
-                data = response.json()
-                if not data[u'UserName'] == "": # only care if name is not empty
-                    user = {}
-                    user['Id']       = data[u'Id']
-                    user['Name']     = data[u'Name']
-                    user['UserName'] = data[u'UserName']
-                    user['RoleId']   = data[u'RoleId']
-                    result.append(user)
-
-    elif command == "AddUser":
-        plUserName = {'UserName': USER_INFO['username']}
-        plPass     = {'Password': USER_INFO['userpswd']}
-        plRoleID   = {'RoleId': USER_INFO['userrole']}
-        for payload in plUserName,plPass,plRoleID:
+    if command == "AddUser":
+        user    = {'UserName': USER_INFO['username']}
+        pswd    = {'Password': USER_INFO['userpswd']}
+        roleid  = {'RoleId': USER_INFO['userrole']}
+        enabled = {'Enabled': True}
+        for payload in user,pswd,roleid,enabled:
             response = send_patch_request(IDRAC_INFO, uri, payload, headers)
-        result = response.status_code
 
-    elif command == "UpdateUserPassword":
-        payload = {'Password': USER_INFO['userpswd']}
+    elif command == "DisableUser":
+        payload = {'Enabled': False}
         response = send_patch_request(IDRAC_INFO, uri, payload, headers)
-        result = response.status_code
+
+    elif command == "EnableUser":
+        payload = {'Enabled': True}
+        response = send_patch_request(IDRAC_INFO, uri, payload, headers)
 
     elif command == "UpdateUserRole":
         payload = {'RoleId': USER_INFO['userrole']}
         response = send_patch_request(IDRAC_INFO, uri, payload, headers)
-        result = response.status_code
+
+    elif command == "UpdateUserPassword":
+        payload = {'Password': USER_INFO['userpswd']}
+        response = send_patch_request(IDRAC_INFO, uri, payload, headers)
 
     elif command == "DeleteUser":
-        result = "Not yet implemented."
+        result = { 'ret': False, 'msg': "Not yet implemented" }
 
     else:
-        result = "Invalid Command."
+        result = { 'ret': False, 'msg': "Invalid Command" }
+
+    if response.status_code == 200:		# success
+        result['ret'] = True
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+
     return result
 
-def get_logs(command, IDRAC_INFO, root_uri):
-    result = []
-    if command == "GetSelog":			# System Event logs
-        response = send_get_request(IDRAC_INFO, root_uri + "/Logs/Sel")
+def get_se_logs(IDRAC_INFO, root_uri):
+    # System Event logs
+    result = {}
+    allentries = []
+    response = send_get_request(IDRAC_INFO, root_uri + "/Logs/Sel")
+    if response.status_code == 200:		# success
+        result['ret'] = True
         data = response.json()
-        # I only extract some parameters, not all
         for logEntry in data[u'Members']:
+            # I only extract some fields
             entry = {}
             entry['Name']    = logEntry[u'Name']
             entry['Created'] = logEntry[u'Created']
             entry['Message'] = logEntry[u'Message']
-            result.append(entry)
+            allentries.append(entry)
+        result["entries"] = allentries
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
-    elif command == "GetLclog":			# Lifecycle controller logs
-        response = send_get_request(IDRAC_INFO, root_uri + "/Logs/Lclog")
+    # This looks like: result{allentries[entry{}]}
+    return result
+
+def get_lc_logs(IDRAC_INFO, root_uri):
+    # Lifecycle Controller logs
+    result = {}
+    allentries = []
+    response = send_get_request(IDRAC_INFO, root_uri + "/Logs/Lclog")
+    if response.status_code == 200:		# success
+        result['ret'] = True
         data = response.json()
-        # I only extract some parameters, not all
         for logEntry in data[u'Members']:
+            # I only extract some fields
             entry = {}
             entry['Name']     = logEntry[u'Name']
             entry['Created']  = logEntry[u'Created']
             entry['Message']  = logEntry[u'Message']
             entry['Severity'] = logEntry[u'Severity']
-            result.append(entry)
+            allentries.append(entry)
+        result["entries"] = allentries
     else:
-        result = "Invalid Command."
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+
+    # This looks like: result{allentries[entry{}]}
     return result
 
-def get_firmware_inventory(command, IDRAC_INFO, root_uri, rf_uri):
+def get_firmware_inventory(IDRAC_INFO, root_uri, rf_uri):
     result = {}
     devices = []
-    if command == "GetInventory":
-        response = send_get_request(IDRAC_INFO, root_uri + rf_uri)
-        if response.status_code == 200:		# success
-            data = response.json()
-            for device in data[u'Members']:
-                d = device[u'@odata.id']
-                d = d.replace(rf_uri, "")	# leave just device name
-                if "Installed" in d:
-                    # Get details for each device that is relevant
-                    uri = root_uri + rf_uri + d
-                    response = send_get_request(IDRAC_INFO, uri)
-                    if response.status_code == 200:	# success
-                        data = response.json()
-                        result[data[u'Name']] = data[u'Version']
 
-        # PropertyValueTypeError
-        elif response.status_code == 400:
-            result = "14G only"
-        else:
-            result = "error code %s" % response.status_code 
+    response = send_get_request(IDRAC_INFO, root_uri + rf_uri)
+    if response.status_code == 200:		# success
+        result['ret'] = True
+        data = response.json()
+        for device in data[u'Members']:
+            d = device[u'@odata.id']
+            d = d.replace(rf_uri, "")	# leave just device name
+            if "Installed" in d:
+                # Get details for each device that is relevant
+                uri = root_uri + rf_uri + d
+                response = send_get_request(IDRAC_INFO, uri)
+                if response.status_code == 200:	# success
+                    data = response.json()
+                    result[data[u'Name']] = data[u'Version']
+
+    # PropertyValueTypeError
+    elif response.status_code == 400:
+        result = { 'ret': False, 'msg': '14G only'}
     else:
-        result = "Invalid Command."
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+
     return result 
 
-def manage_bios(command, IDRAC_INFO, root_uri):
+def get_bios_attributes(IDRAC_INFO, root_uri):
     result = {}
-    if command == "GetAttributes":
-        response = send_get_request(IDRAC_INFO, root_uri + "/Bios")
-        if response.status_code == 200:		# success
-            data = response.json()
-            for attribute in data[u'Attributes'].items():
-                result[attribute[0]] = attribute[1]
-        # PropertyValueTypeError
-        elif response.status_code == 400:
-            result = "14G only"
-        else:
-            result = "error code %s" % response.status_code 
-
-    elif command == "GetBootOrder":
-        # Get boot mode first as it will determine what attribute to read
-        response = send_get_request(IDRAC_INFO, root_uri + "/Bios")
-        if response.status_code == 200:		# success
-            data = response.json()
-            boot_mode = data[u'Attributes']["BootMode"]
-            response = send_get_request(IDRAC_INFO, root_uri + "/BootSources")
-            if response.status_code == 200:		# success
-                data = response.json()
-                if boot_mode == "Uefi":
-                    boot_seq = "UefiBootSeq"
-                else:
-                    boot_seq = "BootSeq"
-                boot_devices = data[u'Attributes'][boot_seq]
-                for b in boot_devices:
-                    result["device%s" % b[u'Index']] = b[u'Name']
-        # PropertyValueTypeError
-        elif response.status_code == 400:
-            result = "14G only"
-        else:
-            result = "error code %s" % response.status_code 
+    response = send_get_request(IDRAC_INFO, root_uri + "/Bios")
+    if response.status_code == 200:		# success
+        data = response.json()
+        for attribute in data[u'Attributes'].items():
+            result[attribute[0]] = attribute[1]
+        result['ret'] = True
+    # PropertyValueTypeError
+    elif response.status_code == 400:
+        result = { 'ret': False, 'msg': '14G only'}
     else:
-        result = "Invalid Command."
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+
+    return result
+
+def get_bios_boot_order(IDRAC_INFO, root_uri):
+    # Get boot mode first as it will determine what attribute to read
+    result = {}
+    response = send_get_request(IDRAC_INFO, root_uri + "/Bios")
+    if response.status_code == 200:		# success
+        result['ret'] = True
+        data = response.json()
+        boot_mode = data[u'Attributes']["BootMode"]
+        response = send_get_request(IDRAC_INFO, root_uri + "/BootSources")
+        if response.status_code == 200:		# success
+            data = response.json()
+            if boot_mode == "Uefi":
+                boot_seq = "UefiBootSeq"
+            else:
+                boot_seq = "BootSeq"
+            boot_devices = data[u'Attributes'][boot_seq]
+            for b in boot_devices:
+                result["device%s" % b[u'Index']] = b[u'Name']
+    # PropertyValueTypeError
+    elif response.status_code == 400:
+        result = { 'ret': False, 'msg': '14G only'}
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+
     return result 
 
-def get_inventory(command, IDRAC_INFO, root_uri):
+def set_one_time_boot_device(IDRAC_INFO, bootdevice, root_uri):
     result = {}
-    if command == "GetInventory":
-        response = send_get_request(IDRAC_INFO, root_uri)
+    payload = {"Boot": {"BootSourceOverrideTarget": bootdevice}}
+    headers = {'content-type': 'application/json'}
+    response = send_patch_request(IDRAC_INFO, root_uri, payload, headers)
+    if response.status_code == 200:		# success
+        result = { 'ret': True, 'msg': 'SetOneTimeBoot completed'}
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+    return result
+
+def get_inventory(IDRAC_INFO, root_uri):
+    result = {}
+    response = send_get_request(IDRAC_INFO, root_uri)
+    if response.status_code == 200:		# success
+        result['ret'] = True
         data = response.json()
 
         # There could be more information to extract
@@ -415,37 +502,38 @@ def get_inventory(command, IDRAC_INFO, root_uri):
             result['BootSourceOverrideMode'] = data[u'Boot'][u'BootSourceOverrideMode']
         else:
             result['BootSourceOverrideMode'] = "14G only"
-
     else:
-        result = "Invalid Command."
-
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     return result
 
 def main():
+    result = {}
     module = AnsibleModule(
         argument_spec = dict(
-            category  = dict(required=True, type='str', default=None),
-            command   = dict(required=True, type='str', default=None),
-            idracip   = dict(required=True, type='str', default=None),
-            idracuser = dict(required=False, type='str', default='root'),
-            idracpswd = dict(required=False, type='str', default='calvin'),
-            userid    = dict(required=False, type='str', default='16'),
-            username  = dict(required=False, type='str', default=None),
-            userpswd  = dict(required=False, type='str', default=None),
-            userrole  = dict(required=False, type='str', default=None),
-            hostname  = dict(required=False, type='str', default=None),
-            sharehost = dict(required=False, type='str', default=None),
-            sharename = dict(required=False, type='str', default=None),
-            shareuser = dict(required=False, type='str', default=None),
-            sharepswd = dict(required=False, type='str', default=None),
+            category   = dict(required=True, type='str', default=None),
+            command    = dict(required=True, type='str', default=None),
+            idracip    = dict(required=True, type='str', default=None),
+            idracuser  = dict(required=False, type='str', default='root'),
+            idracpswd  = dict(required=False, type='str', default='calvin'),
+            userid     = dict(required=False, type='str', default=None),
+            username   = dict(required=False, type='str', default=None),
+            userpswd   = dict(required=False, type='str', default=None),
+            userrole   = dict(required=False, type='str', default=None),
+            hostname   = dict(required=False, type='str', default=None),
+            sharehost  = dict(required=False, type='str', default=None),
+            sharename  = dict(required=False, type='str', default=None),
+            shareuser  = dict(required=False, type='str', default=None),
+            sharepswd  = dict(required=False, type='str', default=None),
+            bootdevice = dict(required=False, type='str', default=None),
         ),
         supports_check_mode=True
     )
 
     params = module.params
-    category = params['category']
-    command  = params['command']
-    hostname = params['hostname']
+    category   = params['category']
+    command    = params['command']
+    hostname   = params['hostname']
+    bootdevice = params['bootdevice']
 
     # Disable insecure-certificate-warning message
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -473,19 +561,33 @@ def main():
     # how the URI is used in each function.
     if category == "Inventory":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
-        result = get_inventory(command, IDRAC_INFO, root_uri + rf_uri)
+        if command == "GetInventory":
+           result = get_inventory(IDRAC_INFO, root_uri + rf_uri)
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Firmware":
         rf_uri = "/redfish/v1/UpdateService/FirmwareInventory/"
-        result = get_firmware_inventory(command, IDRAC_INFO, root_uri, rf_uri)
+        if command == "GetInventory":
+           result = get_firmware_inventory(command, IDRAC_INFO, root_uri, rf_uri)
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Logs":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-        result = get_logs(command, IDRAC_INFO, root_uri + rf_uri)
+        if command == "GetSeLogs":
+            result = get_se_logs(IDRAC_INFO, root_uri + rf_uri)
+        elif command == "GetLcLogs":
+            result = get_lc_logs(IDRAC_INFO, root_uri + rf_uri)
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Users":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-        result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri, rf_uri)
+        if command == "ListUsers":
+            result = list_users(IDRAC_INFO, USER_INFO, root_uri, rf_uri)
+        else:
+            result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri, rf_uri)
 
     elif category == "SystemPower":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
@@ -493,24 +595,43 @@ def main():
 
     elif category == "IdracPower":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-        result = manage_idrac_power(command, IDRAC_INFO, root_uri + rf_uri)
+        result = restart_idrac_gracefully(IDRAC_INFO, root_uri + rf_uri)
 
     elif category == "Storage":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/"
-        result = manage_storage(command, IDRAC_INFO, root_uri, rf_uri)
+        if command == "GetControllerInfo":
+            result = get_stor_cont_info(IDRAC_INFO, root_uri, rf_uri)
+        elif command == "GetDiskInfo":
+            result = get_disk_info(IDRAC_INFO, root_uri, rf_uri)
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "SCP":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-        result = manage_scp(command, hostname, IDRAC_INFO, SHARE_INFO, root_uri + rf_uri)
+        if command == "ExportSCP":
+            result = export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri + rf_uri)
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Bios":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
-        result = manage_bios(command, IDRAC_INFO, root_uri + rf_uri)
-
+        if command == "GetAttributes":
+            result = get_bios_attributes(IDRAC_INFO, root_uri + rf_uri)
+        elif command == "GetBootOrder":
+            result = get_bios_boot_order(IDRAC_INFO, root_uri + rf_uri)
+        elif command == "SetOneTimeBoot":
+            result = set_one_time_boot_device(IDRAC_INFO, bootdevice, root_uri + rf_uri)
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
     else:
-        result = "Invalid Category"
+        result = { 'ret': False, 'msg': 'Invalid Category'}
 
-    module.exit_json(result=result)
+    # Return data back or fail with proper message
+    if result['ret'] == True:
+        del result['ret']		# Don't want to pass this back
+        module.exit_json(result=result)
+    else:
+        module.fail_json(msg=result['msg'])
 
 if __name__ == '__main__':
     main()

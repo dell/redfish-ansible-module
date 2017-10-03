@@ -8,10 +8,12 @@
   - name: Prepare output file
     include: setup_outputfile.yml
 
-  - local_action: >
+  - name: Getting system inventory
+    local_action: >
        idrac category=Inventory command=GetInventory idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
 
-  - local_action: copy content={{ result | to_nice_json }}
+  - name: Copying results to file
+    local_action: copy content={{ result | to_nice_json }}
        dest={{template}}_inventory.json

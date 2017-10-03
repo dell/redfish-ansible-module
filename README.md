@@ -37,7 +37,7 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
 ...
 ```
 
-## Functionality Categories
+## Categories
 
   - Inventory: Collects System Information (Health, CPUs, RAM, etc.)
   - Logs: Collect System Event and Lifecycle Controller Logs

@@ -4,8 +4,8 @@
   gather_facts: False
 
   # Options available:
-  #   ExportSCP 	Export Server Configuration Profile (SCP)
-  #   ImportSCP		Import Server Configuration Profile (SCP)
+  #   ExportSCP 	Export Server Configuration Profile
+  #   ImportSCP		Import Server Configuration Profile - Coming Soon
 
   tasks:
 
@@ -17,10 +17,3 @@
        shareuser={{ shareuser }} sharepswd={{ sharepswd }}
        hostname={{ host }}
 
-  - name: Import SCP file
-    local_action: >
-       idrac category=SCP command=ImportSCP idracip={{ idracip }}
-       idracuser={{ idracuser }} idracpswd={{ idracpswd }}
-       sharehost={{ sharehost }} sharename={{ sharename }}
-       shareuser={{ shareuser }} sharepswd={{ sharepswd }}
-       hostname={{ host }}

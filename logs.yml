@@ -4,17 +4,18 @@
   gather_facts: False
 
   # Logs available:
-  #   GetSelog	System Event Log
-  #   GetLclog	Lifecycle Log (coming soon)
+  #   GetSeLogs	System Event Log
+  #   GetLcLogs	Lifecycle Log (coming soon)
 
   tasks:
 
   - name: Prepare output file
     include: setup_outputfile.yml
 
+  # ------------------------------------------------------------------------
   - name: Get SE Logs
     local_action: >
-       idrac category=Logs command=GetSelog idracip={{ idracip }}
+       idrac category=Logs command=GetSeLogs idracip={{ idracip }}
             idracuser={{ idracuser }} idracpswd={{ idracpswd }}
     register: result
 
@@ -22,9 +23,10 @@
     local_action: copy content={{ result | to_nice_json }}
              dest={{template}}_SELog.json
 
+  # ------------------------------------------------------------------------
   - name: Get LC Logs
     local_action: >
-       idrac category=Logs command=GetLclog idracip={{ idracip }}
+       idrac category=Logs command=GetLcLogs idracip={{ idracip }}
             idracuser={{ idracuser }} idracpswd={{ idracpswd }}
     register: result
 

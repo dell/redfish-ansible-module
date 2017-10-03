@@ -16,25 +16,34 @@
   - name: Prepare output file
     include: setup_outputfile.yml
 
-  # Get BIOS Attributes
-  - local_action: >
+  # ------------------------------------------------------------------------
+  - name: Get BIOS attributes
+    local_action: >
        idrac category=Bios command=GetAttributes idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
+    ignore_errors: yes
 
-  - local_action: copy content={{ result | to_nice_json }}
+  - name: Copy BIOS attributes to file
+    local_action: copy content={{ result | to_nice_json }}
        dest={{template}}_bios_attributes.json
 
-  # Get BIOS Boot Order
-  - local_action: >
+  # ------------------------------------------------------------------------
+  - name: Get BIOS boot order
+    local_action: >
        idrac category=Bios command=GetBootOrder idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
+    ignore_errors: yes
 
-  - local_action: copy content={{ result | to_nice_json }}
+  - name: Copy BIOS boot order to file
+    local_action: copy content={{ result | to_nice_json }}
        dest={{template}}_bios_bootorder.json
 
-  # Set One-Time BIOS Boot Device (Not implemented yet)
-  - local_action: >
+  # ------------------------------------------------------------------------
+  - name: Set one-time boot device to {{bootdevice}}
+    local_action: >
        idrac category=Bios command=SetOneTimeBoot idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}} bootdevice={{bootdevice}}
+    ignore_errors: yes
+

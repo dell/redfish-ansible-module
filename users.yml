@@ -7,15 +7,17 @@
   # Options available:
   #   ListUsers			Lists all users, including empty slots
   #   AddUser			Add user
+  #   EnableUser		Enable user
+  #   DiasbleUser		Disable user
   #   UpdateUserRole		Update user role
   #   UpdateUserPassword	Update user password
-  #   DeleteUser		Delete user
+  #   DeleteUser		Delete user - Coming Soon
 
   tasks:
 
   # Though some tasks are not mutually exclusive, do only one task at a time
 
-  #--------- List Users ----------------------------------------------------
+  # ------------------------------------------------------------------------
   - name: Prepare output file
     include: setup_outputfile.yml
 
@@ -28,33 +30,33 @@
   - local_action: copy content={{ result | to_nice_json }}
        dest={{template}}_idrac_users.json
 
-  # Commenting these actions to avoid running conflicting plays
+  # Select the actions you want to execute, comment out the rest
 
-  #--------- Add User ------------------------------------------------------
-# - name: Add iDRAC user
-#   local_action: >
-#      idrac category=Users command=AddUser idracip={{ idracip }}
-#      idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
-#      username={{ username }} userpswd={{ userpswd }} userrole={{ userrole }}
+  # ------------------------------------------------------------------------
+  - name: Add iDRAC user
+    local_action: >
+       idrac category=Users command=AddUser idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
+       username={{ username }} userpswd={{ userpswd }} userrole={{ userrole }}
 
-  #--------- Update User Role ----------------------------------------------
-# - name: Update iDRAC user role
-#   local_action: >
-#      idrac category=Users command=UpdateUserRole idracip={{ idracip }}
-#      idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
-#      userrole={{ userrole }}
+  # ------------------------------------------------------------------------
+  - name: Update iDRAC user role
+    local_action: >
+       idrac category=Users command=UpdateUserRole idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
+       userrole={{ userrole }}
 
-  #--------- Update User Password ------------------------------------------
-# - name: Update iDRAC user password
-#   local_action: >
-#      idrac category=Users command=UpdateUserPassword idracip={{ idracip }}
-#      idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
-#      userpswd={{ userpswd }}
+  # ------------------------------------------------------------------------
+  - name: Update iDRAC user password
+    local_action: >
+       idrac category=Users command=UpdateUserPassword idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
+       userpswd={{ userpswd }}
 
-  #--------- Delete User ---------------------------------------------------
-  # Not  yet implemented
-# - name: Delete iDRAC user
-#   local_action: >
-#      idrac category=Users command=DeleteUser idracip={{ idracip }}
-#      idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
+  # ------------------------------------------------------------------------
+  # Not yet implemented
+  - name: Delete iDRAC user
+    local_action: >
+       idrac category=Users command=DeleteUser idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
 

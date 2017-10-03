@@ -9,12 +9,12 @@
   #   PowerOff			Turn system power off
   #   GracefulRestart		Reset OS gracefully
   #   GracefulShutdown		Shutdown OS gracefully
-  #   IdracGracefulRestarat	Restart iDRAC gracefully
 
   tasks:
 
   # Tasks are mutually exclusive, run only one at a time
 
+  # ------------------------------------------------------------------------
   - name: Turn system power on
     local_action: >
        idrac category=SystemPower command=PowerOn idracip={{ idracip }}
@@ -22,24 +22,22 @@
 
   # Commented out to avoid on/off actions in same run
 
-# - name: Turn system power off
-#   local_action: >
-#      idrac category=SystemPower command=PowerOff idracip={{ idracip }}
-#      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+  # ------------------------------------------------------------------------
+  - name: Turn system power off
+    local_action: >
+       idrac category=SystemPower command=PowerOff idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
-# - name: Power graceful restart
-#   local_action: >
-#      idrac category=SystemPower command=GracefulRestart idracip={{ idracip }}
-#      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+  # ------------------------------------------------------------------------
+  - name: Power graceful restart
+    local_action: >
+       idrac category=SystemPower command=GracefulRestart idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 
-# - name: Idrac Power graceful restart
-#   local_action: >
-#      idrac category=IdracPower command=IdracGracefulRestart
-#      idracip={{ idracip }} idracuser={{ idracuser }} idracpswd={{ idracpswd }}
-
+  # ------------------------------------------------------------------------
   # 14G only
-# - name: Power graceful shutdown
-#   local_action: >
-#      idrac category=SystemPower command=GracefulShutdown idracip={{ idracip }}
-#      idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+  - name: Power graceful shutdown
+    local_action: >
+       idrac category=SystemPower command=GracefulShutdown idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }}
 

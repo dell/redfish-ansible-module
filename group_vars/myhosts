@@ -10,16 +10,16 @@ idracpswd: calvin
 
 # Misc
 rootdir: /root             # local directory where all results are placed
-bootdevice: Pxe		   # device to boot from
+bootdevice: Hdd		   # device to boot from
 
 # For SCP files
-sharehost: 192.168.0.200
+sharehost: 10.9.165.171
 sharename: share2
-shareuser: joe
-sharepswd: 123456
+shareuser: dell
+sharepswd: 111111
 
 # For managing users - userid 2 is default root user, be mindful!
 userid: 3                  # user id of user to add/delete/modify (1-16)
 username: user3            # user name to add/delete/modify
-userpswd: mypassword       # user password to add/delete/modify
+userpswd: pa$$word         # user password to add/delete/modify
 userrole: Operator         # user role to add/delete/modify
