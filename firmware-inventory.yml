@@ -6,7 +6,7 @@
   tasks:
 
   - name: Prepare output file
-    include: setup_outputfile.yml
+    include: setupoutputfile.yml
 
   - name: Get Firmware Inventory
     local_action: >

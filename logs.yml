@@ -10,7 +10,7 @@
   tasks:
 
   - name: Prepare output file
-    include: setup_outputfile.yml
+    include: setupoutputfile.yml
 
   # ------------------------------------------------------------------------
   - name: Get SE Logs

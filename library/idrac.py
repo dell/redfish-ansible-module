@@ -322,33 +322,48 @@ def manage_users(command, IDRAC_INFO, USER_INFO, root_uri, rf_uri):
         enabled = {'Enabled': True}
         for payload in user,pswd,roleid,enabled:
             response = send_patch_request(IDRAC_INFO, uri, payload, headers)
+            if response.status_code == 200:		# success
+                result['ret'] = True
+            else:
+                result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
     elif command == "DisableUser":
         payload = {'Enabled': False}
         response = send_patch_request(IDRAC_INFO, uri, payload, headers)
+        if response.status_code == 200:		# success
+            result['ret'] = True
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
     elif command == "EnableUser":
         payload = {'Enabled': True}
         response = send_patch_request(IDRAC_INFO, uri, payload, headers)
+        if response.status_code == 200:		# success
+            result['ret'] = True
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
     elif command == "UpdateUserRole":
         payload = {'RoleId': USER_INFO['userrole']}
         response = send_patch_request(IDRAC_INFO, uri, payload, headers)
+        if response.status_code == 200:		# success
+            result['ret'] = True
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
     elif command == "UpdateUserPassword":
         payload = {'Password': USER_INFO['userpswd']}
         response = send_patch_request(IDRAC_INFO, uri, payload, headers)
+        if response.status_code == 200:		# success
+            result['ret'] = True
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
     elif command == "DeleteUser":
         result = { 'ret': False, 'msg': "Not yet implemented" }
 
     else:
         result = { 'ret': False, 'msg': "Invalid Command" }
-
-    if response.status_code == 200:		# success
-        result['ret'] = True
-    else:
-        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
     return result
 
@@ -490,6 +505,19 @@ def set_one_time_boot_device(IDRAC_INFO, bootdevice, root_uri):
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     return result
 
+def set_idrac_default_settings(IDRAC_INFO, root_uri):
+    result = {}
+    payload = {"ResetType": "All"}
+    headers = {'content-type': 'application/json'}
+    response = send_post_request(IDRAC_INFO, root_uri, payload, headers)
+    if response.status_code == 200:		# success
+        result = { 'ret': True, 'msg': 'SetIdracDefaultSettings completed'}
+    elif response.status_code == 405:
+        result = { 'ret': False, 'msg': "Resource not supported" }
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+    return result
+
 def get_inventory(IDRAC_INFO, root_uri):
     result = {}
     response = send_get_request(IDRAC_INFO, root_uri)
@@ -611,10 +639,6 @@ def main():
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         result = manage_system_power(command, IDRAC_INFO, root_uri + rf_uri)
 
-    elif category == "IdracPower":
-        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-        result = restart_idrac_gracefully(IDRAC_INFO, root_uri + rf_uri)
-
     elif category == "Storage":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/"
         if command == "GetControllerInfo":
@@ -644,6 +668,17 @@ def main():
             result = set_bios_default_settings(IDRAC_INFO, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
+
+    elif category == "Idrac":
+        if command == "SetDefaultSettings":
+            rf_uri = "redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/DellManager.ResetToDefaults"
+            result = set_idrac_default_settings(IDRAC_INFO, root_uri + rf_uri)
+        elif command == "IdracGracefulRestart":
+            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
+            result = restart_idrac_gracefully(IDRAC_INFO, root_uri + rf_uri)
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
+
     else:
         result = { 'ret': False, 'msg': 'Invalid Category'}
 

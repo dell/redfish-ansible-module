@@ -4,13 +4,16 @@
   name: PowerEdge iDRAC - Manage iDRAC Power
   gather_facts: False
 
+  # I AM PLACING THIS TASK IN A SEPARATE PLAYOOK TO AVOID ACCIDENTAL IDRAC
+  # REBOOTS.
+
   # Commands available:
-  #   IdracGracefulRestarat	Restart iDRAC gracefully
+  #   IdracGracefulRestart	Restart iDRAC gracefully
 
   tasks:
 
   # ------------------------------------------------------------------------
   - name: Idrac Power graceful restart
     local_action: >
-       idrac category=IdracPower command=IdracGracefulRestart
+       idrac category=Idrac command=IdracGracefulRestart
        idracip={{ idracip }} idracuser={{ idracuser }} idracpswd={{ idracpswd }}

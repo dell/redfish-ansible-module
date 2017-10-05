@@ -22,7 +22,7 @@
 
   # ------------------------------------------------------------------------
   - name: Prepare output file
-    include: setup_outputfile.yml
+    include: setupoutputfile.yml
 
   - name: List all iDRAC users
     local_action: >

@@ -1,0 +1,29 @@
+---
+
+- hosts: myhosts
+  name: PowerEdge iDRAC - Manage iDRAC Settings
+  gather_facts: False
+
+  # WARNING: CAREFULLY REVIEW ALL TASKS AVAILABLE AND SELECT WHAT YOU WANT.
+  # RUNNING ALL TASKS BELOW MIGHT HAVE UNINTENDED CONSEQUENCES.
+
+  # Commands available:
+  #   SetDefaultSettings	Set iDRAC default settings
+  #   SetIPv4Settings		Set iDRAC IPv4 settings (coming soon)
+  #   SetIPv6Settings		Set iDRAC IPv6 settings (coming soon)
+  #   SetIPMISettings		Set iDRAC IPMI settings (coming soon)
+  #   SetVLANSettings		Set iDRAC VLAN settings (coming soon)
+  #   SetSerialSettings		Set iDRAC Serial settings (coming soon)
+  #   SetTimezoneSettings	Set iDRAC Timezone settings (coming soon)
+  #   SetNTPSettings		Set iDRAC NTP settings (coming soon)
+  #   SetISMSettings		Set iDRAC iSM settings (coming soon)
+  #   ViewJobQueue		View iDRAC Job Queue (coming soon)
+
+  tasks:
+
+  # ------------------------------------------------------------------------
+  # Resetting to default values will reset everything and reboot the iDRAC
+  - name: Idrac set default settings
+    local_action: >
+       idrac category=Idrac command=SetDefaultSettings
+       idracip={{ idracip }} idracuser={{ idracuser }} idracpswd={{ idracpswd }}
