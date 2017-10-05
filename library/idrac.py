@@ -92,6 +92,11 @@ options:
     default: None
     description:
       - CIFS/SMB share user password for managing SCP files
+  bootdevice:
+    required: false
+    default: None
+    description:
+      - bootdevice when setting boot configuration
 
 author: "jose.delarosa@dell.com"
 """
@@ -461,6 +466,19 @@ def get_bios_boot_order(IDRAC_INFO, root_uri):
 
     return result 
 
+def set_bios_default_settings(IDRAC_INFO, root_uri):
+    result = {}
+    payload = {}
+    headers = {'content-type': 'application/json'}
+    response = send_post_request(IDRAC_INFO, root_uri, payload, headers)
+    if response.status_code == 200:		# success
+        result = { 'ret': True, 'msg': 'SetBiosDefaultSettings completed'}
+    elif response.status_code == 405:
+        result = { 'ret': False, 'msg': "Resource not supported" }
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+    return result
+
 def set_one_time_boot_device(IDRAC_INFO, bootdevice, root_uri):
     result = {}
     payload = {"Boot": {"BootSourceOverrideTarget": bootdevice}}
@@ -621,6 +639,9 @@ def main():
             result = get_bios_boot_order(IDRAC_INFO, root_uri + rf_uri)
         elif command == "SetOneTimeBoot":
             result = set_one_time_boot_device(IDRAC_INFO, bootdevice, root_uri + rf_uri)
+        elif command == "SetDefaultSettings":
+            rf_uri = "/redfish/v1/Systems/System.Embedded.1/Bios/Actions/Bios.ResetBios/"
+            result = set_bios_default_settings(IDRAC_INFO, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
     else:

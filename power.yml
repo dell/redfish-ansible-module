@@ -4,6 +4,9 @@
   name: PowerEdge iDRAC Manage System Power
   gather_facts: False
 
+  # WARNING: CAREFULLY REVIEW ALL TASKS AVAILABLE AND SELECT WHAT YOU WANT.
+  # RUNNING ALL TASKS BELOW MIGHT HAVE UNINTENDED CONSEQUENCES.
+
   # Commands available:
   #   PowerOn			Turn system power on
   #   PowerOff			Turn system power off

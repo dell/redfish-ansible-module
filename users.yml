@@ -4,6 +4,9 @@
   name: PowerEdge iDRAC Manage Users
   gather_facts: False
 
+  # WARNING: CAREFULLY REVIEW ALL TASKS AVAILABLE AND SELECT WHAT YOU WANT.
+  # RUNNING ALL TASKS BELOW MIGHT HAVE UNINTENDED CONSEQUENCES.
+
   # Options available:
   #   ListUsers			Lists all users, including empty slots
   #   AddUser			Add user

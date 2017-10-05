@@ -1,12 +1,16 @@
 ---
 - hosts: myhosts
   name: PowerEdge BIOS
-  gather_facts: False
+  gather_facts: Falseo
+
+  # WARNING: CAREFULLY REVIEW ALL TASKS AVAILABLE AND SELECT WHAT YOU WANT.
+  # RUNNING ALL TASKS BELOW MIGHT HAVE UNINTENDED CONSEQUENCES.
 
   # Commands available:
-  #   GetAttributes 	Get BIOS attributes
-  #   GetBootOrder 	Get device boot order
-  #   SetOneTimeBoot 	Set one-time boot device
+  #   GetAttributes 		Get BIOS attributes
+  #   GetBootOrder 		Get device boot order
+  #   SetOneTimeBoot 		Set one-time boot device
+  #   SetDefaultSettings 	Set BIOS default settings 
 
   # Note 1: not all commands implemented yet, more coming soon
   # Note 2: Pick and choose tasks as needed 
@@ -45,5 +49,12 @@
     local_action: >
        idrac category=Bios command=SetOneTimeBoot idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}} bootdevice={{bootdevice}}
+    ignore_errors: yes
+
+  # ------------------------------------------------------------------------
+  - name: Set default settings
+    local_action: >
+       idrac category=Bios command=SetDefaultSettings idracip={{idracip}}
+       idracuser={{idracuser}} idracpswd={{idracpswd}}
     ignore_errors: yes
 
