@@ -45,11 +45,11 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
   - Storage: Manages storage controllers, HDDs and VDs
   - Bios: Manages BIOS settings
   - SCP: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
+  - Idrac: Manages iDRAC properties (network, time, etc.)
   - Users: Manages iDRAC users (add/delete/update)
-  - IdracSettings (coming soon): Manages iDRAC settings (network, time, etc.)
   - Firmware (coming soon): Manages system firmware
 
-Note: Some of these categories might be combined later on (Users and IdracSettings, for example), but for the sake of simplicity they are listed separately for now.
+Note: Some of these categories could be combined (i.e. Users and Idrac, for example), but for the sake of simplicity they are listed separately for now.
 
 ## Requirements
 
