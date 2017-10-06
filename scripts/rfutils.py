@@ -84,7 +84,7 @@ class rfutils:
             if (args.argv[1]) == "--help" or (args.argv[1]) == "-h":
                 self.usage(args.argv[0])
             else: idrac["ip"] = args.argv[1]
-        else: idrac["ip"] = addr_def
+        else: idrac["ip"] = args.argv[1]
 
         if len(args.argv) == 3: idrac["user"] = args.argv[2]
         else: idrac["user"] = user_def

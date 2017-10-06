@@ -20,7 +20,8 @@ rf = rfutils.rfutils()
 
 def get_selogs(idrac, base_uri, rf_uri):
     response = rf.send_get_request(idrac, base_uri + rf_uri)
-    rf.print_bold("status_code: %s" % response.status_code)
+    #rf.print_bold("status_code: %s" % response.status_code)
+    rf.print_bold("uri: %s" % base_uri + rf_uri)
     if not response.status_code == 200:
         rf.print_red("Something went wrong.")
         exit(1)
@@ -56,8 +57,8 @@ def main():
     get_selogs(idrac, base_uri, rf_uri)
 
     # Get Lifecycle Controller Logs
-    rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog"
-    get_lclogs(idrac, base_uri, rf_uri)
+#   rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog"
+#   get_lclogs(idrac, base_uri, rf_uri)
 
 if __name__ == '__main__':
     main()

@@ -11,15 +11,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Script used to retrieve device firmware inventory
+# Script used to retrieve fan information
 
 import rfutils
 import json
 import sys
 rf = rfutils.rfutils()
 
-def get_list_of_devices(idrac, base_uri, rf_uri):
-    devices = []
+def get_list_of_fans(idrac, base_uri, rf_uri):
+    fanslist = []
     response = rf.send_get_request(idrac, base_uri + rf_uri)
     rf.print_bold("status_code: %s" % response.status_code)
     if response.status_code == 400:
@@ -29,37 +29,22 @@ def get_list_of_devices(idrac, base_uri, rf_uri):
         rf.print_red("Something went wrong.")
         return 1
     data = response.json()
-    for device in data[u'Members']:
-        d = device[u'@odata.id']
-        d = d.replace(rf_uri, "")	# remove part of URL, leave device name
-        if "Installed" in d: devices.append(d)
-    return devices
-
-def get_fw_version(idrac, base_uri, rf_uri, devices):
-    devices_details = []
-    for d in devices:
-        uri = base_uri + rf_uri + d
-        response = rf.send_get_request(idrac, uri)
-        data = response.json()
-
-        devices_details.append("Name: %s" % data[u'Name'])
-        devices_details.append("FW version: %s\n" % data[u'Version'])
-    return devices_details
+    for fans in data[u'Fans']:
+    # There is more information avvailable but this is most important
+        print("Name: %s" % fans[u'FanName'])
+        print("Reading: %s RPMs" % fans[u'Reading'])
+        print("State: %s" % fans[u'Status'][u'State'])
+        print("Health: %s\n" % fans[u'Status'][u'Health'])
+    return fanslist
 
 def main():
     # Initialize iDRAC arguments
     idrac = rf.check_args(sys)
     base_uri = "https://" + idrac['ip']
 
-    # Get all devices
-    rf_uri = "/redfish/v1/UpdateService/FirmwareInventory/"
-    devices = get_list_of_devices(idrac, base_uri, rf_uri)
-    if devices == 1: exit(1)
-
-    # Go through list of devices and get detailed information for each one
-    devices_details = get_fw_version(idrac, base_uri, rf_uri, devices)
-    for d in devices_details:
-        print(d)
+    # Get all fan information
+    rf_uri = "/redfish/v1/Chassis/System.Embedded.1/Thermal"
+    fans = get_list_of_fans(idrac, base_uri, rf_uri)
 
 if __name__ == '__main__':
     main()
