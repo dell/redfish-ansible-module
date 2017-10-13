@@ -19,7 +19,7 @@ import json
 import sys
 rf = rfutils.rfutils()
 
-def add_user(idrac, base_uri, rf_uri, payload, headers):
+def delete_user(idrac, base_uri, rf_uri, payload, headers):
     response = rf.send_patch_request(idrac, base_uri + rf_uri, payload, headers)
     rf.print_bold("status_code: %s" % response.status_code)
     if not response.status_code == 200:
@@ -32,15 +32,13 @@ def main():
     base_uri = "https://" + idrac['ip']
     rf_uri="/redfish/v1/Managers/iDRAC.Embedded.1/Accounts/3"
 
-    idracuser = {'UserName': 'operator3'}
-    idracpswd = {'Password': 'mypassword'}
-    idracrole = {'RoleId': 'Operator'}
-    userenable = {'Enabled': True}
+    a = {'Enabled': False}		# make sure you disable it first
+    c = {'UserName': ""}		# Same effect as deleting it (mostly)
     headers = {'content-type': 'application/json'}
 
-    # Add user
-    for payload in idracuser, idracpswd, idracrole, userenable:
-        add_user(idrac, base_uri, rf_uri, payload, headers)
+    # Delete user
+    for payload in a, c:
+        delete_user(idrac, base_uri, rf_uri, payload, headers)
 
 if __name__ == '__main__':
     main()

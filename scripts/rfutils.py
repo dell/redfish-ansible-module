@@ -63,15 +63,22 @@ class rfutils:
 
     def send_post_request(self, idrac, uri, payload, headers):
         try:
-            response = requests.post(uri, payload, headers=headers,
-                           verify=False, auth=(idrac['user'], idrac['pswd']))
+            response = requests.post(uri, data=json.dumps(payload),
+            headers=headers, verify=False, auth=(idrac['user'], idrac['pswd']))
         except: raise
         return response
 
     def send_patch_request(self, idrac, uri, payload, headers):
         try:
-            response = requests.patch(uri, payload, headers=headers,
-                           verify=False, auth=(idrac['user'], idrac['pswd']))
+            response = requests.patch(uri, data=json.dumps(payload),
+            headers=headers, verify=False, auth=(idrac['user'], idrac['pswd']))
+        except: raise
+        return response
+
+    def send_delete_request(self, idrac, uri, payload, headers):
+        try:
+            response = requests.delete(uri, data=json.dumps(payload),
+            headers=headers, verify=False, auth=(idrac['user'], idrac['pswd']))
         except: raise
         return response
 

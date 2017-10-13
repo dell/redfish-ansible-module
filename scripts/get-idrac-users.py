@@ -45,7 +45,8 @@ def get_users_details(idrac, base_uri, rf_uri, user_list):
             users_details.append("Id: %s" % data[u'Id'])
             users_details.append("Name: %s" % data[u'Name'])
             users_details.append("UserName: %s" % data[u'UserName'])
-            users_details.append("RoleId: %s\n" % data[u'RoleId'])
+            users_details.append("RoleId: %s" % data[u'RoleId'])
+            users_details.append("Enabled: %s\n" % data[u'Enabled'])
     return users_details
 
 def main():
