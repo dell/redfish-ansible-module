@@ -30,6 +30,12 @@ def delete_user(idrac, base_uri, rf_uri, payload, headers):
 def main():
     idrac = rf.check_args(sys)
     base_uri = "https://" + idrac['ip']
+    # This assumes we know the URI we want to do, which is a crude approach.
+    # Need to find a more elegant way to remove users, like providing a username,
+    # and then finding the URI to use based on the username.
+
+    # Be sure you don't use /Accounts/2, which is the root user! Maybe I should add
+    # code to prevent that.
     rf_uri="/redfish/v1/Managers/iDRAC.Embedded.1/Accounts/3"
 
     a = {'Enabled': False}		# make sure you disable it first
