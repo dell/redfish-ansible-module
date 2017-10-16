@@ -30,7 +30,7 @@ def get_list_of_fans(idrac, base_uri, rf_uri):
         return 1
     data = response.json()
     for fans in data[u'Fans']:
-    # There is more information avvailable but this is most important
+    # There is more information available but this is most important
         print("Name: %s" % fans[u'FanName'])
         print("Reading: %s RPMs" % fans[u'Reading'])
         print("State: %s" % fans[u'Status'][u'State'])
