@@ -136,7 +136,7 @@ def send_patch_request(idrac, uri, pyld, hdrs):
     return response
 
 def export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri):
-    result = {} 
+    result = {}
     # timestamp to add to SCP XML file name
     ts = str(datetime.strftime(datetime.now(), "_%Y%m%d_%H%M%S"))
     scp_uri = root_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
@@ -437,7 +437,7 @@ def get_firmware_inventory(IDRAC_INFO, root_uri, rf_uri):
     else:
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
-    return result 
+    return result
 
 def get_bios_attributes(IDRAC_INFO, root_uri):
     result = {}
@@ -479,7 +479,7 @@ def get_bios_boot_order(IDRAC_INFO, root_uri):
     else:
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
-    return result 
+    return result
 
 def set_bios_default_settings(IDRAC_INFO, root_uri):
     result = {}
@@ -517,6 +517,22 @@ def set_idrac_default_settings(IDRAC_INFO, root_uri):
     else:
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     return result
+
+def set_bios_attributes(IDRAC_INFO,root_uri,bios_attributes):
+    result = {}
+    bios_attributes=bios_attributes.replace("'","\"")
+    payload = {"Attributes": json.loads(bios_attributes) }
+    headers = {'content-type': 'application/json'}
+    response = send_patch_request(IDRAC_INFO, root_uri, payload, headers)
+    if response.status_code == 200:
+        result = { 'ret': True, 'msg': 'BIOS Attributes set as pending values'}
+    elif response.status_code == 405:
+        result = { 'ret': False, 'msg': "Resource not supported" }
+    else:
+        pp=response.json()
+        result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
+    return result
+
 
 def get_inventory(IDRAC_INFO, root_uri):
     result = {}
@@ -571,6 +587,7 @@ def main():
             shareuser  = dict(required=False, type='str', default=None),
             sharepswd  = dict(required=False, type='str', default=None),
             bootdevice = dict(required=False, type='str', default=None),
+            bios_attributes    = dict(required=False, type='str', default=None),
         ),
         supports_check_mode=False
     )
@@ -587,7 +604,7 @@ def main():
     IDRAC_INFO = { 'ip'   : params['idracip'],
                    'user' : params['idracuser'],
                    'pswd' : params['idracpswd']
-                 } 
+                 }
     SHARE_INFO = { 'host' : params['sharehost'],
                    'name' : params['sharename'],
                    'user' : params['shareuser'],
@@ -666,6 +683,10 @@ def main():
         elif command == "SetDefaultSettings":
             rf_uri = "/redfish/v1/Systems/System.Embedded.1/Bios/Actions/Bios.ResetBios/"
             result = set_bios_default_settings(IDRAC_INFO, root_uri + rf_uri)
+        elif command == "SetAttributes":
+	    rf_uri = '/redfish/v1/Systems/System.Embedded.1/Bios/Settings'
+	    result = set_bios_attributes(IDRAC_INFO,root_uri+rf_uri,params['bios_attributes'])
+
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

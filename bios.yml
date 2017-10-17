@@ -58,3 +58,12 @@
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     ignore_errors: yes
 
+  # ------------------------------------------------------------------------
+  - name: Set BootMode as Uefi
+    local_action: >
+       idrac category=Bios command=SetAttributes bios_attributes={'BootMode':'Uefi'}
+       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+    tags:
+        - bootmode
+    ignore_errors: yes
+
