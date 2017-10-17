@@ -533,6 +533,17 @@ def set_bios_attributes(IDRAC_INFO,root_uri,bios_attributes):
         result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
     return result
 
+def create_bios_config_job (IDRAC_INFO,url):
+    payload = {"TargetSettingsURI":"/redfish/v1/Systems/System.Embedded.1/Bios/Settings", "RebootJobType":"PowerCycle"}
+    headers = {'content-type': 'application/json'}
+    response = send_post_request(IDRAC_INFO, url, payload, headers)
+    if response.status_code == 200:
+        result = { 'ret': True, 'msg': 'Config job created'}
+    else:
+        pp=response.json()
+        result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
+    return result
+
 
 def get_inventory(IDRAC_INFO, root_uri):
     result = {}
@@ -686,7 +697,9 @@ def main():
         elif command == "SetAttributes":
 	    rf_uri = '/redfish/v1/Systems/System.Embedded.1/Bios/Settings'
 	    result = set_bios_attributes(IDRAC_INFO,root_uri+rf_uri,params['bios_attributes'])
-
+        elif command == "ConfigJob":
+            rf_uri = '/redfish/v1/Managers/iDRAC.Embedded.1/Jobs'
+            result = create_bios_config_job(IDRAC_INFO,root_uri+rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

@@ -19,6 +19,8 @@
 
   - name: Prepare output file
     include: setupoutputfile.yml
+    tags:
+        - bootmode
 
   # ------------------------------------------------------------------------
   - name: Get BIOS attributes
@@ -63,6 +65,13 @@
     local_action: >
        idrac category=Bios command=SetAttributes bios_attributes={'BootMode':'Uefi'}
        idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+    tags:
+        - bootmode
+    ignore_errors: yes
+    
+  - name: Sechdule Config Job
+    local_action: >
+      idrac category=Bios command=ConfigJob idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
     tags:
         - bootmode
     ignore_errors: yes
