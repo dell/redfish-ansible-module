@@ -6,6 +6,8 @@
 
   # WARNING: CAREFULLY REVIEW ALL TASKS AVAILABLE AND SELECT WHAT YOU WANT.
   # RUNNING ALL TASKS BELOW MIGHT HAVE UNINTENDED CONSEQUENCES.
+  # ALTERNATIVELY, USE TAGS:
+  # Example: ansible-playbook manage_system_power.yml --tags=poweron
 
   # Commands available:
   #   PowerOn			Turn system power on
@@ -22,25 +24,27 @@
     local_action: >
        idrac category=SystemPower command=PowerOn idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }}
-
-  # Commented out to avoid on/off actions in same run
+    tags: poweron
 
   # ------------------------------------------------------------------------
   - name: Turn system power off
     local_action: >
        idrac category=SystemPower command=PowerOff idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+    tags: poweroff
 
   # ------------------------------------------------------------------------
-  - name: Power graceful restart
+  - name: Graceful system power restart
     local_action: >
        idrac category=SystemPower command=GracefulRestart idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+    tags: gracefulrestart
 
   # ------------------------------------------------------------------------
   # 14G only
-  - name: Power graceful shutdown
+  - name: Graceful system power shutdown
     local_action: >
        idrac category=SystemPower command=GracefulShutdown idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+    tags: gracefulshutdown
 
