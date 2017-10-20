@@ -7,10 +7,14 @@
   #   GetControllerStatus     Storage controller information
   #   GetDiskStatus           Disk information
 
+  # You can use tags to run specific tasks. 
+  # Example: ansible-playbook manage_storage.yml --tags=getcontrollerinfo
+
   tasks:
 
   - name: Prepare output file
     include: setupoutputfile.yml
+    tags: always
 
   # ------------------------------------------------------------------------
   - name: Get controller information
@@ -19,10 +23,12 @@
             idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
     ignore_errors: yes
+    tags: getcontrollerinfo
 
   - name: Place data in file
     local_action: copy content={{ result | to_nice_json }}
              dest={{template}}_storagecontrollers.json
+    tags: getcontrollerinfo
 
   # ------------------------------------------------------------------------
   - name: Get disk information
@@ -31,7 +37,9 @@
             idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
     ignore_errors: yes
+    tags: getdiskinfo
 
   - name: Place data in file
     local_action: copy content={{ result | to_nice_json }}
             dest={{template}}_disks.json
+    tags: getdiskinfo

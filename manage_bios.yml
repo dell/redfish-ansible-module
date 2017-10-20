@@ -11,19 +11,16 @@
   #   GetBootOrder 		Get device boot order
   #   SetOneTimeBoot 		Set one-time boot device
   #   SetDefaultSettings 	Set BIOS default settings 
+  # Note: not all commands implemented yet, more coming soon
 
   # You can use tags to run specific tasks. 
   # Example: ansible-playbook manage_bios.yml --tags=getbootorder
-
-  # Note: not all commands implemented yet, more coming soon
 
   tasks:
 
   - name: Prepare output file
     include: setupoutputfile.yml
-    tags:
-        - bootmode
-        - getbootorder
+    tags: [getattributes, getbootorder]
 
   # ------------------------------------------------------------------------
   - name: Get BIOS attributes
@@ -32,10 +29,12 @@
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
     ignore_errors: yes
+    tags: getattributes
 
   - name: Copy BIOS attributes to file
     local_action: copy content={{ result | to_nice_json }}
        dest={{template}}_bios_attributes.json
+    tags: getattributes
 
   # ------------------------------------------------------------------------
   - name: Get BIOS boot order
@@ -57,6 +56,7 @@
        idrac category=Bios command=SetOneTimeBoot idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}} bootdevice={{bootdevice}}
     ignore_errors: yes
+    tags: setonetimebootdevice
 
   # ------------------------------------------------------------------------
   - name: Set default settings
@@ -64,6 +64,7 @@
        idrac category=Bios command=SetDefaultSettings idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     ignore_errors: yes
+    tags: setdefaultsettings
 
   # ------------------------------------------------------------------------
   - name: Set BootMode as Uefi

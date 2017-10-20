@@ -14,9 +14,7 @@
 
   - name: Prepare output file
     include: setupoutputfile.yml
-    tags:
-        - selog
-        - lclog
+    tags: always
 
   # ------------------------------------------------------------------------
   - name: Get SE Logs

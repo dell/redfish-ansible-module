@@ -6,6 +6,8 @@
 
   # WARNING: CAREFULLY REVIEW ALL TASKS AVAILABLE AND SELECT WHAT YOU WANT.
   # RUNNING ALL TASKS BELOW MIGHT HAVE UNINTENDED CONSEQUENCES.
+  # ALTERNATIVELY, USE TAGS:
+  # Example: ansible-playbook manage_idrac_settings.yml --tags=setdefaultsettings
 
   # Commands available:
   #   SetDefaultSettings	Set iDRAC default settings
@@ -27,3 +29,4 @@
     local_action: >
        idrac category=Idrac command=SetDefaultSettings
        idracip={{ idracip }} idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+    tags: setdefaultsettings
