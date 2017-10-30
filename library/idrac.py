@@ -481,6 +481,31 @@ def get_bios_boot_order(IDRAC_INFO, root_uri):
 
     return result
 
+def get_fans_stats(IDRAC_INFO, root_uri):
+    result = {}
+    fan_details = []
+    response = send_get_request(IDRAC_INFO, root_uri)
+    if response.status_code == 200:             # success
+        result['ret'] = True
+        data = response.json()
+
+        for device in data[u'Fans']:
+            # There is more information available but this is most important
+            fan = {}
+            fan['Name']   = device[u'FanName']
+            fan['RPMs']   = device[u'Reading']
+            fan['State']  = device[u'Status'][u'State']
+            fan['Health'] = device[u'Status'][u'Health']
+            fan_details.append(fan)
+        result["entries"] = fan_details
+
+    elif response.status_code == 400:
+        result = { 'ret': False, 'msg': '14G only'}
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+
+    return result
+
 def set_bios_default_settings(IDRAC_INFO, root_uri):
     result = {}
     payload = {}
@@ -543,7 +568,6 @@ def create_bios_config_job (IDRAC_INFO,url):
         pp=response.json()
         result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
     return result
-
 
 def get_inventory(IDRAC_INFO, root_uri):
     result = {}
@@ -680,6 +704,13 @@ def main():
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "ExportSCP":
             result = export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri + rf_uri)
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
+
+    elif category == "Cooling":
+        rf_uri = "/redfish/v1/Chassis/System.Embedded.1/Thermal"
+        if command == "GetFanStats":
+            result = get_fans_stats(IDRAC_INFO, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

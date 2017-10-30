@@ -61,10 +61,12 @@ Note: Some of these categories could be combined (i.e. Users and Idrac, for exam
 
 Clone this repository. The idrac module is in the *library* directory, it can be left there or placed somewhere else. If you move it, be sure to define the ANSIBLE_LIBRARY environment variable.
 
+There are a number of playbooks in the root directory with self-explanatory names. Every Redfish API supported by the Ansible module is represented in the playbooks. If it's not in a playbook, it's not supported.
+
 ```bash
 $ export ANSIBLE_LIBRARY=<directory-with-module>
 
-$ ansible-playbook system-inventory.yml
+$ ansible-playbook get_system_inventory.yml
   ...
 PLAY [PowerEdge iDRAC Get System Inventory] ************************************
 
