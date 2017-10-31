@@ -7,6 +7,14 @@
       idracpswd: calvin
 
   tasks:
+  - name: download Catalog file
+    get_url:
+        url: http://downloads.dell.com/catalog/Catalog.xml.gz
+        dest: /tmp/Catalog.gz
+        mode: 0444
+        force: yes
+    register: CatalogFile
+    delegate_to: 127.0.0.1
 
   - name: upload firmware image
     local_action: >
