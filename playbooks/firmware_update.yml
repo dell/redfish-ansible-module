@@ -30,35 +30,41 @@
         idrac category=Firmware command=FirmwareCompare idracip={{idracip}} Model={{result.result.Model|replace('PowerEdge ','')}} idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: firmware
 
-  - name: create folder for firmware binary
+  - name: create folder for download firmware binary
     file:
         path: /tmp/firmware
         state: directory
         mode: 0755
     delegate_to: 127.0.0.1
 
-  - name: download firmwares 
+  - name: download firmware images 
     get_url:
         url: http://downloads.dell.com/{{ item.path }}
         dest: /tmp/firmware/{{ item.path | basename}}
         mode: 0444
         force: no
     when:
-        - item.curr != item.latest
+        - item.latest != item.curr
     with_items:
         - "{{firmware.result.Firmwares}}"
-
     delegate_to: 127.0.0.1
 
-  - name: upload firmware image
+
+  - name: upload firmware images
     local_action: >
         idrac category=Firmware command=UploadFirmware idracip={{idracip}} FWPath=/tmp/firmware/{{ item.path | basename}}
         idracuser={{idracuser}} idracpswd={{idracpswd}}
     when:
-        - item.curr != item.latest
+        - item.latest != item.curr
     with_items:
         - "{{firmware.result.Firmwares}}"
     ignore_errors: yes
+
+
+  - name: install firmware image
+    local_action: >
+        idrac category=Firmware command=InstallFirmware idracip={{idracip}} 
+        idracuser={{idracuser}} idracpswd={{idracpswd}}  InstallOption=Now
 
 
 

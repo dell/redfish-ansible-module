@@ -502,6 +502,26 @@ def upload_firmware(IDRAC_INFO,root_uri,FWPath):
         result = { 'ret': False, 'msg': 'Failed to upload firmware image %s'%str(response.__dict__)}
     return result
 
+def schedule_firmware_update(IDRAC_INFO,root_uri,InstallOption):
+    fw=[]
+    response = send_get_request(IDRAC_INFO,root_uri+'/redfish/v1/UpdateService/FirmwareInventory/')
+    if response.status_code == 200:
+        data=response.json()
+        for i in data['Members']:
+            if 'Available' in i['@odata.id']:
+                fw.append(i['@odata.id'])
+
+
+    url = root_uri + '/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install'
+    payload = { "SoftwareIdentityURIs":fw,"InstallUpon":"InstallOption "}
+    headers = {'content-type': 'application/json'}
+    response = send_post_request(IDRAC_INFO,url,payload,headers)
+    if response.status_code == 202:
+        result = { 'ret': True, 'msg': 'firmware install job accepted ','Location':'%s'%str(response.json()) }
+    else:
+        result = { 'ret': True, 'msg': 'failed to schedule firmware install job','code':'%s'%str(response.__dict__)}
+    return result
+
 def get_bios_attributes(IDRAC_INFO, root_uri):
     result = {}
     response = send_get_request(IDRAC_INFO, root_uri + "/Bios")
@@ -688,6 +708,7 @@ def main():
             bios_attributes    = dict(required=False, type='str', default=None),
             FWPath    = dict(required=False, type='str', default=None),
             Model    = dict(required=False, type='str', default=None),
+            InstallOption    = dict(required=False, type='str', default=None,choices=['Now','NowAndReboot','NextReboot']),
         ),
         supports_check_mode=False
     )
@@ -737,6 +758,8 @@ def main():
             result = upload_firmware(IDRAC_INFO,root_uri,params['FWPath'])
 	elif command == "FirmwareCompare":
 	    result = compare_firmware(IDRAC_INFO,root_uri,"/tmp/Catalog",params['Model'])
+        elif command == "InstallFirmware":
+            result = schedule_firmware_update(IDRAC_INFO,root_uri,params['InstallOption'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
