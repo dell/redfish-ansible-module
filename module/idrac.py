@@ -439,6 +439,24 @@ def get_firmware_inventory(IDRAC_INFO, root_uri, rf_uri):
 
     return result
 
+def upload_firmware(IDRAC_INFO,root_uri,FWPath):
+    result={}
+    response = send_get_request(IDRAC_INFO,root_uri+'/redfish/v1/UpdateService/FirmwareInventory/')
+    if response.status_code == 200:
+        ETag=response.headers['ETag']
+    else:
+        result = { 'ret': False, 'msg': 'Failed to get update service etag %s'%str(root_uri)}
+        return result
+
+    files = {'file': (os.path.basename(FWPath), open(FWPath, 'rb'), 'multipart/form-data')}
+    headers = {"if-match": ETag}
+    url=root_uri + '/redfish/v1/UpdateService/FirmwareInventory'
+    response = requests.post(url,files=files,auth=('root','calvin'),headers=headers,verify=False)
+    if response.status_code == 201:
+        result = { 'ret': True, 'msg': 'Firmare uploaded successfully', 'Version': '%s'%str(response.json()['Version']), 'Location':'%s'%response.headers['Location']}
+    else:
+        result = { 'ret': False, 'msg': 'Failed to upload firmware image %s'%str(response.__dict__)}
+    return result
 def get_bios_attributes(IDRAC_INFO, root_uri):
     result = {}
     response = send_get_request(IDRAC_INFO, root_uri + "/Bios")
@@ -623,6 +641,7 @@ def main():
             sharepswd  = dict(required=False, type='str', default=None),
             bootdevice = dict(required=False, type='str', default=None),
             bios_attributes    = dict(required=False, type='str', default=None),
+            FWPath    = dict(required=False, type='str', default=None),
         ),
         supports_check_mode=False
     )
@@ -668,6 +687,8 @@ def main():
         rf_uri = "/redfish/v1/UpdateService/FirmwareInventory/"
         if command == "GetInventory":
            result = get_firmware_inventory(IDRAC_INFO, root_uri, rf_uri)
+        elif command == "UploadFirmware":
+            result = upload_firmware(IDRAC_INFO,root_uri,params['FWPath'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
