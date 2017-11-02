@@ -97,6 +97,11 @@ options:
     default: None
     description:
       - bootdevice when setting boot configuration
+  bios_attributes:
+    required: false
+    default: None
+    description:
+      - dict where we specify BIOS attributes to set
 
 author: "jose.delarosa@dell.com"
 """
@@ -565,7 +570,7 @@ def create_bios_config_job (IDRAC_INFO,url):
     if response.status_code == 200:
         result = { 'ret': True, 'msg': 'Config job created'}
     else:
-        pp=response.json()
+        pp = response.json()
         result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
     return result
 
@@ -622,7 +627,7 @@ def main():
             shareuser  = dict(required=False, type='str', default=None),
             sharepswd  = dict(required=False, type='str', default=None),
             bootdevice = dict(required=False, type='str', default=None),
-            bios_attributes    = dict(required=False, type='str', default=None),
+            bios_attributes = dict(required=False, type='str', default=None),
         ),
         supports_check_mode=False
     )
@@ -727,16 +732,16 @@ def main():
             result = set_bios_default_settings(IDRAC_INFO, root_uri + rf_uri)
         elif command == "SetAttributes":
 	    rf_uri = '/redfish/v1/Systems/System.Embedded.1/Bios/Settings'
-	    result = set_bios_attributes(IDRAC_INFO,root_uri+rf_uri,params['bios_attributes'])
+	    result = set_bios_attributes(IDRAC_INFO, root_uri + rf_uri, params['bios_attributes'])
         elif command == "ConfigJob":
             rf_uri = '/redfish/v1/Managers/iDRAC.Embedded.1/Jobs'
-            result = create_bios_config_job(IDRAC_INFO,root_uri+rf_uri)
+            result = create_bios_config_job(IDRAC_INFO, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Idrac":
         if command == "SetDefaultSettings":
-            rf_uri = "redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/DellManager.ResetToDefaults"
+            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/DellManager.ResetToDefaults"
             result = set_idrac_default_settings(IDRAC_INFO, root_uri + rf_uri)
         elif command == "IdracGracefulRestart":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
