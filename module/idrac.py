@@ -365,7 +365,12 @@ def manage_users(command, IDRAC_INFO, USER_INFO, root_uri, rf_uri):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
     elif command == "DeleteUser":
-        result = { 'ret': False, 'msg': "Not yet implemented" }
+        payload = {'UserName': ""}
+        response = send_patch_request(IDRAC_INFO, uri, payload, headers)
+        if response.status_code == 200:		# success
+            result['ret'] = True
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
     else:
         result = { 'ret': False, 'msg': "Invalid Command" }

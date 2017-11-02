@@ -9,15 +9,16 @@
   # ALTERNATIVELY, USE TAGS:
   # Example: ansible-playbook manage_users.yml --tags=adduser
 
+  # User to add, modify or delete is defined in group_vars/myhosts
 
   # Options available:
-  #   ListUsers			Lists all users, including empty slots
+  #   ListUsers			Lists all users, including empty entries
   #   AddUser			Add user
   #   EnableUser		Enable user
   #   DiasbleUser		Disable user
   #   UpdateUserRole		Update user role
   #   UpdateUserPassword	Update user password
-  #   DeleteUser		Delete user - Coming Soon
+  #   DeleteUser		Delete user
 
   tasks:
 
@@ -50,7 +51,7 @@
     local_action: >
        idrac category=Users command=EnableUser idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
-    tags: adduser
+    tags: [enableuser, adduser]
 
   # ------------------------------------------------------------------------
   - name: Update iDRAC user role
@@ -74,7 +75,7 @@
     local_action: >
        idrac category=Users command=DisableUser idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
-    tags: deleteuser
+    tags: [disableuser, deleteuser]
 
   - name: Delete iDRAC user
     local_action: >

@@ -37,7 +37,7 @@ def main():
     rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Accounts/" + id
 
     a = {'Enabled': False}		# make sure you disable it first
-    c = {'UserName': ""}		# Same effect as deleting it (mostly)
+    c = {'UserName': ""}		# same effect as deleting it (mostly)
     headers = {'content-type': 'application/json'}
 
     # check to make sure we're not removing default root user
