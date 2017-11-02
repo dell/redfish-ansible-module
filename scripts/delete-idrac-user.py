@@ -11,8 +11,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Script to add a user to iDRAC. Very simple stuff here, should add some
-# logic to get first empty user ID rather than specifying one.
+# Script to delete an iDRAC user. Very simple stuff here, should add some
+# to specify user by name, and then find user ID based on the name.
 
 import rfutils
 import json
@@ -30,17 +30,21 @@ def delete_user(idrac, base_uri, rf_uri, payload, headers):
 def main():
     idrac = rf.check_args(sys)
     base_uri = "https://" + idrac['ip']
-    # This assumes we know the URI we want to do, which is a crude approach.
-    # Need to find a more elegant way to remove users, like providing a username,
-    # and then finding the URI to use based on the username.
+    # Find more effective way to remove users, perhaps by username rather than
+    # userid, although it might be better to just use the simplest approach. 
 
-    # Be sure you don't use /Accounts/2, which is the root user! Maybe I should add
-    # code to prevent that.
-    rf_uri="/redfish/v1/Managers/iDRAC.Embedded.1/Accounts/3"
+    id = "3"		# we should probably pass this is a parameter
+    rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Accounts/" + id
 
     a = {'Enabled': False}		# make sure you disable it first
     c = {'UserName': ""}		# Same effect as deleting it (mostly)
     headers = {'content-type': 'application/json'}
+
+    # check to make sure we're not removing default root user
+    userid = rf_uri.split('/')[-1]
+    if userid == "2":
+        rf.print_red("Not allowed to remove default root user!")
+        exit(1)
 
     # Delete user
     for payload in a, c:
