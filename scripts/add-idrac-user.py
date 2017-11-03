@@ -30,7 +30,9 @@ def add_user(idrac, base_uri, rf_uri, payload, headers):
 def main():
     idrac = rf.check_args(sys)
     base_uri = "https://" + idrac['ip']
-    rf_uri="/redfish/v1/Managers/iDRAC.Embedded.1/Accounts/3"
+
+    id = "3"		# we should probably pass this is a parameter
+    rf_uri="/redfish/v1/Managers/iDRAC.Embedded.1/Accounts/" + id
 
     idracuser = {'UserName': 'operator3'}
     idracpswd = {'Password': 'mypassword'}
