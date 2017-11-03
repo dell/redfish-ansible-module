@@ -2,9 +2,6 @@
 - hosts: myhosts
   name: PowerEdge Firmware Update 
   gather_facts: False
-  vars:
-      idracuser: root
-      idracpswd: calvin
 
   tasks:
   - name: download Catalog file
@@ -15,10 +12,12 @@
         force: yes
     register: CatalogFile
     delegate_to: 127.0.0.1
+    run_once: true
 
   - name: extract gz file 
     shell: gzip -d /tmp/Catalog.gz -f
     delegate_to: 127.0.0.1
+    run_once: true
 
   - name: Getting system inventory
     local_action: >
@@ -36,6 +35,7 @@
         state: directory
         mode: 0755
     delegate_to: 127.0.0.1
+    run_once: true
 
   - name: download firmware images 
     get_url:
@@ -54,6 +54,7 @@
     local_action: >
         idrac category=Firmware command=UploadFirmware idracip={{idracip}} FWPath=/tmp/firmware/{{ item.path | basename}}
         idracuser={{idracuser}} idracpswd={{idracpswd}}
+    register: fw_available
     when:
         - item.latest != item.curr
     with_items:
@@ -65,10 +66,3 @@
     local_action: >
         idrac category=Firmware command=InstallFirmware idracip={{idracip}} 
         idracuser={{idracuser}} idracpswd={{idracpswd}}  InstallOption=Now
-
-
-
-
-
-
-
