@@ -9,15 +9,18 @@
 * python >= 2.6
 * ansible >= 2.3
 
+| <ul> <li>Dedicated</li>  <li>LOM1</li>  <li>LOM2</li>  <li>LOM3</li>  <li>LOM4</li> </ul>
+
+
 ## Options
 
 | paramater       | required | default | choices  | comments                  |
 |-----------------|----------|---------|----------|---------------------------|
-| category        | yes      |         |          |                           |
-| command         | yes      |         |          |                           |
+| category        | yes      |         | <ul><li>Bios</li><li>Firmware</li><li>Inventory</li><li>Logs</li></ul>| Type of action to run         |
+| command         | yes      |         |          | Each category has unique commands  |
 | idracip         | yes      |         |          |                           |
-| idracuser       | yes      | root    |          |                           |
-| idracpswd       | yes      | calvin  |          |                           |
+| idracuser       | yes      | root    |          | Credentials                |
+| idracpswd       | yes      | calvin  |          | Credentials               |
 | bios_attributes | no       |         |          |                           |
 | bootdevice      | no       |         |          |                           |
 | sharehost       | no       |         |          | For managing SCP files    |
@@ -59,6 +62,15 @@
             idracuser={{ idracuser }} idracpswd={{ idracpswd }}
     register: result
     tags: lclog
+
+  - name: Get BIOS attributes
+    local_action: >
+       idrac category=Bios command=GetAttributes idracip={{idracip}}
+       idracuser={{idracuser}} idracpswd={{idracpswd}}
+    register: result
+    ignore_errors: yes
+    tags: getattributes
+
 
 ```
 
