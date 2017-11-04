@@ -1,0 +1,68 @@
+---
+- hosts: myhosts
+  name: PowerEdge Firmware Update 
+  gather_facts: False
+
+  tasks:
+  - name: download Catalog file
+    get_url:
+        url: http://downloads.dell.com/catalog/Catalog.xml.gz
+        dest: /tmp/Catalog.gz
+        mode: 0444
+        force: yes
+    register: CatalogFile
+    delegate_to: 127.0.0.1
+    run_once: true
+
+  - name: extract gz file 
+    shell: gzip -d /tmp/Catalog.gz -f
+    delegate_to: 127.0.0.1
+    run_once: true
+
+  - name: Getting system inventory
+    local_action: >
+        idrac category=Inventory command=GetInventory idracip={{idracip}} idracuser={{idracuser}} idracpswd={{idracpswd}}
+    register: result
+
+  - name: compare firmware inventory
+    local_action: >
+        idrac category=Firmware command=FirmwareCompare idracip={{idracip}} Model={{result.result.Model|replace('PowerEdge ','')}} idracuser={{idracuser}} idracpswd={{idracpswd}}
+    register: firmware
+
+  - name: create folder for download firmware binary
+    file:
+        path: /tmp/firmware
+        state: directory
+        mode: 0755
+    delegate_to: 127.0.0.1
+    run_once: true
+
+  - name: download firmware images 
+    get_url:
+        url: http://downloads.dell.com/{{ item.path }}
+        dest: /tmp/firmware/{{ item.path | basename}}
+        mode: 0444
+        force: no
+    when:
+        - item.latest != item.curr
+    with_items:
+        - "{{firmware.result.Firmwares}}"
+    delegate_to: 127.0.0.1
+
+
+  - name: upload firmware images
+    local_action: >
+        idrac category=Firmware command=UploadFirmware idracip={{idracip}} FWPath=/tmp/firmware/{{ item.path | basename}}
+        idracuser={{idracuser}} idracpswd={{idracpswd}}
+    register: fw_available
+    when:
+        - item.latest != item.curr
+    with_items:
+        - "{{firmware.result.Firmwares}}"
+    ignore_errors: yes
+
+
+  - name: install firmware image
+    local_action: >
+        idrac category=Firmware command=InstallFirmware idracip={{idracip}} 
+        idracuser={{idracuser}} idracpswd={{idracpswd}}  InstallOption=Now
