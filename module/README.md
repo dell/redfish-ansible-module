@@ -32,4 +32,27 @@
 
 ## Examples
 
-The best way to learn how to use these playbooks is by looking at each one in the <i>playbooks</i> directory. Most playbooks can be run as-is, whereas others require that you run specific sections using tags or by commenting out what you don't want.
+```bash
+  tasks:
+
+  - name: Prepare output file
+    include: setupoutputfile.yml
+
+  - name: Getting system inventory
+    local_action: >
+       idrac category=Inventory command=GetInventory idracip={{idracip}}
+       idracuser={{idracuser}} idracpswd={{idracpswd}}
+    register: result
+
+  - name: Copying results to file
+    local_action: copy content={{ result | to_nice_json }}
+       dest={{template}}_inventory.json
+
+  - name: Update iDRAC user password
+    local_action: >
+       idrac category=Users command=UpdateUserPassword idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
+       userpswd={{ userpswd }}
+    tags: updatepassword
+
+```

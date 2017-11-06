@@ -47,9 +47,7 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
   - SCP: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
   - Idrac: Manages iDRAC properties (network, time, etc.)
   - Users: Manages iDRAC users (add/delete/update)
-  - Firmware (coming soon): Manages system firmware
-
-Note: Some of these categories could be combined (i.e. Users and Idrac, for example), but for the sake of simplicity they are listed separately for now.
+  - Firmware: Manages system firmware
 
 ## Requirements
 
@@ -59,9 +57,9 @@ Note: Some of these categories could be combined (i.e. Users and Idrac, for exam
 
 ## Example
 
-Clone this repository. The idrac module is in the *library* directory, it can be left there or placed somewhere else. If you move it, be sure to define the ANSIBLE_LIBRARY environment variable.
+Clone this repository. The idrac module is in the *module* directory, it can be left there (I added a symlink to it in the *playbooks* directory). If you move it, be sure to define the ANSIBLE_LIBRARY environment variable.
 
-There are a number of playbooks in the root directory with self-explanatory names. Every Redfish API supported by the Ansible module is represented in the playbooks. If it's not in a playbook, it's not supported.
+The playbook names describe what they are for, and they are the best source to learn how to use them. Every Redfish API supported by the Ansible module is represented in the playbooks. If it's not in a playbook, it hasn't been coded in the module yet.
 
 ```bash
 $ export ANSIBLE_LIBRARY=<directory-with-module>
