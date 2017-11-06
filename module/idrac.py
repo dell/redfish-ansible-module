@@ -738,7 +738,6 @@ def main():
 	    Model=dict(required=False, type='str', default=None),
 	    InstallOption=dict(required=False, type='str', default=None, choices=['Now', 'NowAndReboot', 'NextReboot']),
         ),
-        ),
         supports_check_mode=False
     )
 
