@@ -102,6 +102,23 @@ options:
     default: None
     description:
       - dict where we specify BIOS attributes to set
+  FWPath:
+    required: false
+    default: None
+    description:
+      - firmware binary path which is used to upload firmware
+  Model:
+    required: false
+    default: None
+    description:
+      - system model name like R940, R740
+  InstallOption:
+    required: false
+    choices: [ Now, NowAndReboot, NextReboot ]
+    default: None
+    description:
+      - firmware installation option like Now or NextReboot
+
 
 author: "jose.delarosa@dell.com"
 """
@@ -458,11 +475,11 @@ def compare_firmware(IDRAC_INFO, root_uri, catalog_file, model):
     response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
     if response.status_code == 200:
         data = response.json()
-        
+
         for i in data['Members']:
             if 'Installed' in i['@odata.id']:
                 fw.append(i['@odata.id'])
-                
+
         # read catalog file
         tree = ET.parse(catalog_file)
         root = tree.getroot()
@@ -478,7 +495,7 @@ def compare_firmware(IDRAC_INFO, root_uri, catalog_file, model):
                                         if LooseVersion(i.attrib['vendorVersion']) > LooseVersion(version):
                                             version = i.attrib['vendorVersion']
                                             path = i.attrib['path']
-    
+
         if path != "":
             fw_list['Firmwares'].append({ 'curr':'%s' % inv.split('-')[2], 'latest':'%s' % version, 'path':'%s' % path })
     else:
@@ -497,15 +514,15 @@ def upload_firmware(IDRAC_INFO, root_uri, FWPath):
     files = {'file': (os.path.basename(FWPath), open(FWPath, 'rb'), 'multipart/form-data')}
     headers = {"if-match": ETag}
     url = root_uri + '/redfish/v1/UpdateService/FirmwareInventory'
-    
+
     response =send_post_request(IDRAC_INFO, url,None,headers,files)
-    
+
     if response.status_code == 201:
         result = { 'ret': True, 'msg': 'Firmare uploaded successfully', 'Version': '%s' % str(response.json()['Version']), 'Location':'%s' % response.headers['Location']}
-        
+
     elif response.status_code == 400:
         result = { 'ret': False, 'msg': '14G only'}
-        
+
     else:
         result = { 'ret': False, 'msg': 'Failed to upload firmware image %s' % str(response.__dict__)}
     return result
@@ -526,7 +543,7 @@ def schedule_firmware_update(IDRAC_INFO, root_uri, InstallOption):
     response = send_post_request(IDRAC_INFO, url, payload, headers)
     if response.status_code == 202:
         result = { 'ret': True, 'msg': 'firmware install job accepted ', 'Location':'%s' % str(response.json()) }
-        
+
     elif response.status_code == 400:
         result = { 'ret': False, 'msg': '14G only'}
     else:
