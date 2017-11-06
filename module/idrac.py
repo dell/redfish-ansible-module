@@ -110,6 +110,8 @@ import os
 import requests
 import json
 import re
+import xml.etree.ElementTree as ET
+from distutils.version import LooseVersion
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from ansible.module_utils.basic import AnsibleModule
@@ -448,6 +450,41 @@ def get_firmware_inventory(IDRAC_INFO, root_uri, rf_uri):
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
     return result
+
+def compare_firmware(IDRAC_INFO, root_uri, catalog_file, model):
+    fw = []
+    fw_list = {'ret':True, 'Firmwares':[]}
+
+    response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
+    if response.status_code == 200:
+        data = response.json()
+        
+        for i in data['Members']:
+            if 'Installed' in i['@odata.id']:
+                fw.append(i['@odata.id'])
+                
+        # read catalog file
+        tree = ET.parse(catalog_file)
+        root = tree.getroot()
+        for inv in fw:
+            ver = inv.split('-')[1]
+            version = '0'
+            path = ""
+            for i in root.findall('.//Category/..'):
+                        for m in i.findall('.//SupportedDevices/Device'):
+                            if m.attrib['componentID'] == ver:
+                                for nx in i.findall('.//SupportedSystems/Brand/Model/Display'):
+                                    if nx.text == model:
+                                        if LooseVersion(i.attrib['vendorVersion']) > LooseVersion(version):
+                                            version = i.attrib['vendorVersion']
+                                            path = i.attrib['path']
+    
+        if path != "":
+            fw_list['Firmwares'].append({ 'curr':'%s' % inv.split('-')[2], 'latest':'%s' % version, 'path':'%s' % path })
+    else:
+        fw_list['ret']=False
+    return fw_list
+
 def upload_firmware(IDRAC_INFO, root_uri, FWPath):
     result = {}
     response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
@@ -658,6 +695,7 @@ def main():
             bootdevice = dict(required=False, type='str', default=None),
             bios_attributes = dict(required=False, type='str', default=None),
 	    FWPath=dict(required=False, type='str', default=None),
+	    Model=dict(required=False, type='str', default=None),
         ),
         supports_check_mode=False
     )
@@ -705,6 +743,8 @@ def main():
            result = get_firmware_inventory(IDRAC_INFO, root_uri, rf_uri)
 	elif command == "UploadFirmware":
             result = upload_firmware(IDRAC_INFO, root_uri, params['FWPath'])
+	elif command == "FirmwareCompare":
+            result = compare_firmware(IDRAC_INFO, root_uri, "/tmp/Catalog", params['Model'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
