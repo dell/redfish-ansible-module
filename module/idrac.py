@@ -141,10 +141,10 @@ def send_get_request(idrac, uri):
         raise			# Do we let module exit or should we return an error value?
     return response
 
-def send_post_request(idrac, uri, pyld, hdrs):
-    result = {}
+def send_post_request(idrac, uri, pyld, hdrs,fileName=None):
+
     try:
-        response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,
+        response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,files=fileName,
                            verify=False, auth=(idrac['user'], idrac['pswd']))
     except:
         raise			# Do we let module exit or should we return an error value?
