@@ -496,8 +496,8 @@ def compare_firmware(IDRAC_INFO, root_uri, catalog_file, model):
                                             version = i.attrib['vendorVersion']
                                             path = i.attrib['path']
 
-        if path != "":
-            fw_list['Firmwares'].append({ 'curr':'%s' % inv.split('-')[2], 'latest':'%s' % version, 'path':'%s' % path })
+	    if path != "":
+		fw_list['Firmwares'].append({ 'curr':'%s' % inv.split('-')[2], 'latest':'%s' % version, 'path':'%s' % path })
     else:
         fw_list['ret']=False
     return fw_list
