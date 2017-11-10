@@ -102,6 +102,23 @@ options:
     default: None
     description:
       - dict where we specify BIOS attributes to set
+  FWPath:
+    required: false
+    default: None
+    description:
+      - firmware binary path which is used to upload firmware
+  Model:
+    required: false
+    default: None
+    description:
+      - system model name like R940, R740
+  InstallOption:
+    required: false
+    choices: [ Now, NowAndReboot, NextReboot ]
+    default: None
+    description:
+      - firmware installation option like Now or NextReboot
+
 
 author: "jose.delarosa@dell.com"
 """
@@ -110,6 +127,8 @@ import os
 import requests
 import json
 import re
+import xml.etree.ElementTree as ET
+from distutils.version import LooseVersion
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from ansible.module_utils.basic import AnsibleModule
@@ -122,10 +141,10 @@ def send_get_request(idrac, uri):
         raise			# Do we let module exit or should we return an error value?
     return response
 
-def send_post_request(idrac, uri, pyld, hdrs):
-    result = {}
+def send_post_request(idrac, uri, pyld, hdrs,fileName=None):
+
     try:
-        response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,
+        response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,files=fileName,
                            verify=False, auth=(idrac['user'], idrac['pswd']))
     except:
         raise			# Do we let module exit or should we return an error value?
@@ -449,6 +468,88 @@ def get_firmware_inventory(IDRAC_INFO, root_uri, rf_uri):
 
     return result
 
+def compare_firmware(IDRAC_INFO, root_uri, catalog_file, model):
+    fw = []
+    fw_list = {'ret':True, 'Firmwares':[]}
+
+    response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
+    if response.status_code == 200:
+        data = response.json()
+
+        for i in data['Members']:
+            if 'Installed' in i['@odata.id']:
+                fw.append(i['@odata.id'])
+
+        # read catalog file
+        tree = ET.parse(catalog_file)
+        root = tree.getroot()
+        for inv in fw:
+            ver = inv.split('-')[1]
+            version = '0'
+            path = ""
+            for i in root.findall('.//Category/..'):
+                        for m in i.findall('.//SupportedDevices/Device'):
+                            if m.attrib['componentID'] == ver:
+                                for nx in i.findall('.//SupportedSystems/Brand/Model/Display'):
+                                    if nx.text == model:
+                                        if LooseVersion(i.attrib['vendorVersion']) > LooseVersion(version):
+                                            version = i.attrib['vendorVersion']
+                                            path = i.attrib['path']
+
+	    if path != "":
+		fw_list['Firmwares'].append({ 'curr':'%s' % inv.split('-')[2], 'latest':'%s' % version, 'path':'%s' % path })
+    else:
+        fw_list['ret']=False
+    return fw_list
+
+def upload_firmware(IDRAC_INFO, root_uri, FWPath):
+    result = {}
+    response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
+    if response.status_code == 200:
+        ETag = response.headers['ETag']
+    else:
+        result = { 'ret': False, 'msg': 'Failed to get update service etag %s' % str(root_uri)}
+        return result
+
+    files = {'file': (os.path.basename(FWPath), open(FWPath, 'rb'), 'multipart/form-data')}
+    headers = {"if-match": ETag}
+    url = root_uri + '/redfish/v1/UpdateService/FirmwareInventory'
+
+    response =send_post_request(IDRAC_INFO, url,None,headers,files)
+
+    if response.status_code == 201:
+        result = { 'ret': True, 'msg': 'Firmare uploaded successfully', 'Version': '%s' % str(response.json()['Version']), 'Location':'%s' % response.headers['Location']}
+
+    elif response.status_code == 400:
+        result = { 'ret': False, 'msg': '14G only'}
+
+    else:
+        result = { 'ret': False, 'msg': 'Failed to upload firmware image %s' % str(response.__dict__)}
+    return result
+
+def schedule_firmware_update(IDRAC_INFO, root_uri, InstallOption):
+    fw = []
+    response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
+    if response.status_code == 200:
+        data = response.json()
+        for i in data['Members']:
+            if 'Available' in i['@odata.id']:
+                fw.append(i['@odata.id'])
+
+
+    url = root_uri + '/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install'
+    payload = { "SoftwareIdentityURIs":fw, "InstallUpon":"InstallOption "}
+    headers = {'content-type': 'application/json'}
+    response = send_post_request(IDRAC_INFO, url, payload, headers)
+    if response.status_code == 202:
+        result = { 'ret': True, 'msg': 'firmware install job accepted ', 'Location':'%s' % str(response.json()) }
+
+    elif response.status_code == 400:
+        result = { 'ret': False, 'msg': '14G only'}
+    else:
+        result = { 'ret': True, 'msg': 'failed to schedule firmware install job', 'code':'%s' % str(response.__dict__)}
+    return result
+
 def get_bios_attributes(IDRAC_INFO, root_uri):
     result = {}
     response = send_get_request(IDRAC_INFO, root_uri + "/Bios")
@@ -633,6 +734,9 @@ def main():
             sharepswd  = dict(required=False, type='str', default=None),
             bootdevice = dict(required=False, type='str', default=None),
             bios_attributes = dict(required=False, type='str', default=None),
+	    FWPath=dict(required=False, type='str', default=None),
+	    Model=dict(required=False, type='str', default=None),
+	    InstallOption=dict(required=False, type='str', default=None, choices=['Now', 'NowAndReboot', 'NextReboot']),
         ),
         supports_check_mode=False
     )
@@ -678,6 +782,12 @@ def main():
         rf_uri = "/redfish/v1/UpdateService/FirmwareInventory/"
         if command == "GetInventory":
            result = get_firmware_inventory(IDRAC_INFO, root_uri, rf_uri)
+	elif command == "UploadFirmware":
+            result = upload_firmware(IDRAC_INFO, root_uri, params['FWPath'])
+	elif command == "FirmwareCompare":
+            result = compare_firmware(IDRAC_INFO, root_uri, "/tmp/Catalog", params['Model'])
+        elif command == "InstallFirmware":
+            result = schedule_firmware_update(IDRAC_INFO, root_uri, params['InstallOption'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
