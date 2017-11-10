@@ -21,12 +21,15 @@
 
   - name: Getting system inventory
     local_action: >
-        idrac category=Inventory command=GetInventory idracip={{idracip}} idracuser={{idracuser}} idracpswd={{idracpswd}}
+        idrac category=Inventory command=GetInventory idracip={{idracip}}
+        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
 
   - name: compare firmware inventory
     local_action: >
-        idrac category=Firmware command=FirmwareCompare idracip={{idracip}} Model={{result.result.Model|replace('PowerEdge ','')}} idracuser={{idracuser}} idracpswd={{idracpswd}}
+        idrac category=Firmware command=FirmwareCompare idracip={{idracip}}
+        idracuser={{idracuser}} idracpswd={{idracpswd}}
+        Model={{result.result.Model|replace('PowerEdge ','')}}
     register: firmware
 
   - name: create folder for download firmware binary
@@ -49,11 +52,11 @@
         - "{{firmware.result.Firmwares}}"
     delegate_to: 127.0.0.1
 
-
   - name: upload firmware images
     local_action: >
-        idrac category=Firmware command=UploadFirmware idracip={{idracip}} FWPath=/tmp/firmware/{{ item.path | basename}}
+        idrac category=Firmware command=UploadFirmware idracip={{idracip}}
         idracuser={{idracuser}} idracpswd={{idracpswd}}
+        FWPath=/tmp/firmware/{{ item.path | basename}}
     register: fw_available
     when:
         - item.latest != item.curr
@@ -61,15 +64,8 @@
         - "{{firmware.result.Firmwares}}"
     ignore_errors: yes
 
-
   - name: install firmware image
     local_action: >
         idrac category=Firmware command=InstallFirmware idracip={{idracip}} 
-        idracuser={{idracuser}} idracpswd={{idracpswd}}  InstallOption=NowAndReboot
-
-
-
-
-
-
-
+        idracuser={{idracuser}} idracpswd={{idracpswd}}
+        InstallOption=NowAndReboot
