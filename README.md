@@ -43,6 +43,7 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
   - Logs: Collect System Event and Lifecycle Controller Logs
   - Power: Manages system power (status/on/off/restart)
   - Storage: Manages storage controllers, HDDs and VDs
+  - Network: Manages NICs, NTP settings, etc.
   - Bios: Manages BIOS settings
   - Idrac: Manages iDRAC properties (network, time, etc.)
   - Users: Manages iDRAC users (add/delete/update)
@@ -53,6 +54,7 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
 
   - PowerEdge 12G/13G/14G servers (some features only available in 14G)
   - Minimum iDRAC 7/8/9 FW 2.40.40.40
+  - *requests* python library ("pip install requests")
   - SMB share to place SCP files
 
 ## Example
