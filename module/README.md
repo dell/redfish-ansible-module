@@ -8,18 +8,19 @@
 
 * python >= 2.6
 * ansible >= 2.3
+* *requests* python library
 
 ## Options
 
 | paramater       | required | default | choices  | comments                  |
-|-----------------|----------|---------|----------|---------------------------|
-| category        | yes      |         | <ul><li>Bios</li><li>Firmware</li><li>Idrac</li><li>Inventory</li><li>Logs</li><li>SCP</li><li>Users</li></ul>| Type of action to run         |
+|-----------------|----------|---------|----------|-----------------------------------|
+| category        | yes      |         | <ul><li>Bios</li><li>Firmware</li><li>Idrac</li><li>Inventory</li><li>Logs</li><li>SCP</li><li>Users</li></ul>| Type of action to run |
 | command         | yes      |         |          | Each category has unique commands  |
 | idracip         | yes      |         |          |                           |
 | idracuser       | yes      | root    |          | User credentials          |
 | idracpswd       | yes      | calvin  |          | User credentials          |
-| bios_attributes | no       |         |          |                           |
-| bootdevice      | no       |         |          |                           |
+| bios_attributes | no       |         |          | dict for BIOS attributes to set |
+| bootdevice      | no       |         |          | For setting boot configuration |
 | sharehost       | no       |         |          | For managing SCP files    |
 | sharename       | no       |         |          | For managing SCP files    |
 | shareuser       | no       |         |          | For managing SCP files    |
@@ -29,6 +30,9 @@
 | username        | no       |         |          | For managing users        |
 | userpswd        | no       |         |          | For managing users        |
 | userrole        | no       |         |          | For managing users        |
+| FWPath          | no       |         |          | Firmware location (for FW upgrade) |
+| Model           | no       |         |          | Server model (for FW upgrade) |
+| InstallOption   | no       |         | <ul><li>Now</li><li>NowAndReboot</li><li>NextReboot</li></ul>| Action to take after upgrade |
 
 ## Examples
 

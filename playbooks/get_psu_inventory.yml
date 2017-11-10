@@ -5,6 +5,8 @@
 
   tasks:
 
+  # Not supported in 12G servers
+
   - name: Prepare output file
     include: setupoutputfile.yml
 
