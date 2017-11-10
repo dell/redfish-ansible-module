@@ -44,14 +44,14 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
   - Power: Manages system power (status/on/off/restart)
   - Storage: Manages storage controllers, HDDs and VDs
   - Bios: Manages BIOS settings
-  - SCP: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
   - Idrac: Manages iDRAC properties (network, time, etc.)
   - Users: Manages iDRAC users (add/delete/update)
-  - Firmware: Manages system firmware
+  - SCP: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
+  - Firmware: Manages system firmware (FW upgrade only in 14G)
 
 ## Requirements
 
-  - PowerEdge 12G/13G/14G servers
+  - PowerEdge 12G/13G/14G servers (some features only available in 14G)
   - Minimum iDRAC 7/8/9 FW 2.40.40.40
   - SMB share to place SCP files
 
