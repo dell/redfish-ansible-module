@@ -678,7 +678,7 @@ def create_bios_config_job (IDRAC_INFO, url):
         result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
     return result
 
-def get_nic_inventory(IDRAC_INFO, root_uri, rf_uri):
+def get_nic_information(IDRAC_INFO, root_uri, rf_uri):
     result = {}
     nic_details = []
 
@@ -821,9 +821,6 @@ def main():
         if command == "GetSystemInventory":
             rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
             result = get_system_inventory(IDRAC_INFO, root_uri + rf_uri)
-        if command == "GetNICInventory":
-            rf_uri = "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/"
-            result = get_nic_inventory(IDRAC_INFO, root_uri, rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
@@ -859,6 +856,13 @@ def main():
     elif category == "SystemPower":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         result = manage_system_power(command, IDRAC_INFO, root_uri + rf_uri)
+
+    elif category == "Network":
+        if command == "GetNICInfo":
+            rf_uri = "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/"
+            result = get_nic_information(IDRAC_INFO, root_uri, rf_uri)
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Storage":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/"

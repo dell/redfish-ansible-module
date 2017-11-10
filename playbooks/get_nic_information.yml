@@ -10,11 +10,11 @@
 
   - name: Get NIC Inventory
     local_action: >
-       idrac category=Inventory command=GetNICInventory idracip={{idracip}}
+       idrac category=Network command=GetNICInfo idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
     ignore_errors: yes
 
   - name: Copy inventory to file
     local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_nic_inventory.json
+       dest={{template}}_nic_information.json
