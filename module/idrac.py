@@ -119,7 +119,6 @@ options:
     description:
       - firmware installation option like Now or NextReboot
 
-
 author: "jose.delarosa@dell.com"
 """
 
@@ -515,8 +514,8 @@ def upload_firmware(IDRAC_INFO, root_uri, FWPath):
     headers = {"if-match": ETag}
     url = root_uri + '/redfish/v1/UpdateService/FirmwareInventory'
 
-    response =send_post_request(IDRAC_INFO, url,None,headers,files)
-
+    # Calling POST directly rather than use send_post_request() - look into it?
+    response = requests.post(url, files=files, auth=(IDRAC_INFO['user'], IDRAC_INFO['pswd']), headers=headers, verify=False)
     if response.status_code == 201:
         result = { 'ret': True, 'msg': 'Firmare uploaded successfully', 'Version': '%s' % str(response.json()['Version']), 'Location':'%s' % response.headers['Location']}
 
@@ -535,7 +534,6 @@ def schedule_firmware_update(IDRAC_INFO, root_uri, InstallOption):
         for i in data['Members']:
             if 'Available' in i['@odata.id']:
                 fw.append(i['@odata.id'])
-
 
     url = root_uri + '/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install'
     payload = { "SoftwareIdentityURIs":fw, "InstallUpon":"InstallOption "}
@@ -734,9 +732,9 @@ def main():
             sharepswd  = dict(required=False, type='str', default=None),
             bootdevice = dict(required=False, type='str', default=None),
             bios_attributes = dict(required=False, type='str', default=None),
-	    FWPath=dict(required=False, type='str', default=None),
-	    Model=dict(required=False, type='str', default=None),
-	    InstallOption=dict(required=False, type='str', default=None, choices=['Now', 'NowAndReboot', 'NextReboot']),
+	    FWPath     = dict(required=False, type='str', default=None),
+	    Model      = dict(required=False, type='str', default=None),
+	    InstallOption = dict(required=False, type='str', default=None, choices=['Now', 'NowAndReboot', 'NextReboot']),
         ),
         supports_check_mode=False
     )
@@ -774,7 +772,7 @@ def main():
     if category == "Inventory":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
         if command == "GetInventory":
-           result = get_inventory(IDRAC_INFO, root_uri + rf_uri)
+            result = get_inventory(IDRAC_INFO, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
