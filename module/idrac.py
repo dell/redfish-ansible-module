@@ -652,7 +652,7 @@ def set_idrac_default_settings(IDRAC_INFO, root_uri):
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     return result
 
-def set_bios_attributes(IDRAC_INFO,root_uri,bios_attributes):
+def set_bios_attributes(IDRAC_INFO, root_uri, bios_attributes):
     result = {}
     bios_attributes=bios_attributes.replace("'","\"")
     payload = {"Attributes": json.loads(bios_attributes) }
@@ -663,11 +663,11 @@ def set_bios_attributes(IDRAC_INFO,root_uri,bios_attributes):
     elif response.status_code == 405:
         result = { 'ret': False, 'msg': "Resource not supported" }
     else:
-        pp=response.json()
+        pp = response.json()
         result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
     return result
 
-def create_bios_config_job (IDRAC_INFO,url):
+def create_bios_config_job (IDRAC_INFO, url):
     payload = {"TargetSettingsURI":"/redfish/v1/Systems/System.Embedded.1/Bios/Settings", "RebootJobType":"PowerCycle"}
     headers = {'content-type': 'application/json'}
     response = send_post_request(IDRAC_INFO, url, payload, headers)
@@ -678,7 +678,55 @@ def create_bios_config_job (IDRAC_INFO,url):
         result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
     return result
 
-def get_inventory(IDRAC_INFO, root_uri):
+def get_nic_inventory(IDRAC_INFO, root_uri, rf_uri):
+    result = {}
+    nic_details = []
+
+    # Get a list of all storage controllers and build respective URIs
+    nic_list = []
+    response = send_get_request(IDRAC_INFO, root_uri + rf_uri)
+    if response.status_code == 200:		# success
+        result['ret'] = True
+        data = response.json()
+
+        for nic in data[u'Members']:
+            nic_list.append(nic[u'@odata.id'])
+
+        for n in nic_list:
+            uri = root_uri + n
+            response = send_get_request(IDRAC_INFO, uri)
+            if response.status_code == 200:             # success
+                data = response.json()
+
+                nic = {}
+                nic['Name']  = data[u'Name']
+                nic['FQDN']  = data[u'FQDN']
+                for d in data[u'IPv4Addresses']:
+                    nic['IPv4']       = d[u'Address']
+                    nic['Gateway']    = d[u'GateWay']
+                    nic['SubnetMask'] = d[u'SubnetMask']
+                for d in data[u'IPv6Addresses']:
+                    nic['IPv6']   = d[u'Address']
+                for d in data[u'NameServers']:
+                    nic['NameServers'] = d
+                nic['MAC']        = data[u'PermanentMACAddress']
+                nic['Speed']      = data[u'SpeedMbps']
+                nic['MTU']        = data[u'MTUSize']
+                nic['Autoneg']    = data[u'AutoNeg']
+                nic['State']      = data[u'Status'][u'State']
+                nic['Health']     = data[u'Status'][u'Health']
+                nic_details.append(nic)
+
+            else:
+                result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+                return result           # no need to go through the whole loop
+
+        result["entries"] = nic_details
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+    return result
+
+def get_system_inventory(IDRAC_INFO, root_uri):
     result = {}
     response = send_get_request(IDRAC_INFO, root_uri)
     if response.status_code == 200:		# success
@@ -770,9 +818,12 @@ def main():
     # ending slash ('/') and other don't. It's all by design and depends on
     # how the URI is used in each function.
     if category == "Inventory":
-        rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
-        if command == "GetInventory":
-            result = get_inventory(IDRAC_INFO, root_uri + rf_uri)
+        if command == "GetSystemInventory":
+            rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
+            result = get_system_inventory(IDRAC_INFO, root_uri + rf_uri)
+        if command == "GetNICInventory":
+            rf_uri = "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/"
+            result = get_nic_inventory(IDRAC_INFO, root_uri, rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
