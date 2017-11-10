@@ -726,6 +726,49 @@ def get_nic_information(IDRAC_INFO, root_uri, rf_uri):
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     return result
 
+def get_psu_inventory(IDRAC_INFO, root_uri, rf_uri):
+    result = {}
+    psu_details = []
+
+    # Get a list of all PSUs and build respective URIs
+    psu_list = []
+    response = send_get_request(IDRAC_INFO, root_uri + rf_uri)
+    if response.status_code == 200:		# success
+        result['ret'] = True
+        data = response.json()
+
+        for psu in data[u'Links'][u'PoweredBy']:
+            psu_list.append(psu[u'@odata.id'])
+
+        for p in psu_list:
+            uri = root_uri + p
+            response = send_get_request(IDRAC_INFO, uri)
+            if response.status_code == 200:             # success
+                data = response.json()
+
+                psu = {}
+                psu['Name']            = data[u'Name']
+                psu['Model']           = data[u'Model']
+                psu['SerialNumber']    = data[u'SerialNumber']
+                psu['PartNumber']      = data[u'PartNumber']
+                # Only supported in 14G, so commenting out for now
+                #psu['Manufacturer']    = data[u'Manufacturer']
+                psu['FirmwareVersion'] = data[u'FirmwareVersion']
+                psu['PowerCapacityWatts'] = data[u'PowerCapacityWatts']
+                psu['PowerSupplyType'] = data[u'PowerSupplyType']
+                psu['Status']          = data[u'Status'][u'State']
+                psu['Health']          = data[u'Status'][u'Health']
+                psu_details.append(psu)
+
+            else:
+                result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+                return result           # no need to go through the whole loop
+
+        result["entries"] = psu_details
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+    return result
+
 def get_system_inventory(IDRAC_INFO, root_uri):
     result = {}
     response = send_get_request(IDRAC_INFO, root_uri)
@@ -818,9 +861,11 @@ def main():
     # ending slash ('/') and other don't. It's all by design and depends on
     # how the URI is used in each function.
     if category == "Inventory":
+        rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
         if command == "GetSystemInventory":
-            rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
             result = get_system_inventory(IDRAC_INFO, root_uri + rf_uri)
+        if command == "GetPSUInventory":
+            result = get_psu_inventory(IDRAC_INFO, root_uri, rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

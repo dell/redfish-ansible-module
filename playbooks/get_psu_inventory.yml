@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC NIC Information
+  name: PowerEdge iDRAC Power Supply (PSU) Information
   gather_facts: False
 
   tasks:
@@ -8,13 +8,13 @@
   - name: Prepare output file
     include: setupoutputfile.yml
 
-  - name: Get NIC Information
+  - name: Get PSU Information
     local_action: >
-       idrac category=Network command=GetNICInfo idracip={{idracip}}
+       idrac category=Inventory command=GetPSUInventory idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
     ignore_errors: yes
 
   - name: Copy information to file
     local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_nic_information.json
+       dest={{template}}_psu_inventory.json
