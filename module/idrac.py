@@ -498,7 +498,7 @@ def compare_firmware(IDRAC_INFO, root_uri, catalog_file, model):
 	    if path != "":
 		fw_list['Firmwares'].append({ 'curr':'%s' % inv.split('-')[2], 'latest':'%s' % version, 'path':'%s' % path })
     else:
-        fw_list['ret']=False
+        fw_list['ret'] = False
     return fw_list
 
 def upload_firmware(IDRAC_INFO, root_uri, FWPath):
@@ -678,11 +678,50 @@ def create_bios_config_job (IDRAC_INFO, url):
         result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
     return result
 
+def get_cpu_inventory(IDRAC_INFO, root_uri, rf_uri):
+    result = {}
+    cpu_details = []
+
+    # Get a list of all CPUs and build respective URIs
+    cpu_list = []
+    response = send_get_request(IDRAC_INFO, root_uri + rf_uri)
+    if response.status_code == 200:		# success
+        result['ret'] = True
+        data = response.json()
+
+        for cpu in data[u'Members']:
+            cpu_list.append(cpu[u'@odata.id'])
+
+        for c in cpu_list:
+            uri = root_uri + c
+            response = send_get_request(IDRAC_INFO, uri)
+            if response.status_code == 200:             # success
+                data = response.json()
+                cpu = {}
+                cpu['Name']         = data[u'Id']
+                cpu['Manufacturer'] = data[u'Manufacturer']
+                cpu['Model']        = data[u'Model']
+                cpu['MaxSpeedMHz']  = data[u'MaxSpeedMHz']
+                cpu['TotalCores']   = data[u'TotalCores']
+                cpu['TotalThreads'] = data[u'TotalThreads']
+                cpu['State']        = data[u'Status'][u'State']
+                cpu['Health']       = data[u'Status'][u'Health']
+                cpu_details.append(cpu)
+
+            else:
+                result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+                return result           # no need to go through the whole loop
+
+        result["entries"] = cpu_details
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+    return result
+
 def get_nic_information(IDRAC_INFO, root_uri, rf_uri):
     result = {}
     nic_details = []
 
-    # Get a list of all storage controllers and build respective URIs
+    # Get a list of all network controllers and build respective URIs
     nic_list = []
     response = send_get_request(IDRAC_INFO, root_uri + rf_uri)
     if response.status_code == 200:		# success
@@ -697,7 +736,6 @@ def get_nic_information(IDRAC_INFO, root_uri, rf_uri):
             response = send_get_request(IDRAC_INFO, uri)
             if response.status_code == 200:             # success
                 data = response.json()
-
                 nic = {}
                 nic['Name']  = data[u'Name']
                 nic['FQDN']  = data[u'FQDN']
@@ -864,8 +902,11 @@ def main():
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
         if command == "GetSystemInventory":
             result = get_system_inventory(IDRAC_INFO, root_uri + rf_uri)
-        if command == "GetPSUInventory":
+        elif command == "GetPSUInventory":
             result = get_psu_inventory(IDRAC_INFO, root_uri, rf_uri)
+        elif command == "GetCPUInventory":
+            rf_uri = "/redfish/v1/Systems/System.Embedded.1/Processors"
+            result = get_cpu_inventory(IDRAC_INFO, root_uri, rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
