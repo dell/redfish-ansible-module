@@ -1,0 +1,20 @@
+---
+- hosts: myhosts
+  name: PowerEdge iDRAC CPU Inventory
+  gather_facts: False
+
+  tasks:
+
+  - name: Prepare output file
+    include: setupoutputfile.yml
+
+  - name: Get CPU Information
+    local_action: >
+       idrac category=Inventory command=GetCPUInventory idracip={{idracip}}
+       idracuser={{idracuser}} idracpswd={{idracpswd}}
+    register: result
+    ignore_errors: yes
+
+  - name: Copy information to file
+    local_action: copy content={{ result | to_nice_json }}
+       dest={{template}}_cpu_information.json
