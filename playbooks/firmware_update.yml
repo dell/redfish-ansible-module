@@ -21,7 +21,7 @@
 
   - name: Getting system inventory
     local_action: >
-        idrac category=Inventory command=GetInventory idracip={{idracip}}
+        idrac category=Inventory command=GetSystemInventory idracip={{idracip}}
         idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
 
