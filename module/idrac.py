@@ -837,6 +837,14 @@ def get_system_inventory(IDRAC_INFO, root_uri):
             result['BootSourceOverrideMode'] = data[u'Boot'][u'BootSourceOverrideMode']
         else:
             result['BootSourceOverrideMode'] = "14G only"
+
+        if 'TrustedModules' in data:
+            for d in data[u'TrustedModules']:
+                result['TPMInterfaceType'] = d[u'InterfaceType']
+                result['TPMStatus']        = d[u'Status'][u'State']
+        else:
+            result['TPMInterfaceType'] = "14G only" 
+            result['TPMStatus']        = "14G only" 
     else:
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     return result
