@@ -864,7 +864,7 @@ def main():
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
         if command == "GetSystemInventory":
             result = get_system_inventory(IDRAC_INFO, root_uri + rf_uri)
-        if command == "GetPSUInventory":
+        elif command == "GetPSUInventory":
             result = get_psu_inventory(IDRAC_INFO, root_uri, rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
