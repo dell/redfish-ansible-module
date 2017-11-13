@@ -42,9 +42,9 @@ def get_cpu_details(idrac, base_uri, cpus):
         rf.print_bold("Name: %s" % data[u'Id'])
         print(" Manufacturer: %s" % data[u'Manufacturer'])
         print(" Model: %s" % data[u'Model'])
-        print(" Speed: %s Mhz" % data[u'MaxSpeedMHz'])
-        print(" Cores: %s" % data[u'TotalCores'])
-        print(" Threads: %s" % data[u'TotalThreads'])
+        print(" MaxSpeed: %s Mhz" % data[u'MaxSpeedMHz'])
+        print(" TotalCores: %s" % data[u'TotalCores'])
+        print(" TotalThreads: %s" % data[u'TotalThreads'])
         print(" State: %s" % data[u'Status'][u'State'])
         print(" Health: %s\n" % data[u'Status'][u'Health'])
     return
