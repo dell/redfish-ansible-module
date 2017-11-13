@@ -10,7 +10,7 @@
   - name: Prepare output file
     include: setupoutputfile.yml
 
-  - name: Get PSU Information
+  - name: Get PSU Inventory
     local_action: >
        idrac category=Inventory command=GetPSUInventory idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}

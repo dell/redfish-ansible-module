@@ -8,7 +8,7 @@
   - name: Prepare output file
     include: setupoutputfile.yml
 
-  - name: Get CPU Information
+  - name: Get CPU Inventory
     local_action: >
        idrac category=Inventory command=GetCPUInventory idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
@@ -17,4 +17,4 @@
 
   - name: Copy information to file
     local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_cpu_information.json
+       dest={{template}}_cpu_inventory.json
