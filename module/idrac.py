@@ -538,7 +538,11 @@ def upload_firmware(IDRAC_INFO, root_uri, FWPath):
 def schedule_firmware_update(IDRAC_INFO, root_uri, InstallOption):
     fw = []
     response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
-    if response.status_code == 200:
+
+    if response.status_code == 400:
+        return { 'ret': False, 'msg': '14G only'}
+
+    elif response.status_code == 200:
         data = response.json()
         for i in data['Members']:
             if 'Available' in i['@odata.id']:
@@ -548,6 +552,7 @@ def schedule_firmware_update(IDRAC_INFO, root_uri, InstallOption):
     payload = { "SoftwareIdentityURIs":fw, "InstallUpon":"InstallOption "}
     headers = {'content-type': 'application/json'}
     response = send_post_request(IDRAC_INFO, url, payload, headers)
+
     if response.status_code == 202:
         result = { 'ret': True, 'msg': 'firmware install job accepted ', 'Location':'%s' % str(response.json()) }
 
@@ -849,7 +854,8 @@ def get_system_inventory(IDRAC_INFO, root_uri):
 
         if 'TrustedModules' in data:
             for d in data[u'TrustedModules']:
-                result['TPMInterfaceType'] = d[u'InterfaceType']
+                if 'InterfaceType' in d.keys():
+                    result['TPMInterfaceType'] = d[u'InterfaceType']
                 result['TPMStatus']        = d[u'Status'][u'State']
         else:
             result['TPMInterfaceType'] = "14G only"
