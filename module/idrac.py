@@ -472,7 +472,11 @@ def compare_firmware(IDRAC_INFO, root_uri, catalog_file, model):
     fw_list = {'ret':True, 'Firmwares':[]}
 
     response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
-    if response.status_code == 200:
+
+    if response.status_code == 400:
+        return { 'ret': False, 'msg': '14G only'}
+
+    elif response.status_code == 200:
         data = response.json()
 
         for i in data['Members']:
@@ -504,8 +508,13 @@ def compare_firmware(IDRAC_INFO, root_uri, catalog_file, model):
 def upload_firmware(IDRAC_INFO, root_uri, FWPath):
     result = {}
     response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
-    if response.status_code == 200:
+
+    if response.status_code == 400:
+        return { 'ret': False, 'msg': '14G only'}
+
+    elif response.status_code == 200:
         ETag = response.headers['ETag']
+
     else:
         result = { 'ret': False, 'msg': 'Failed to get update service etag %s' % str(root_uri)}
         return result
