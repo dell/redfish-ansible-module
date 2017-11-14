@@ -66,7 +66,8 @@
 
   - set_fact:
       schedule_fw_update_job: True
-    when: "{{ item.result.Location  is defined }}"
+    when: item.result is defined
+#   when: "{{ item.result.Location is defined }}"
     with_items:
       - "{{fw_available.results}}"
 
