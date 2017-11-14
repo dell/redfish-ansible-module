@@ -21,7 +21,7 @@
 
   - name: Getting system inventory
     local_action: >
-        idrac category=Inventory command=GetInventory idracip={{idracip}}
+        idrac category=Inventory command=GetSystemInventory idracip={{idracip}}
         idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
 
@@ -64,8 +64,16 @@
         - "{{firmware.result.Firmwares}}"
     ignore_errors: yes
 
+  - set_fact:
+      schedule_fw_update_job: True
+    when: item.result.Location is defined
+    with_items:
+      - "{{fw_available.results}}"
+
   - name: install firmware image
     local_action: >
         idrac category=Firmware command=InstallFirmware idracip={{idracip}} 
         idracuser={{idracuser}} idracpswd={{idracpswd}}
         InstallOption=NowAndReboot
+    when: schedule_fw_update_job|bool == true
+
