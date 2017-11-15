@@ -11,7 +11,8 @@
   #   GetBootOrder 		Get device boot order
   #   SetOneTimeBoot 		Set one-time boot device
   #   SetDefaultSettings 	Set BIOS default settings 
-  # Note: not all commands implemented yet, more coming soon
+  #   SetAttributes		Set BIOS attributes
+  #   ConfigJob			Implement new settings
 
   # You can use tags to run specific tasks. 
   # Example: ansible-playbook manage_bios.yml --tags=getbootorder
@@ -67,16 +68,32 @@
     tags: setdefaultsettings
 
   # ------------------------------------------------------------------------
-  - name: Set BootMode as Uefi
+  - name: Set BootMode to UEFI
     local_action: >
        idrac category=Bios command=SetAttributes bios_attributes={'BootMode':'Uefi'}
        idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
-    tags: bootmode
+    tags: bootmodeuefi
     ignore_errors: yes
     
-  - name: Sechdule Config Job
+  - name: Schedule Config Job
     local_action: >
-      idrac category=Bios command=ConfigJob idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
-    tags: bootmode
+      idrac category=Bios command=ConfigJob idracip={{idracip}}
+      idracuser={{idracuser}} idracpswd={{idracpswd}}
+    tags: bootmodeuefi
     ignore_errors: yes
 
+  # ------------------------------------------------------------------------
+  - name: Set BootMode to Legacy BIOS
+    local_action: >
+       idrac category=Bios command=SetAttributes bios_attributes={'BootMode':'Bios'}
+       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+    tags: bootmodelegacybios
+    ignore_errors: yes
+    
+  # Reboots server
+  - name: Schedule Config Job
+    local_action: >
+      idrac category=Bios command=ConfigJob idracip={{idracip}}
+      idracuser={{idracuser}} idracpswd={{idracpswd}}
+    tags: bootmodelegacybios
+    ignore_errors: yes
