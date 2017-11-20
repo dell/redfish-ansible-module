@@ -26,19 +26,18 @@ A client talks to iDRAC via its IP address by sending Redfish URIs that the iDRA
 
 ![alt text](http://linux.dell.com/images/ansible-redfish-overview.png)
 
-
 ## Categories
 
-  - Inventory: Collects System Information (Health, CPUs, RAM, etc.)
-  - Logs: Collect System Event and Lifecycle Controller Logs
+  - Inventory: Collects system inventory (Health, CPUs, RAM, etc.)
+  - Firmware: Manages system firmware (FW upgrade only in 14G)
   - Power: Manages system power (status/on/off/restart)
-  - Storage: Manages storage controllers, HDDs and VDs
+  - Storage: Manages storage controllers, HDDs, VDs, etc.
   - Network: Manages NICs, NTP settings, etc.
   - Bios: Manages BIOS settings
-  - Idrac: Manages iDRAC properties (network, time, etc.)
+  - Idrac: Manages iDRAC settings (network, time, etc.)
   - Users: Manages iDRAC users (add/delete/update)
   - SCP: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
-  - Firmware: Manages system firmware (FW upgrade only in 14G)
+  - Logs: Collect System Event (SE) and Lifecycle Controller (LC) logs
 
 ## Requirements
 
@@ -55,7 +54,7 @@ The file */etc/ansible/hosts* should look like this:
 
 ```
 [myhosts]
-# Hostname        iDRAC IP               Host alias
+# host name       iDRAC IP               host alias
 host1.domain.com  idracip=192.168.0.101  host=webserver1
 host2.domain.com  idracip=192.168.0.102  host=webserver2
 host3.domain.com  idracip=192.168.0.103  host=dbserver1
@@ -63,6 +62,8 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
 ```
 
 The *host alias* entry can be a server's hostname, alias, etc. It doesn't have to be resolvable, it is just a name used to identify each server. This name will be used in the files where the results for each server will be placed (read more below).
+
+The iDRAC IP is critical here as this is the IP that we connect to (we are not connecting to the host OS via ssh, but rather to the iDRAC via https), so be sure this information is correct. Please note that this variable can also be a DNS-resolvable name.
 
 The playbook names are self-explanatory, and they are the best source to learn how to use them. Every Redfish API supported by the Ansible module is included in the playbooks. If it's not in a playbook, a Redfish API has not been coded into the module yet.
 
@@ -134,7 +135,7 @@ $ cat webserver1_20170912_103733_storagecontrollers.json
 }
 ```
 
-These files are in the format *{{host}}_{timestamp}}_{{datatype}}* and each contains valuable server information. 
+These files are in the format *{{hostalias}}_{timestamp}}_{{datatype}}* and each contains valuable server information. 
 
 We will be providing scripts to easily parse through these JSON files and consolidate all server information in easy-to-read formats, including in CSV format for easy import into spreadsheets.
 
@@ -142,7 +143,7 @@ We will be providing scripts to easily parse through these JSON files and consol
 
 All data collected from servers is returned in JSON format. Any JSON parser can then be used to extract the specific data you are looking for, which can come in handy since in some cases the amount of data collected can be more than you need.
 
-I found the [jq](https://stedolan.github.io/jq/) parser to be easy to install and use, here are some examples using the output files above:
+The [jq](https://stedolan.github.io/jq/) parser to be easy to install and use, here are some examples using the output files above:
 
 ```bash
 $ jq .result.BiosVersion webserver1_20170912_104953_inventory.json 
