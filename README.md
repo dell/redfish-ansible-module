@@ -26,16 +26,6 @@ A client talks to iDRAC via its IP address by sending Redfish URIs that the iDRA
 
 ![alt text](http://linux.dell.com/images/ansible-redfish-overview.png)
 
-Your */etc/ansible/hosts* should look like this:
-
-```
-[myhosts]
-# Hostname        iDRAC IP               Host alias
-host1.domain.com  idracip=192.168.0.101  host=webserver1
-host2.domain.com  idracip=192.168.0.102  host=webserver2
-host3.domain.com  idracip=192.168.0.103  host=dbserver1
-...
-```
 
 ## Categories
 
@@ -59,13 +49,26 @@ host3.domain.com  idracip=192.168.0.103  host=dbserver1
 
 ## Example
 
-Clone this repository. The idrac module is in the *module* directory, it can be left there (I added a symlink to it in the *playbooks* directory). If you move it, be sure to define the ANSIBLE_LIBRARY environment variable.
+Clone this repository. The idrac module is in the *module* directory, it can be left there (there is a symlink to it in the *playbooks* directory). If you move it, be sure to define the ANSIBLE_LIBRARY environment variable.
 
-The playbook names describe what they are for, and they are the best source to learn how to use them. Every Redfish API supported by the Ansible module is represented in the playbooks. If it's not in a playbook, it hasn't been coded in the module yet.
+The file */etc/ansible/hosts* should look like this:
+
+```
+[myhosts]
+# Hostname        iDRAC IP               Host alias
+host1.domain.com  idracip=192.168.0.101  host=webserver1
+host2.domain.com  idracip=192.168.0.102  host=webserver2
+host3.domain.com  idracip=192.168.0.103  host=dbserver1
+...
+```
+
+The *host alias* entry can be a server's hostname, alias, etc. It doesn't have to be resolvable, it is just a name used to identify each server. This name will be used in the files where the results for each server will be placed (read more below).
+
+The playbook names are self-explanatory, and they are the best source to learn how to use them. Every Redfish API supported by the Ansible module is included in the playbooks. If it's not in a playbook, a Redfish API has not been coded into the module yet.
 
 ```bash
-$ export ANSIBLE_LIBRARY=<directory-with-module>
 
+$ cd playbooks
 $ ansible-playbook get_system_inventory.yml
   ...
 PLAY [PowerEdge iDRAC Get System Inventory] ************************************
