@@ -135,9 +135,9 @@ $ cat webserver1_StorageControllerInventory_20170912_103733.json
 }
 ```
 
-These files are in the format *{{hostalias}}_{timestamp}}_{{datatype}}* and each contains valuable server inventory. 
+These files are in the format *<hostalias>_<timestamp>_<datatype>* and each contains valuable server inventory. 
 
-Some Redfish APIs are only available in 14G PowerEdge servers. If you run a task that is only available in 14G servers or is just not available in iDRAC (i.e. outdated firmware), you will see an error thrown out during playbook execution:
+Some Redfish APIs are only available in 14G PowerEdge servers. In addition, availabilty of Redfish APIs varies in 13G and 12G servers (though we are working to make them uniform across all supported servers). If you run a task for a Redfish API that is not available in a server, you will see an error displayed during playbook execution:
 
 ```
 TASK [Get Firmware Inventory] *********************************************************************
@@ -153,7 +153,7 @@ All data collected from servers is returned in JSON format. Any JSON parser can 
 The [jq](https://stedolan.github.io/jq/) parser to be easy to install and use, here are some examples using the output files above:
 
 ```bash
-$ jq .result.BiosVersion webserver1_SystemInventory_20170912_104953.json 
+$ jq .result.BiosVersion webserver1_SystemInventory_20170912_104953.json
 "2.4.3"
 
 $ jq '.result | {Manufacturer: .Manufacturer, Name: .Model}' webserver1_SystemInventory_20170912_104953.json
@@ -162,7 +162,7 @@ $ jq '.result | {Manufacturer: .Manufacturer, Name: .Model}' webserver1_SystemIn
   "Name": "PowerEdge R630"
 }
 
-$ jq '.result[] | .Health' webserver1_StorageControllerInventory_20170912_103733.json 
+$ jq '.result[] | .Health' webserver1_StorageControllerInventory_20170912_103733.json
 "OK"
 "OK"
 null
