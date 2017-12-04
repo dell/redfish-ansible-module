@@ -1,0 +1,33 @@
+{
+    "changed": false, 
+    "failed": false, 
+    "result": {
+        "entries": [
+            {
+                "Created": "2017-11-14T21:27:09-06:00", 
+                "Message": "The process of installing an operating system or hypervisor is successfully completed.", 
+                "Name": " Log Entry 5"
+            }, 
+            {
+                "Created": "2017-11-14T16:10:28-06:00", 
+                "Message": "The process of installing an operating system or hypervisor is started and is in progress.", 
+                "Name": " Log Entry 4"
+            }, 
+            {
+                "Created": "2017-11-14T15:53:46-06:00", 
+                "Message": "The chassis is closed while the power is off.", 
+                "Name": " Log Entry 3"
+            }, 
+            {
+                "Created": "2017-11-14T15:53:41-06:00", 
+                "Message": "The chassis is open while the power is off.", 
+                "Name": " Log Entry 2"
+            }, 
+            {
+                "Created": "2017-11-01T23:37:31-05:00", 
+                "Message": "Log cleared.", 
+                "Name": " Log Entry 1"
+            }
+        ]
+    }
+}

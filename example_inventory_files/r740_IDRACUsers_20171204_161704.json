@@ -1,0 +1,32 @@
+{
+    "changed": false, 
+    "failed": false, 
+    "result": {
+        "entries": [
+            {
+                "Id": "2", 
+                "Name": "User Account", 
+                "RoleId": "Administrator", 
+                "UserName": "root"
+            }, 
+            {
+                "Id": "3", 
+                "Name": "User Account", 
+                "RoleId": "Operator", 
+                "UserName": "jose"
+            }, 
+            {
+                "Id": "4", 
+                "Name": "User Account", 
+                "RoleId": "Administrator", 
+                "UserName": "sysman"
+            }, 
+            {
+                "Id": "5", 
+                "Name": "User Account", 
+                "RoleId": "Operator", 
+                "UserName": "user5"
+            }
+        ]
+    }
+}

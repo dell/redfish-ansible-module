@@ -15,7 +15,7 @@
   #   ConfigJob			Implement new settings
 
   # You can use tags to run specific tasks. 
-  # Example: ansible-playbook manage_bios.yml --tags getbootorder
+  # Example: ansible-playbook manage_bios.yml --tags=getattributes
 
   tasks:
 

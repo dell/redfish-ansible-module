@@ -1,0 +1,20 @@
+{
+    "changed": false, 
+    "failed": false, 
+    "result": {
+        "entries": [
+            {
+                "Health": "OK", 
+                "Name": "PERC H740P Adapter "
+            }, 
+            {
+                "Health": null, 
+                "Name": "Lewisburg SATA Controller [AHCI mode]"
+            }, 
+            {
+                "Health": null, 
+                "Name": "Lewisburg SSATA Controller [AHCI mode]"
+            }
+        ]
+    }
+}

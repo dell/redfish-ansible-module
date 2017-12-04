@@ -1,0 +1,44 @@
+{
+    "changed": false, 
+    "failed": false, 
+    "result": {
+        "entries": [
+            {
+                "Health": "OK", 
+                "Name": "System Board Fan1", 
+                "RPMs": 5640, 
+                "State": "Enabled"
+            }, 
+            {
+                "Health": "OK", 
+                "Name": "System Board Fan2", 
+                "RPMs": 5640, 
+                "State": "Enabled"
+            }, 
+            {
+                "Health": "OK", 
+                "Name": "System Board Fan3", 
+                "RPMs": 5640, 
+                "State": "Enabled"
+            }, 
+            {
+                "Health": "OK", 
+                "Name": "System Board Fan4", 
+                "RPMs": 5520, 
+                "State": "Enabled"
+            }, 
+            {
+                "Health": "OK", 
+                "Name": "System Board Fan5", 
+                "RPMs": 5640, 
+                "State": "Enabled"
+            }, 
+            {
+                "Health": "OK", 
+                "Name": "System Board Fan6", 
+                "RPMs": 5640, 
+                "State": "Enabled"
+            }
+        ]
+    }
+}

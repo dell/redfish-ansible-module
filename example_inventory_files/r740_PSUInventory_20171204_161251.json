@@ -1,0 +1,30 @@
+{
+    "changed": false, 
+    "failed": false, 
+    "result": {
+        "entries": [
+            {
+                "FirmwareVersion": "00.1B.53", 
+                "Health": "OK", 
+                "Model": "PWR SPLY,495W,RDNT,ARTESYN    ", 
+                "Name": "PS1 Status", 
+                "PartNumber": "0VKDD2A00", 
+                "PowerCapacityWatts": 495, 
+                "PowerSupplyType": "AC", 
+                "SerialNumber": "PHARP0078400O8", 
+                "Status": "Enabled"
+            }, 
+            {
+                "FirmwareVersion": "00.1B.53", 
+                "Health": "OK", 
+                "Model": "PWR SPLY,495W,RDNT,ARTESYN    ", 
+                "Name": "PS2 Status", 
+                "PartNumber": "0VKDD2A00", 
+                "PowerCapacityWatts": 495, 
+                "PowerSupplyType": "AC", 
+                "SerialNumber": "PHARP0078A00Q3", 
+                "Status": "Enabled"
+            }
+        ]
+    }
+}
