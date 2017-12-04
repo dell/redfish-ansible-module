@@ -1,14 +1,14 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC Power Supply (PSU) Information
+  name: PowerEdge iDRAC Power Supply (PSU) Inventory
   gather_facts: False
 
   tasks:
 
   # Not supported in 12G servers
 
-  - name: Prepare output file
-    include: setupoutputfile.yml
+  - name: Set output file
+    include: set_output_file.yml type=PSUInventory
 
   - name: Get PSU Inventory
     local_action: >
@@ -19,4 +19,4 @@
 
   - name: Copy information to file
     local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_psu_inventory.json
+       dest={{template}}.json

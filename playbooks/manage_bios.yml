@@ -15,15 +15,15 @@
   #   ConfigJob			Implement new settings
 
   # You can use tags to run specific tasks. 
-  # Example: ansible-playbook manage_bios.yml --tags=getbootorder
+  # Example: ansible-playbook manage_bios.yml --tags getbootorder
 
   tasks:
 
-  - name: Prepare output file
-    include: setupoutputfile.yml
-    tags: [getattributes, getbootorder]
-
   # ------------------------------------------------------------------------
+  - name: Set output file
+    include: set_output_file.yml type=BIOSAttributes
+    tags: getattributes
+
   - name: Get BIOS attributes
     local_action: >
        idrac category=Bios command=GetAttributes idracip={{idracip}}
@@ -34,10 +34,14 @@
 
   - name: Copy BIOS attributes to file
     local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_bios_attributes.json
+       dest={{template}}.json
     tags: getattributes
 
   # ------------------------------------------------------------------------
+  - name: Set output file
+    include: set_output_file.yml type=BIOSBootOrder
+    tags: getbootorder
+
   - name: Get BIOS boot order
     local_action: >
        idrac category=Bios command=GetBootOrder idracip={{idracip}}
@@ -48,7 +52,7 @@
 
   - name: Copy BIOS boot order to file
     local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_bios_bootorder.json
+       dest={{template}}.json
     tags: getbootorder
 
   # ------------------------------------------------------------------------

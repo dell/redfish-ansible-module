@@ -443,7 +443,7 @@ def manage_users(command, IDRAC_INFO, USER_INFO, root_uri, rf_uri):
 
     return result
 
-def get_se_logs(IDRAC_INFO, root_uri):
+def get_selogs(IDRAC_INFO, root_uri):
     # System Event logs
     result = {}
     allentries = []
@@ -465,7 +465,7 @@ def get_se_logs(IDRAC_INFO, root_uri):
     # This looks like: result{allentries[entry{}]}
     return result
 
-def get_lc_logs(IDRAC_INFO, root_uri):
+def get_lclogs(IDRAC_INFO, root_uri):
     # Lifecycle Controller logs
     result = {}
     allentries = []
@@ -779,7 +779,7 @@ def get_cpu_inventory(IDRAC_INFO, root_uri, rf_uri):
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     return result
 
-def get_nic_information(IDRAC_INFO, root_uri, rf_uri):
+def get_nic_inventory(IDRAC_INFO, root_uri, rf_uri):
     result = {}
     nic_details = []
 
@@ -809,12 +809,12 @@ def get_nic_information(IDRAC_INFO, root_uri, rf_uri):
                     nic['IPv6']   = d[u'Address']
                 for d in data[u'NameServers']:
                     nic['NameServers'] = d
-                nic['MAC']        = data[u'PermanentMACAddress']
-                nic['Speed']      = data[u'SpeedMbps']
+                nic['MACAddress'] = data[u'PermanentMACAddress']
+                nic['SpeedMbps']  = data[u'SpeedMbps']
                 nic['MTU']        = data[u'MTUSize']
-                nic['Autoneg']    = data[u'AutoNeg']
-                nic['State']      = data[u'Status'][u'State']
+                nic['AutoNeg']    = data[u'AutoNeg']
                 nic['Health']     = data[u'Status'][u'Health']
+                nic['State']      = data[u'Status'][u'State']
                 nic_details.append(nic)
 
             else:
@@ -998,10 +998,10 @@ def main():
 
     elif category == "Logs":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-        if command == "GetSeLogs":
-            result = get_se_logs(IDRAC_INFO, root_uri + rf_uri)
-        elif command == "GetLcLogs":
-            result = get_lc_logs(IDRAC_INFO, root_uri + rf_uri)
+        if command == "GetSELogs":
+            result = get_selogs(IDRAC_INFO, root_uri + rf_uri)
+        elif command == "GetLCLogs":
+            result = get_lclogs(IDRAC_INFO, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
@@ -1017,17 +1017,17 @@ def main():
         result = manage_system_power(command, IDRAC_INFO, root_uri + rf_uri)
 
     elif category == "Network":
-        if command == "GetNICInfo":
+        if command == "GetNICInventory":
             rf_uri = "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/"
-            result = get_nic_information(IDRAC_INFO, root_uri, rf_uri)
+            result = get_nic_inventory(IDRAC_INFO, root_uri, rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Storage":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/"
-        if command == "GetControllerInfo":
+        if command == "GetControllerInventory":
             result = get_stor_cont_info(IDRAC_INFO, root_uri, rf_uri)
-        elif command == "GetDiskInfo":
+        elif command == "GetDiskInventory":
             result = get_disk_info(IDRAC_INFO, root_uri, rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}

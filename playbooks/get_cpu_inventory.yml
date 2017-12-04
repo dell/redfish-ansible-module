@@ -5,8 +5,8 @@
 
   tasks:
 
-  - name: Prepare output file
-    include: setupoutputfile.yml
+  - name: Set output file
+    include: set_output_file.yml type=CPUInventory
 
   - name: Get CPU Inventory
     local_action: >
@@ -17,4 +17,4 @@
 
   - name: Copy information to file
     local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_cpu_inventory.json
+       dest={{template}}.json

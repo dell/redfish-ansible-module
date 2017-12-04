@@ -11,11 +11,10 @@
 
   tasks:
 
-  - name: Prepare output file
-    include: setupoutputfile.yml
-    tags: [getfanstats]
+  - name: Set output file
+    include: set_output_file.yml type=FanStats
+    tags: getfanstats
 
-  # ------------------------------------------------------------------------
   - name: Get fans statistics
     local_action: >
        idrac category=Cooling command=GetFanStats idracip={{idracip}}
@@ -26,6 +25,6 @@
 
   - name: Copy fans statistics to file
     local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_fans_reading.json
+       dest={{template}}.json
     tags: getfanstats
 

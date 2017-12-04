@@ -12,32 +12,36 @@
 
   tasks:
 
-  - name: Prepare output file
-    include: setupoutputfile.yml
-    tags: always
-
   # ------------------------------------------------------------------------
+  - name: Set output file
+    include: set_output_file.yml type=SELogs
+    tags: selogs
+
   - name: Get SE Logs
     local_action: >
-       idrac category=Logs command=GetSeLogs idracip={{ idracip }}
+       idrac category=Logs command=GetSELogs idracip={{ idracip }}
             idracuser={{ idracuser }} idracpswd={{ idracpswd }}
     register: result
-    tags: selog
+    tags: selogs
 
   - name: Place SE Logs in file
     local_action: copy content={{ result | to_nice_json }}
-             dest={{template}}_SELog.json
-    tags: selog
+             dest={{template}}.json
+    tags: selogs
 
   # ------------------------------------------------------------------------
+  - name: Set output file
+    include: set_output_file.yml type=LCLogs
+    tags: lclogs
+
   - name: Get LC Logs
     local_action: >
-       idrac category=Logs command=GetLcLogs idracip={{ idracip }}
+       idrac category=Logs command=GetLCLogs idracip={{ idracip }}
             idracuser={{ idracuser }} idracpswd={{ idracpswd }}
     register: result
-    tags: lclog
+    tags: lclogs
 
   - name: Place LC Logs in file
     local_action: copy content={{ result | to_nice_json }}
-             dest={{template}}_LCLog.json
-    tags: lclog
+             dest={{template}}.json
+    tags: lclogs

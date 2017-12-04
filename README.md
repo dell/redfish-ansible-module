@@ -54,16 +54,16 @@ The file */etc/ansible/hosts* should look like this:
 
 ```
 [myhosts]
-# host name       iDRAC IP               host alias
+# host name       iDRAC IP/NAME          host alias
 host1.domain.com  idracip=192.168.0.101  host=webserver1
 host2.domain.com  idracip=192.168.0.102  host=webserver2
 host3.domain.com  idracip=192.168.0.103  host=dbserver1
 ...
 ```
 
-The *host alias* entry can be a server's hostname, alias, etc. It doesn't have to be resolvable, it is just a name used to identify each server. This name will be used in the files where the results for each server will be placed (read more below).
+The *host alias* entry can be a server's hostname, alias, etc. It doesn't have to be resolvable, it is just a name used to identify each server and shoule be unique. The host alias will be used in the filenames where the results for each server are placed (read more below).
 
-The iDRAC IP is critical here as this is the IP that we connect to (we are not connecting to the host OS via ssh, but rather to the iDRAC via https), so be sure this information is correct. Please note that this variable can also be a DNS-resolvable name.
+The iDRAC IP is critical as this is the IP that we connect to (we are not connecting to the host OS via ssh, but rather to the iDRAC via https), so be sure this information is correct. Please note that *idracip* can also be a DNS-resolvable name.
 
 The playbook names are self-explanatory, and they are the best source to learn how to use them. Every Redfish API supported by the Ansible module is included in the playbooks. If it's not in a playbook, a Redfish API has not been coded into the module yet.
 
@@ -81,14 +81,14 @@ ok: [dbserver1]
   --- snip ---
 ```
 
-You will see the usual task execution output. Playbooks that collect system information will place it in files in JSON format in a directory defined by the *rootdir* variable in file *group_vars/myhosts*. The playbook creates a directory for each server and places files there. For example:
+Playbooks that collect system information will place it in files in JSON format in a directory defined by the *rootdir* variable in file *group_vars/myhosts*. The playbook creates a directory for each server and places files there. For example:
 
 ```bash
 $ cd <rootdir>/webserver1
 $ ls
-webserver1_20170912_104953_inventory.json
-webserver1_20170912_103733_storagecontrollers.json
-$ cat webserver1_20170912_104953_inventory.json
+webserver1_SystemInventory_20170912_104953.json
+webserver1_StorageControllerInventory_20170912_103733.json
+$ cat webserver1_SystemInventory_20170912_104953.json
 {
     "changed": false,
     "result": {
@@ -111,7 +111,7 @@ $ cat webserver1_20170912_104953_inventory.json
         "SystemType": "Physical"
     }
 }
-$ cat webserver1_20170912_103733_storagecontrollers.json
+$ cat webserver1_StorageControllerInventory_20170912_103733.json
 {
     "changed": false,
     "result": [
@@ -135,9 +135,16 @@ $ cat webserver1_20170912_103733_storagecontrollers.json
 }
 ```
 
-These files are in the format *{{hostalias}}_{timestamp}}_{{datatype}}* and each contains valuable server information. 
+These files are in the format *{{hostalias}}_{timestamp}}_{{datatype}}* and each contains valuable server inventory. 
 
-We will be providing scripts to easily parse through these JSON files and consolidate all server information in easy-to-read formats, including in CSV format for easy import into spreadsheets.
+Some Redfish APIs are only available in 14G PowerEdge servers. If you run a task that is only available in 14G servers or is just not available in iDRAC (i.e. outdated firmware), you will see an error thrown out during playbook execution:
+
+```
+TASK [Get Firmware Inventory] *********************************************************************
+fatal: [r630 -> localhost]: FAILED! => {"changed": false, "failed": true, "msg": "14G only"}
+...ignoring
+ok: [r740-1 -> localhost]
+```
 
 ## Parsing through JSON files
 
@@ -146,16 +153,16 @@ All data collected from servers is returned in JSON format. Any JSON parser can 
 The [jq](https://stedolan.github.io/jq/) parser to be easy to install and use, here are some examples using the output files above:
 
 ```bash
-$ jq .result.BiosVersion webserver1_20170912_104953_inventory.json 
+$ jq .result.BiosVersion webserver1_SystemInventory_20170912_104953.json 
 "2.4.3"
 
-$ jq '.result | {Manufacturer: .Manufacturer, Name: .Model}' webserver1_20170912_104953_inventory.json
+$ jq '.result | {Manufacturer: .Manufacturer, Name: .Model}' webserver1_SystemInventory_20170912_104953.json
 {
   "Manufacturer": "Dell Inc.",
   "Name": "PowerEdge R630"
 }
 
-$ jq '.result[] | .Health' webserver1_20170912_103733_storagecontrollers.json 
+$ jq '.result[] | .Health' webserver1_StorageControllerInventory_20170912_103733.json 
 "OK"
 "OK"
 null

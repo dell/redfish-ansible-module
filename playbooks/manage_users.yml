@@ -23,8 +23,8 @@
   tasks:
 
   # ------------------------------------------------------------------------
-  - name: Prepare output file
-    include: setupoutputfile.yml
+  - name: Set output file
+    include: set_output_file.yml type=IDRACUsers
     tags: listusers
 
   - name: List all iDRAC users
@@ -35,7 +35,7 @@
     tags: listusers
 
   - local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_idrac_users.json
+       dest={{template}}.json
     tags: listusers
 
   # ------------------------------------------------------------------------

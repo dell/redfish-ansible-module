@@ -1,20 +1,20 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC NIC Information
+  name: PowerEdge iDRAC NIC Inventory
   gather_facts: False
 
   tasks:
 
-  - name: Prepare output file
-    include: setupoutputfile.yml
+  - name: Set output file
+    include: set_output_file.yml type=NICInventory
 
   - name: Get NIC Information
     local_action: >
-       idrac category=Network command=GetNICInfo idracip={{idracip}}
+       idrac category=Network command=GetNICInventory idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
     ignore_errors: yes
 
   - name: Copy information to file
     local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_nic_information.json
+       dest={{template}}.json

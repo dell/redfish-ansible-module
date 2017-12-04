@@ -5,8 +5,8 @@
 
   tasks:
 
-  - name: Prepare output file
-    include: setupoutputfile.yml
+  - name: Set output file
+    include: set_output_file.yml type=SystemInventory
 
   - name: Getting system inventory
     local_action: >
@@ -16,4 +16,4 @@
 
   - name: Copying results to file
     local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}_system_inventory.json
+       dest={{template}}.json
