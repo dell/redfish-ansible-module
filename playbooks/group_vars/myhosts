@@ -20,9 +20,10 @@ sharehost: 10.9.165.171
 sharename: share2
 shareuser: dell
 sharepswd: 111111
+scpfile: r740-scp.xml
 
 # For managing users - userid 2 is default root user, be mindful!
 userid: 3                  # user id of user to add/delete/modify (1-16)
-username: user3            # user name to add/delete/modify
+username: jose             # user name to add/delete/modify
 userpswd: pa$$word         # user password to add/delete/modify
 userrole: Operator         # user role to add/delete/modify

@@ -1,11 +1,21 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC Manage SCP
+  name: PowerEdge iDRAC Manage Server Configuration Profile (SCP)
   gather_facts: False
 
   # Options available:
-  #   ExportSCP 	Export Server Configuration Profile
-  #   ImportSCP		Import Server Configuration Profile - Coming Soon
+  #   ExportSCP 	Export SCP
+  #   ImportSCP		Import SCP
+
+  # Please note that once an Export or Import job is running, you must wait
+  # until it's complete before sending another request, else it will generate
+  # error code 503.
+
+  # You can use tags to run specific tasks.
+  # Example: ansible-playbook manage_scp.yml --tags=exportscp
+
+  # For information on how to prepare an SCP file for import, please refer
+  # to http://dell.to/2iCy2O9
 
   tasks:
 
@@ -16,4 +26,13 @@
        sharehost={{ sharehost }} sharename={{ sharename }}
        shareuser={{ shareuser }} sharepswd={{ sharepswd }}
        hostname={{ host }}
+    tags: exportscp
 
+  - name: Import SCP file
+    local_action: >
+       idrac category=SCP command=ImportSCP idracip={{ idracip }}
+       idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+       sharehost={{ sharehost }} sharename={{ sharename }}
+       shareuser={{ shareuser }} sharepswd={{ sharepswd }}
+       scpfile={{ scpfile }}
+    tags: importscp

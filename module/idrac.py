@@ -20,7 +20,7 @@
 #
 ANSIBLE_METADATA = {'status': ['preview'],
                     'supported_by': 'community',
-                    'version': '0.1'}
+                    'metadata_version': '1.1'}
 
 DOCUMENTATION = """
 module: idrac
@@ -92,6 +92,16 @@ options:
     default: None
     description:
       - CIFS/SMB share user password for managing SCP files
+  hostname:
+    required: false
+    default: None
+    description:
+      - server name to add to filename when exporting SCP file
+  scpfile:
+    required: false
+    default: None
+    description:
+      - SCP file to import
   bootdevice:
     required: false
     default: None
@@ -158,28 +168,66 @@ def send_patch_request(idrac, uri, pyld, hdrs):
         raise			# Do we let module exit or should we return an error value?
     return response
 
-def export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri):
+def import_scp(IDRAC_INFO, SHARE_INFO, scpfile, root_uri):
     result = {}
-    # timestamp to add to SCP XML file name
-    ts = str(datetime.strftime(datetime.now(), "_%Y%m%d_%H%M%S"))
-    scp_uri = root_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
     headers = {'content-type': 'application/json'}
-    payload = { "ExportFormat" : "XML",
+    payload = { "ShutdownType" : "Forced",
                 "ShareParameters" : { "Target" : "ALL",
                      "ShareType" : "CIFS",
                      "IPAddress" : SHARE_INFO['host'],
                      "ShareName" : SHARE_INFO['name'],
                      "UserName"  : SHARE_INFO['user'],
                      "Password"  : SHARE_INFO['pswd'],
-                     "FileName"  : "SCP_" + hostname + ts + ".xml"}
+                     "FileName"  : scpfile }
               }
-    response = send_post_request(IDRAC_INFO, scp_uri, payload, headers)
+    response = send_post_request(IDRAC_INFO, root_uri, payload, headers)
     if response.status_code == 202:		# success
         result['ret'] = True
-        # Getting Job ID, but not really doing anything with it
+        '''
+        Getting Job ID, but not really doing anything with it.
+        Ideally I should return the Job ID or wait for the task to complete
+        and then send result back to user. In its current implementation,
+        there isn't a way to know if the task finished successfully other
+        then verifying if the configuration settings specified in the SCP
+        file were implemented. 
+        '''
         data_dict = response.__dict__
         job_id_full = data_dict["headers"]["Location"]
         job_id = re.search("JID_.+", job_id_full).group()
+        result = { 'ret': True, 'msg': "Job ID %s" % job_id }
+    else:
+        result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
+    return result
+
+def export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri):
+    result = {}
+    # timestamp to add to SCP XML file name
+    ts = str(datetime.strftime(datetime.now(), "_%Y%m%d_%H%M%S"))
+    headers = {'content-type': 'application/json'}
+    payload = { "ExportFormat" : "XML",
+                "ExportUse" : "Default",
+                "ShareParameters" : { "Target" : "ALL",
+                     "ShareType" : "CIFS",
+                     "IPAddress" : SHARE_INFO['host'],
+                     "ShareName" : SHARE_INFO['name'],
+                     "UserName"  : SHARE_INFO['user'],
+                     "Password"  : SHARE_INFO['pswd'],
+                     "FileName"  : "SCP_" + hostname + ts + ".xml" }
+              }
+    response = send_post_request(IDRAC_INFO, root_uri, payload, headers)
+    if response.status_code == 202:		# success
+        result['ret'] = True
+        '''
+        Getting Job ID, but not doing anything with it.
+        Ideally I should return the Job ID or wait for the task to complete
+        and then send result back to user. In its current implementation, there
+        isn't a way to know if the task finished successfully other than waiting
+        to see if the SCP file is eventually dropped in the SMB share.
+        '''
+        data_dict = response.__dict__
+        job_id_full = data_dict["headers"]["Location"]
+        job_id = re.search("JID_.+", job_id_full).group()
+        result = { 'ret': True, 'msg': "Job ID %s" % job_id }
     else:
         result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
     return result
@@ -878,6 +926,7 @@ def main():
             userpswd   = dict(required=False, type='str', default=None),
             userrole   = dict(required=False, type='str', default=None),
             hostname   = dict(required=False, type='str', default=None),
+            scpfile    = dict(required=False, type='str', default=None),
             sharehost  = dict(required=False, type='str', default=None),
             sharename  = dict(required=False, type='str', default=None),
             shareuser  = dict(required=False, type='str', default=None),
@@ -895,6 +944,7 @@ def main():
     category   = params['category']
     command    = params['command']
     hostname   = params['hostname']
+    scpfile    = params['scpfile']
     bootdevice = params['bootdevice']
 
     # Disable insecure-certificate-warning message
@@ -983,9 +1033,12 @@ def main():
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "SCP":
-        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "ExportSCP":
+            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
             result = export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri + rf_uri)
+        elif command == "ImportSCP":
+            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration"
+            result = import_scp(IDRAC_INFO, SHARE_INFO, scpfile, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
