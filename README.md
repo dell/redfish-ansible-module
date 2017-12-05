@@ -22,7 +22,7 @@ Together, Ansible and Redfish can be used by system administrators to fully auto
 
 ## How it works
 
-A client talks to Dell EMC servers via its iDRAC by sending Redfish URIs. The Redfish APIs will then either 1) perform an action (upgrade firmware, reboot server, etc.) or 2) send information back (system inventory, power readings, etc.). Ansible provides automation so that this process can be scaled up to thousands of servers.
+A client talks to Dell EMC servers via its iDRAC by sending Redfish URIs. The Redfish APIs will then either 1) perform an action (ex: upgrade firmware, reboot server) or 2) send information back (ex: system inventory, power consumption). Ansible provides automation so that this process can be scaled up to thousands of servers.
 
 ![alt text](http://linux.dell.com/images/ansible-redfish-overview.png)
 
