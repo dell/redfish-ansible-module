@@ -5,6 +5,8 @@
 | Inventory | GetSystemInventory     | get_storage_inventory.yml  | yes         |              |
 |           | GetPSUInventory        | get_psu_inventory.yml      | yes         |              |
 |           | GetCPUInventory        | get_cpu_inventory.yml      | yes         |              |
+|           | GetNICInventory        | get_nic_inventory.yml      | yes         |              |
+|           | GetFanInventory        | get_fan_inventory.yml      | yes         |              |
 | Firmware  | GetInventory           | get_firmware_inventory.yml | yes         |              |
 |           | UploadFirmware         | firmware_update.yml        |             | 14G only     |
 |           | FirmwareCompare        | firmware_update.yml        |             | 14G only     |
@@ -28,11 +30,10 @@
 |           | UpdateUserPassword     | manage_idrac_users.yml     |             |              |
 |           | DisableUser            | manage_idrac_users.yml     |             |              |
 |           | DeleteUser             | manage_idrac_users.yml     |             |              |
-| Network   | GetNICInventory        | get_nic_inventory.yml      | yes         |              |
 | SCP       | ExportSCP              | manage_scp.yml             | yes         |              |
 |           | ImportSCP              | manage_scp.yml             |             |              |
-| Cooling   | GetFanStats            | get_fan_stats.ym           | yes         |              |
 | Logs      | GetSELogs              | get_system_logs.yml        | yes         |              |
 |           | GetLCLogs              | get_system_logs.yml        | yes         |              |
 | Idrac     | SetDefaultSettings     | manage_idrac_power.yml     |             |              |
 |           | GracefulRestart        | manage_idrac_power.yml     |             |              |
+| Network   | (coming soon)          | (coming soon)              |             |              |

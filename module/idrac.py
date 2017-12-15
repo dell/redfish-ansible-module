@@ -652,7 +652,7 @@ def get_bios_boot_order(IDRAC_INFO, root_uri):
 
     return result
 
-def get_fans_stats(IDRAC_INFO, root_uri):
+def get_fan_inventory(IDRAC_INFO, root_uri):
     result = {}
     fan_details = []
     response = send_get_request(IDRAC_INFO, root_uri)
@@ -980,6 +980,12 @@ def main():
         elif command == "GetCPUInventory":
             rf_uri = "/redfish/v1/Systems/System.Embedded.1/Processors"
             result = get_cpu_inventory(IDRAC_INFO, root_uri, rf_uri)
+        elif command == "GetNICInventory":
+            rf_uri = "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/"
+            result = get_nic_inventory(IDRAC_INFO, root_uri, rf_uri)
+        elif command == "GetFanInventory":
+            rf_uri = "/redfish/v1/Chassis/System.Embedded.1/Thermal"
+            result = get_fan_inventory(IDRAC_INFO, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
@@ -1016,13 +1022,6 @@ def main():
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         result = manage_system_power(command, IDRAC_INFO, root_uri + rf_uri)
 
-    elif category == "Network":
-        if command == "GetNICInventory":
-            rf_uri = "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/"
-            result = get_nic_inventory(IDRAC_INFO, root_uri, rf_uri)
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
     elif category == "Storage":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/"
         if command == "GetControllerInventory":
@@ -1039,13 +1038,6 @@ def main():
         elif command == "ImportSCP":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration"
             result = import_scp(IDRAC_INFO, SHARE_INFO, scpfile, root_uri + rf_uri)
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
-    elif category == "Cooling":
-        rf_uri = "/redfish/v1/Chassis/System.Embedded.1/Thermal"
-        if command == "GetFanStats":
-            result = get_fans_stats(IDRAC_INFO, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

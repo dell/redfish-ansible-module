@@ -28,16 +28,16 @@ A client talks to Dell EMC servers via its iDRAC by sending Redfish URIs. The Re
 
 ## Categories
 
-  - Inventory: Collects system inventory (Health, CPUs, RAM, etc.)
-  - Firmware: Manages system firmware (FW upgrade only in 14G)
+  - Inventory: Collects system inventory
+  - Firmware: Manages system firmware
   - Bios: Manages BIOS settings
-  - Power: Manages system power (status/on/off/restart)
-  - Storage: Manages storage controllers, HDDs, VDs, etc.
-  - Users: Manages iDRAC users (add/delete/update)
-  - Network: Manages NICs, NTP settings, etc.
-  - SCP: Manages [Server Configuration Profile](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601) files.
+  - Power: Manages system power
+  - Storage: Manages storage controllers
+  - Users: Manages iDRAC users
+  - SCP: Manages [Server Configuration Profiles](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601).
   - Logs: Collect System Event (SE) and Lifecycle Controller (LC) logs
-  - Idrac: Manages iDRAC settings (network, time, etc.)
+  - Idrac: Manages iDRAC settings
+  - Network: Manages network settings - coming soon
 
 For more details on what options are available in each category, refer to this [README](https://github.com/dell/idrac-ansible-module/tree/master/playbooks).
 
