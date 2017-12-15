@@ -1,3 +1,38 @@
-# Playbooks
+## Options
 
-The best way to learn how to use these playbooks is by looking at each one. Most playbooks can be run as-is, whereas others require that you run specific sections using tags or by commenting out what you don't want.
+| category  | command                | playbook                   | output file | restrictions |
+|-----------|------------------------|----------------------------|-------------|--------------|
+| Inventory | GetSystemInventory     | get_storage_inventory.yml  | yes         |              |
+|           | GetPSUInventory        | get_psu_inventory.yml      | yes         |              |
+|           | GetCPUInventory        | get_cpu_inventory.yml      | yes         |              |
+| Firmware  | GetInventory           | get_firmware_inventory.yml | yes         |              |
+|           | UploadFirmware         | firmware_update.yml        |             | 14G only     |
+|           | FirmwareCompare        | firmware_update.yml        |             | 14G only     |
+|           | InstallFirmware        | firmware_update.yml        |             | 14G only     |
+| Bios      | GetAttributes          | manage_bios.yml            | yes         |              |
+|           | GetBootOrder           | manage_bios.yml            | yes         |              |
+|           | SetOneTimeBoot         | manage_bios.yml            |             |              |
+|           | SetDefaultSettings     | manage_bios.yml            |             |              |
+|           | SetAttributes          | manage_bios.yml            |             |              |
+|           | ConfigJob              | manage_bios.yml            |             |              |
+| Power     | PowerOn                | manage_system_power.yml    |             |              |
+|           | PowerOff               | manage_system_power.yml    |             |              |
+|           | GracefulRestart        | manage_system_power.yml    |             |              |
+|           | GracefulShutdown       | manage_system_power.yml    |             | 14G only     |
+| Storage   | GetControllerInventory | get_storage_inventory.yml  | yes         |              |
+|           | GetDiskInventory       | get_storage_inventory.yml  | yes         |              |
+| Users     | ListUsers              | manage_idrac_users.yml     | yes         |              |
+|           | AddUser                | manage_idrac_users.yml     |             |              |
+|           | EnableUser             | manage_idrac_users.yml     |             |              |
+|           | UpdateUserRole         | manage_idrac_users.yml     |             |              |
+|           | UpdateUserPassword     | manage_idrac_users.yml     |             |              |
+|           | DisableUser            | manage_idrac_users.yml     |             |              |
+|           | DeleteUser             | manage_idrac_users.yml     |             |              |
+| Network   | GetNICInventory        | get_nic_inventory.yml      | yes         |              |
+| SCP       | ExportSCP              | manage_scp.yml             | yes         |              |
+|           | ImportSCP              | manage_scp.yml             |             |              |
+| Cooling   | GetFanStats            | get_fan_stats.ym           | yes         |              |
+| Logs      | GetSELogs              | get_system_logs.yml        | yes         |              |
+|           | GetLCLogs              | get_system_logs.yml        | yes         |              |
+| Idrac     | SetDefaultSettings     | manage_idrac_power.yml     |             |              |
+|           | GracefulRestart        | manage_idrac_power.yml     |             |              |
