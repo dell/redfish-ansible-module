@@ -1012,7 +1012,7 @@ def main():
         else:
             result = manage_users(command, IDRAC_INFO, USER_INFO, root_uri, rf_uri)
 
-    elif category == "SystemPower":
+    elif category == "Power":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         result = manage_system_power(command, IDRAC_INFO, root_uri + rf_uri)
 
@@ -1073,7 +1073,7 @@ def main():
         if command == "SetDefaultSettings":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/DellManager.ResetToDefaults"
             result = set_idrac_default_settings(IDRAC_INFO, root_uri + rf_uri)
-        elif command == "IdracGracefulRestart":
+        elif command == "GracefulRestart":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
             result = restart_idrac_gracefully(IDRAC_INFO, root_uri + rf_uri)
         else:

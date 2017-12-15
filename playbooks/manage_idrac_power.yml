@@ -8,12 +8,12 @@
   # REBOOTS.
 
   # Commands available:
-  #   IdracGracefulRestart	Restart iDRAC gracefully
+  #   GracefulRestart		Restart iDRAC gracefully
 
   tasks:
 
   # ------------------------------------------------------------------------
   - name: Idrac Power graceful restart
     local_action: >
-       idrac category=Idrac command=IdracGracefulRestart
+       idrac category=Idrac command=GracefulRestart
        idracip={{ idracip }} idracuser={{ idracuser }} idracpswd={{ idracpswd }}
