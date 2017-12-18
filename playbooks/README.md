@@ -1,8 +1,7 @@
-## Options
 
-| category  | command                | playbook                   | output file | restrictions |
+| category  | command                | playbook                   | output sample | restrictions |
 |-----------|------------------------|----------------------------|-------------|--------------|
-| Inventory | GetSystemInventory     | get_storage_inventory.yml  | yes         |              |
+| Inventory | GetSystemInventory     | get_storage_inventory.yml  | [r740_SystemInventory_YYYYMMDD_hhmmss.json](../sample_output_files/r740_SystemInventory_YYYYMMDD_hhmmss.json) | |
 |           | GetPSUInventory        | get_psu_inventory.yml      | yes         |              |
 |           | GetCPUInventory        | get_cpu_inventory.yml      | yes         |              |
 |           | GetNICInventory        | get_nic_inventory.yml      | yes         |              |
