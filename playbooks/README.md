@@ -1,4 +1,6 @@
 
+## Organization
+
 | category  | command                | playbook                   | sample output file |
 |-----------|------------------------|----------------------------|--------------------|
 | Inventory | GetSystemInventory     | get_storage_inventory.yml  | [r740_SystemInventory_YYYYMMDD_hhmmss.json](../sample_output_files/r740_SystemInventory_YYYYMMDD_hhmmss.json) | |
