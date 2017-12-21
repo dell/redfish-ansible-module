@@ -12,7 +12,7 @@
 
   - name: Get PSU Inventory
     local_action: >
-       idrac category=Inventory command=GetPSUInventory idracip={{idracip}}
+       idrac category=Inventory command=GetPsuInventory idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
     ignore_errors: yes

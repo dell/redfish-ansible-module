@@ -10,7 +10,7 @@
 
   - name: Get CPU Inventory
     local_action: >
-       idrac category=Inventory command=GetCPUInventory idracip={{idracip}}
+       idrac category=Inventory command=GetCpuInventory idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
     ignore_errors: yes

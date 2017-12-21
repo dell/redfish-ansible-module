@@ -10,7 +10,7 @@
 
   - name: Get NIC Information
     local_action: >
-       idrac category=Inventory command=GetNICInventory idracip={{idracip}}
+       idrac category=Inventory command=GetNicInventory idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
     ignore_errors: yes
