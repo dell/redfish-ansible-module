@@ -35,7 +35,7 @@
 |           | ImportSCP              | manage_scp.yml             |                    |
 | Logs      | GetSELogs              | get_system_logs.yml        | [r740_SELogs_YYYYMMDD_hhmmss.json](../sample_output_files/r740_SELogs_YYYYMMDD_hhmmss.json) |
 |           | GetLCLogs              | get_system_logs.yml        | [r740_LCLogs_YYYYMMDD_hhmmss.json](../sample_output_files/r740_LCLogs_YYYYMMDD_hhmmss.json) |
-| Idrac     | GetAttributes          | manage_idrac_settings.yml  |                    |
+| Idrac     | GetAttributes          | manage_idrac_settings.yml  | [r740_IdracAttributes_YYYMMDD_hhmmss.json](../sample_output_files/r740_IdracAttributes_YYYMMDD_hhmmss.json) |
 |           | SetAttributes          | manage_idrac_settings.yml  |                    |
 |           | SetDefaultSettings     | manage_idrac_settings.yml  |                    |
 |           | GracefulRestart        | manage_idrac_power.yml     |                    |
