@@ -37,7 +37,6 @@ A client talks to Dell EMC servers via its iDRAC by sending Redfish URIs. The Re
   - SCP: Manages [Server Configuration Profiles](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601).
   - Logs: Collect System Event (SE) and Lifecycle Controller (LC) logs
   - Idrac: Manages iDRAC settings
-  - Network: Manages network settings - coming soon
 
 For more details on what options are available in each category, refer to this [README](https://github.com/dell/idrac-ansible-module/tree/master/playbooks).
 
