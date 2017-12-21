@@ -16,4 +16,4 @@
   - name: Idrac Power graceful restart
     local_action: >
        idrac category=Idrac command=GracefulRestart
-       idracip={{ idracip }} idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+       idracip={{idracip}} idracuser={{idracuser}} idracpswd={{idracpswd}}

@@ -21,18 +21,18 @@
 
   - name: Export SCP file
     local_action: >
-       idrac category=SCP command=ExportSCP idracip={{ idracip }}
-       idracuser={{ idracuser }} idracpswd={{ idracpswd }}
-       sharehost={{ sharehost }} sharename={{ sharename }}
-       shareuser={{ shareuser }} sharepswd={{ sharepswd }}
-       hostname={{ host }}
+       idrac category=SCP command=ExportSCP idracip={{idracip}}
+       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       sharehost={{sharehost}} sharename={{sharename}}
+       shareuser={{shareuser}} sharepswd={{sharepswd}}
+       hostname={{host}}
     tags: exportscp
 
   - name: Import SCP file
     local_action: >
-       idrac category=SCP command=ImportSCP idracip={{ idracip }}
-       idracuser={{ idracuser }} idracpswd={{ idracpswd }}
-       sharehost={{ sharehost }} sharename={{ sharename }}
-       shareuser={{ shareuser }} sharepswd={{ sharepswd }}
-       scpfile={{ scpfile }}
+       idrac category=SCP command=ImportSCP idracip={{idracip}}
+       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       sharehost={{sharehost}} sharename={{sharename}}
+       shareuser={{shareuser}} sharepswd={{sharepswd}}
+       scpfile={{scpfile}}
     tags: importscp
