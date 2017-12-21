@@ -112,6 +112,11 @@ options:
     default: None
     description:
       - dict where we specify BIOS attributes to set
+  idrac_attributes:
+    required: false
+    default: None
+    description:
+      - dict where we specify IDRAC attributes to set
   FWPath:
     required: false
     default: None
@@ -610,6 +615,22 @@ def schedule_firmware_update(IDRAC_INFO, root_uri, InstallOption):
         result = { 'ret': True, 'msg': 'failed to schedule firmware install job', 'code':'%s' % str(response.__dict__)}
     return result
 
+def get_idrac_attributes(IDRAC_INFO, root_uri):
+    result = {}
+    response = send_get_request(IDRAC_INFO, root_uri + "/Attributes")
+    if response.status_code == 200:             # success
+        data = response.json()
+        for attribute in data[u'Attributes'].items():
+            result[attribute[0]] = attribute[1]
+        result['ret'] = True
+    # PropertyValueTypeError
+    elif response.status_code == 400:
+        result = { 'ret': False, 'msg': '14G only'}
+    else:
+        result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+
+    return result
+
 def get_bios_attributes(IDRAC_INFO, root_uri):
     result = {}
     response = send_get_request(IDRAC_INFO, root_uri + "/Bios")
@@ -712,6 +733,21 @@ def set_idrac_default_settings(IDRAC_INFO, root_uri):
         result = { 'ret': False, 'msg': "Resource not supported" }
     else:
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+    return result
+
+def set_idrac_attributes(IDRAC_INFO, root_uri, idrac_attributes):
+    result = {}
+    idrac_attributes = idrac_attributes.replace("'","\"")
+    payload = {"Attributes": json.loads(idrac_attributes) }
+    headers = {'content-type': 'application/json'}
+    response = send_patch_request(IDRAC_INFO, root_uri, payload, headers)
+    if response.status_code == 200:
+        result = { 'ret': True, 'msg': 'iDRac Attributes set as pending values'}
+    elif response.status_code == 405:
+        result = { 'ret': False, 'msg': "Resource not supported" }
+    else:
+        pp = response.json()
+        result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
     return result
 
 def set_bios_attributes(IDRAC_INFO, root_uri, bios_attributes):
@@ -932,6 +968,7 @@ def main():
             shareuser  = dict(required=False, type='str', default=None),
             sharepswd  = dict(required=False, type='str', default=None),
             bootdevice = dict(required=False, type='str', default=None),
+            idrac_attributes = dict(required=False, type='str', default=None),
             bios_attributes = dict(required=False, type='str', default=None),
 	    FWPath     = dict(required=False, type='str', default=None),
 	    Model      = dict(required=False, type='str', default=None),
@@ -1068,6 +1105,12 @@ def main():
         elif command == "GracefulRestart":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
             result = restart_idrac_gracefully(IDRAC_INFO, root_uri + rf_uri)
+        elif command == "GetIdracAttributes":
+            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
+            result = get_idrac_attributes(IDRAC_INFO, root_uri + rf_uri)
+        elif command == "SetIdracAttributes":
+            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Attributes"
+            result = set_idrac_attributes(IDRAC_INFO, root_uri + rf_uri, params['idrac_attributes'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
