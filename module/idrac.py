@@ -207,7 +207,7 @@ def import_scp(IDRAC_INFO, SHARE_INFO, scpfile, root_uri):
 def export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri):
     result = {}
     # timestamp to add to SCP XML file name
-    ts = str(datetime.strftime(datetime.now(), "_%Y%m%d_%H%M%S"))
+    ts = str(datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S"))
     headers = {'content-type': 'application/json'}
     payload = { "ExportFormat" : "XML",
                 "ExportUse" : "Default",
@@ -217,7 +217,7 @@ def export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri):
                      "ShareName" : SHARE_INFO['name'],
                      "UserName"  : SHARE_INFO['user'],
                      "Password"  : SHARE_INFO['pswd'],
-                     "FileName"  : "SCP_" + hostname + ts + ".xml" }
+                     "FileName"  : hostname + "_SCP_" + ts + ".xml" }
               }
     response = send_post_request(IDRAC_INFO, root_uri, payload, headers)
     if response.status_code == 202:		# success
