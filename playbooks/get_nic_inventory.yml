@@ -6,7 +6,7 @@
   tasks:
 
   - name: Set output file
-    include: set_output_file.yml type=NICInventory
+    include: set_output_file.yml type=NicInventory
 
   - name: Get NIC Information
     local_action: >

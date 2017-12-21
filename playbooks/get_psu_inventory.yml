@@ -8,7 +8,7 @@
   # Not supported in 12G servers
 
   - name: Set output file
-    include: set_output_file.yml type=PSUInventory
+    include: set_output_file.yml type=PsuInventory
 
   - name: Get PSU Inventory
     local_action: >

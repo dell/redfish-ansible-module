@@ -24,7 +24,7 @@
 
   # ------------------------------------------------------------------------
   - name: Set output file
-    include: set_output_file.yml type=IDRACUsers
+    include: set_output_file.yml type=IdracUsers
     tags: listusers
 
   - name: List all iDRAC users
