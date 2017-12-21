@@ -10,9 +10,9 @@
   # Example: ansible-playbook manage_idrac_settings.yml --tags=settimezone
 
   # Commands available:
-  #   GetIdracAttributes	Get iDRAC attributes
+  #   GetAttributes		Get iDRAC attributes
   #   SetDefaultSettings	Set iDRAC default settings
-  #   SetIdracAttributes	Most settings can be set using this
+  #   SetAttributes		Most settings can be set using this
   #   ViewJobQueue		View Job Queue (coming soon)
 
   tasks:
@@ -25,7 +25,7 @@
 
   - name: Get iDRAC attributes
     local_action: >
-       idrac category=Idrac command=GetIdracAttributes idracip={{idracip}}
+       idrac category=Idrac command=GetAttributes idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
     ignore_errors: yes
@@ -40,7 +40,7 @@
   # 14G only
   - name: Set Timezone
     local_action: >
-       idrac category=Idrac command=SetIdracAttributes
+       idrac category=Idrac command=SetAttributes
        idrac_attributes={'Time.1.Timezone':'US/Central'}
        idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
     tags: settimezone
@@ -50,7 +50,7 @@
   # 14G only
   - name: Enable NTP
     local_action: >
-       idrac category=Idrac command=SetIdracAttributes
+       idrac category=Idrac command=SetAttributes
        idrac_attributes={'NTPConfigGroup.1.NTPEnable':'Enabled'}
        idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
     tags: setntp
@@ -58,7 +58,7 @@
 
   - name: Set NTP server
     local_action: >
-       idrac category=Idrac command=SetIdracAttributes
+       idrac category=Idrac command=SetAttributes
        idrac_attributes={'NTPConfigGroup.1.NTP1':'ntp.server.com'}
        idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
     tags: setntp

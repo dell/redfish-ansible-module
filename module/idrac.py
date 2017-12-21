@@ -1105,10 +1105,10 @@ def main():
         elif command == "GracefulRestart":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
             result = restart_idrac_gracefully(IDRAC_INFO, root_uri + rf_uri)
-        elif command == "GetIdracAttributes":
+        elif command == "GetAttributes":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
             result = get_idrac_attributes(IDRAC_INFO, root_uri + rf_uri)
-        elif command == "SetIdracAttributes":
+        elif command == "SetAttributes":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Attributes"
             result = set_idrac_attributes(IDRAC_INFO, root_uri + rf_uri, params['idrac_attributes'])
         else:
