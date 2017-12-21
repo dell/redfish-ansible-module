@@ -36,7 +36,7 @@ def main():
     headers = {'content-type': 'application/json'}
 
     # Turn system power on
-    turn_power_on(idrac, base_uri, rf_uri, json.dumps(payload), headers)
+    turn_power_on(idrac, base_uri, rf_uri, payload, headers)
 
 if __name__ == '__main__':
     main()

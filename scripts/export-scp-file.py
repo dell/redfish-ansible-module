@@ -48,7 +48,7 @@ def main():
                   }
               }
 
-    export_scp(idrac, base_uri, rf_uri, json.dumps(payload), headers)
+    export_scp(idrac, base_uri, rf_uri, payload, headers)
 
 if __name__ == '__main__':
     main()
