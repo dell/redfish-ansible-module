@@ -607,10 +607,10 @@ def schedule_firmware_update(IDRAC_INFO, root_uri, InstallOption):
     response = send_post_request(IDRAC_INFO, url, payload, headers)
 
     if response.status_code == 202:
-        result = { 'ret': True, 'msg': 'firmware install job accepted ', 'Location':'%s' % str(response.json()) }
+        result = { 'ret': True, 'msg': 'firmware install job accepted' }
 
     elif response.status_code == 400:
-        result = { 'ret': False, 'msg': '14G only'}
+        result = { 'ret': False, 'msg': '14G only' }
     else:
         result = { 'ret': True, 'msg': 'failed to schedule firmware install job', 'code':'%s' % str(response.__dict__)}
     return result
