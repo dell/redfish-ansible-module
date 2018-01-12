@@ -1,0 +1,87 @@
+---
+- hosts: myhosts
+  name: PowerEdge BIOS
+  gather_facts: False
+
+  #         WARNING!             WARNING!             WARNING!
+  #
+  # Carefully review all tasks and select what you need by using tags.
+  # Running *ALL* tasks will have unintended consequences!
+  #
+  # Updating BIOS settings requires a reboot to implement, so be sure
+  # to pass the 'reboot' tag accordingly.
+  #
+  # Examples:
+  # ansible-playbook manage_nics.yml --tags enablepxenic2
+  # ansible-playbook manage_nics.yml --tags "disablepxenic1,reboot"
+
+  tasks:
+
+  # ------------------------------------------------------------------------
+  - name: Enable PXE Boot for NIC1
+    local_action: >
+       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev1EnDis':'Enabled'}
+       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+    tags: enablepxenic1
+    ignore_errors: yes
+    
+  - name: Disable PXE Boot for NIC1
+    local_action: >
+       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev1EnDis':'Disabled'}
+       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+    tags: disablepxenic1
+    ignore_errors: yes
+    
+  # ------------------------------------------------------------------------
+  - name: Enable PXE Boot for NIC2
+    local_action: >
+       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev2EnDis':'Enabled'}
+       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+    tags: enablepxenic2
+    ignore_errors: yes
+    
+  - name: Disable PXE Boot for NIC2
+    local_action: >
+       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev2EnDis':'Disabled'}
+       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+    tags: disablepxenic2
+    ignore_errors: yes
+    
+  # ------------------------------------------------------------------------
+  - name: Enable PXE Boot for NIC3
+    local_action: >
+       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev3EnDis':'Enabled'}
+       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+    tags: enablepxenic3
+    ignore_errors: yes
+    
+  - name: Disable PXE Boot for NIC3
+    local_action: >
+       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev3EnDis':'Disabled'}
+       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+    tags: disablepxenic3
+    ignore_errors: yes
+    
+  # ------------------------------------------------------------------------
+  - name: Enable PXE Boot for NIC4
+    local_action: >
+       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev4EnDis':'Enabled'}
+       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+    tags: enablepxenic4
+    ignore_errors: yes
+    
+  - name: Disable PXE Boot for NIC4
+    local_action: >
+       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev4EnDis':'Disabled'}
+       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+    tags: disablepxenic4
+    ignore_errors: yes
+
+  # ------------------------------------------------------------------------
+  - name: Schedule Config Job - REBOOT
+    local_action: >
+      idrac category=Bios command=ConfigJob idracip={{idracip}}
+      idracuser={{idracuser}} idracpswd={{idracpswd}}
+    tags: reboot
+    ignore_errors: yes
+

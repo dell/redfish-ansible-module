@@ -347,7 +347,7 @@ def manage_system_power(command, IDRAC_INFO, root_uri):
     if response.status_code == 204:		# success
         result['ret'] = True
     elif response.status_code == 400:
-        result = { 'ret': False, 'msg': '14G only'}
+        result = { 'ret': False, 'msg': 'Not supported on this platform'}
     elif response.status_code == 405:
         result = { 'ret': False, 'msg': "Resource not supported" }
     elif response.status_code == 409:		# verify this
@@ -514,7 +514,7 @@ def get_firmware_inventory(IDRAC_INFO, root_uri, rf_uri):
 
     # PropertyValueTypeError
     elif response.status_code == 400:
-        result = { 'ret': False, 'msg': '14G only'}
+        result = { 'ret': False, 'msg': 'Not supported on this platform'}
     else:
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
@@ -527,7 +527,7 @@ def compare_firmware(IDRAC_INFO, root_uri, catalog_file, model):
     response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
 
     if response.status_code == 400:
-        return { 'ret': False, 'msg': '14G only'}
+        return { 'ret': False, 'msg': 'Not supported on this platform'}
 
     elif response.status_code == 200:
         data = response.json()
@@ -563,7 +563,7 @@ def upload_firmware(IDRAC_INFO, root_uri, FWPath):
     response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
 
     if response.status_code == 400:
-        return { 'ret': False, 'msg': '14G only'}
+        return { 'ret': False, 'msg': 'Not supported on this platform'}
 
     elif response.status_code == 200:
         ETag = response.headers['ETag']
@@ -582,7 +582,7 @@ def upload_firmware(IDRAC_INFO, root_uri, FWPath):
         result = { 'ret': True, 'msg': 'Firmare uploaded successfully', 'Version': '%s' % str(response.json()['Version']), 'Location':'%s' % response.headers['Location']}
 
     elif response.status_code == 400:
-        result = { 'ret': False, 'msg': '14G only'}
+        result = { 'ret': False, 'msg': 'Not supported on this platform'}
 
     else:
         result = { 'ret': False, 'msg': 'Failed to upload firmware image %s' % str(response.__dict__)}
@@ -593,7 +593,7 @@ def schedule_firmware_update(IDRAC_INFO, root_uri, InstallOption):
     response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
 
     if response.status_code == 400:
-        return { 'ret': False, 'msg': '14G only'}
+        return { 'ret': False, 'msg': 'Not supported on this platform'}
 
     elif response.status_code == 200:
         data = response.json()
@@ -610,7 +610,7 @@ def schedule_firmware_update(IDRAC_INFO, root_uri, InstallOption):
         result = { 'ret': True, 'msg': 'firmware install job accepted' }
 
     elif response.status_code == 400:
-        result = { 'ret': False, 'msg': '14G only' }
+        result = { 'ret': False, 'msg': 'Not supported on this platform' }
     else:
         result = { 'ret': True, 'msg': 'failed to schedule firmware install job', 'code':'%s' % str(response.__dict__)}
     return result
@@ -625,7 +625,7 @@ def get_idrac_attributes(IDRAC_INFO, root_uri):
         result['ret'] = True
     # PropertyValueTypeError
     elif response.status_code == 400:
-        result = { 'ret': False, 'msg': '14G only'}
+        result = { 'ret': False, 'msg': 'Not supported on this platform'}
     else:
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
@@ -641,7 +641,7 @@ def get_bios_attributes(IDRAC_INFO, root_uri):
         result['ret'] = True
     # PropertyValueTypeError
     elif response.status_code == 400:
-        result = { 'ret': False, 'msg': '14G only'}
+        result = { 'ret': False, 'msg': 'Not supported on this platform' }
     else:
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
@@ -667,7 +667,7 @@ def get_bios_boot_order(IDRAC_INFO, root_uri):
                 result["device%s" % b[u'Index']] = b[u'Name']
     # PropertyValueTypeError
     elif response.status_code == 400:
-        result = { 'ret': False, 'msg': '14G only'}
+        result = { 'ret': False, 'msg': 'Not supported on this platform' }
     else:
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
@@ -692,7 +692,7 @@ def get_fan_inventory(IDRAC_INFO, root_uri):
         result["entries"] = fan_details
 
     elif response.status_code == 400:
-        result = { 'ret': False, 'msg': '14G only'}
+        result = { 'ret': False, 'msg': 'Not supported on this platform' }
     else:
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
 
@@ -758,11 +758,12 @@ def set_bios_attributes(IDRAC_INFO, root_uri, bios_attributes):
     response = send_patch_request(IDRAC_INFO, root_uri, payload, headers)
     if response.status_code == 200:
         result = { 'ret': True, 'msg': 'BIOS Attributes set as pending values'}
+    elif response.status_code == 400:
+        result = { 'ret': False, 'msg': 'Not supported on this platform'}
     elif response.status_code == 405:
         result = { 'ret': False, 'msg': "Resource not supported" }
     else:
-        pp = response.json()
-        result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
+        result = { 'ret': False, 'msg': "Error code %s" % str(response.status_code) }
     return result
 
 def create_bios_config_job (IDRAC_INFO, url):
@@ -771,9 +772,12 @@ def create_bios_config_job (IDRAC_INFO, url):
     response = send_post_request(IDRAC_INFO, url, payload, headers)
     if response.status_code == 200:
         result = { 'ret': True, 'msg': 'Config job created'}
+    elif response.status_code == 400:
+        result = { 'ret': False, 'msg': 'Not supported on this platform'}
+    elif response.status_code == 405:
+        result = { 'ret': False, 'msg': "Resource not supported" }
     else:
-        pp = response.json()
-        result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
+        result = { 'ret': False, 'msg': "Error code %s" % str(response.status_code) }
     return result
 
 def get_cpu_inventory(IDRAC_INFO, root_uri, rf_uri):
@@ -887,7 +891,7 @@ def get_psu_inventory(IDRAC_INFO, root_uri, rf_uri):
                 psu['Model']           = data[u'Model']
                 psu['SerialNumber']    = data[u'SerialNumber']
                 psu['PartNumber']      = data[u'PartNumber']
-                # Only supported in 14G, so commenting out for now
+                # Not supported in 12G/13G, so commenting out for now
                 #psu['Manufacturer']    = data[u'Manufacturer']
                 psu['FirmwareVersion'] = data[u'FirmwareVersion']
                 psu['PowerCapacityWatts'] = data[u'PowerCapacityWatts']
@@ -934,7 +938,8 @@ def get_system_inventory(IDRAC_INFO, root_uri):
         if 'BootSourceOverrideMode' in datadict.keys():
             result['BootSourceOverrideMode'] = data[u'Boot'][u'BootSourceOverrideMode']
         else:
-            result['BootSourceOverrideMode'] = "14G only"
+            # Not available in earlier server generations
+            result['BootSourceOverrideMode'] = "Not available"
 
         if 'TrustedModules' in data:
             for d in data[u'TrustedModules']:
@@ -942,8 +947,9 @@ def get_system_inventory(IDRAC_INFO, root_uri):
                     result['TPMInterfaceType'] = d[u'InterfaceType']
                 result['TPMStatus']        = d[u'Status'][u'State']
         else:
-            result['TPMInterfaceType'] = "14G only"
-            result['TPMStatus']        = "14G only"
+            # Not available in earlier server generations
+            result['TPMInterfaceType'] = "Not available"
+            result['TPMStatus']        = "Not available"
     else:
         result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     return result
