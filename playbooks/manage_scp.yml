@@ -3,19 +3,25 @@
   name: PowerEdge iDRAC Manage Server Configuration Profile (SCP)
   gather_facts: False
 
+  #         WARNING!             WARNING!             WARNING!
+  #
+  # Carefully review all tasks and select what you need by using tags.
+  # Running *ALL* tasks will have unintended consequences!
+  #
+  # Examples:
+  # ansible-playbook manage_scp.yml --tags exportscp
+  # ansible-playbook manage_scp.yml --tags importscp
+  #
+  # Please note that once an Export or Import job is running, you must
+  # wait until it's complete before sending another request, else it will
+  # generate error code 503.
+  #
+  # For information on how to prepare an SCP file for import, please refer
+  # to http://dell.to/2iCy2O9
+
   # Options available:
   #   ExportSCP 	Export SCP
   #   ImportSCP		Import SCP
-
-  # Please note that once an Export or Import job is running, you must wait
-  # until it's complete before sending another request, else it will generate
-  # error code 503.
-
-  # You can use tags to run specific tasks.
-  # Example: ansible-playbook manage_scp.yml --tags=exportscp
-
-  # For information on how to prepare an SCP file for import, please refer
-  # to http://dell.to/2iCy2O9
 
   tasks:
 

@@ -49,6 +49,7 @@
        idrac category=Users command=AddUser idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}} userid={{userid}}
        username={{username}} userpswd={{userpswd}} userrole={{userrole}}
+    no_log: true
     tags: adduser
 
   - name: Enable iDRAC user
@@ -71,6 +72,7 @@
        idrac category=Users command=UpdateUserPassword idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}} userid={{userid}}
        userpswd={{userpswd}}
+    no_log: true
     tags: updatepassword
 
   # ------------------------------------------------------------------------
