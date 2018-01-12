@@ -4,12 +4,16 @@
   name: PowerEdge iDRAC Manage Users
   gather_facts: False
 
-  # WARNING: CAREFULLY REVIEW ALL TASKS AVAILABLE AND SELECT WHAT YOU WANT.
-  # RUNNING ALL TASKS BELOW WILL HAVE UNINTENDED CONSEQUENCES.
-  # ALTERNATIVELY, USE TAGS:
-  # Example: ansible-playbook manage_users.yml --tags=adduser
-
-  # User to add, modify or delete is defined in group_vars/myhosts
+  #         WARNING!             WARNING!             WARNING!
+  #
+  # Carefully review all tasks and select what you need by using tags.
+  # Running *ALL* tasks will have unintended consequences!
+  #
+  # Examples:
+  # ansible-playbook manage_users.yml --tags listusers
+  # ansible-playbook manage_users.yml --tags adduser
+  #
+  # User to add, modify or delete is defined in file group_vars/myhosts
 
   # Options available:
   #   ListUsers			Lists all users, including empty entries

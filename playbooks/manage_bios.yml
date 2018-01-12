@@ -3,8 +3,17 @@
   name: PowerEdge BIOS
   gather_facts: False
 
-  # WARNING: CAREFULLY REVIEW ALL TASKS AVAILABLE AND SELECT WHAT YOU WANT.
-  # RUNNING ALL TASKS BELOW WILL HAVE UNINTENDED CONSEQUENCES.
+  #         WARNING!             WARNING!             WARNING!
+  #
+  # Carefully review all tasks and select what you need by using tags.
+  # Running *ALL* tasks will have unintended consequences!
+  #
+  # Updating BIOS settings requires a reboot to implement, so be sure
+  # to pass the 'reboot' tag accordingly.
+  #
+  # Examples:
+  # ansible-playbook manage_bios.yml --tags getattributes
+  # ansible-playbook manage_bios.yml --tags "bootmodeuefi,reboot"
 
   # Commands available:
   #   GetAttributes 		Get BIOS attributes
@@ -13,9 +22,6 @@
   #   SetDefaultSettings 	Set BIOS default settings 
   #   SetAttributes		Set BIOS attributes
   #   ConfigJob			Implement new settings
-
-  # You can use tags to run specific tasks. 
-  # Example: ansible-playbook manage_bios.yml --tags=getattributes
 
   tasks:
 
@@ -79,13 +85,6 @@
     tags: bootmodeuefi
     ignore_errors: yes
     
-  - name: Schedule Config Job
-    local_action: >
-      idrac category=Bios command=ConfigJob idracip={{idracip}}
-      idracuser={{idracuser}} idracpswd={{idracpswd}}
-    tags: bootmodeuefi
-    ignore_errors: yes
-
   # ------------------------------------------------------------------------
   - name: Set BootMode to Legacy BIOS
     local_action: >
@@ -94,10 +93,10 @@
     tags: bootmodelegacybios
     ignore_errors: yes
     
-  # Reboots server
-  - name: Schedule Config Job
+  # ------------------------------------------------------------------------
+  - name: Schedule Config Job - REBOOT
     local_action: >
       idrac category=Bios command=ConfigJob idracip={{idracip}}
       idracuser={{idracuser}} idracpswd={{idracpswd}}
-    tags: bootmodelegacybios
+    tags: reboot
     ignore_errors: yes

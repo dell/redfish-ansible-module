@@ -4,10 +4,14 @@
   name: PowerEdge iDRAC - Manage iDRAC Settings
   gather_facts: False
 
-  # WARNING: CAREFULLY REVIEW ALL TASKS AVAILABLE AND SELECT WHAT YOU WANT.
-  # RUNNING ALL TASKS BELOW MIGHT HAVE UNINTENDED CONSEQUENCES.
-  # ALTERNATIVELY, USE TAGS:
-  # Example: ansible-playbook manage_idrac_settings.yml --tags=settimezone
+  #         WARNING!             WARNING!             WARNING!
+  #
+  # Carefully review all tasks and select what you need by using tags.
+  # Running *ALL* tasks will have unintended consequences!
+  #
+  # Examples:
+  # ansible-playbook manage_idrac_settings.yml --tags settimezone
+  # ansible-playbook manage_idrac_settings.yml --tags enablentp
 
   # Commands available:
   #   GetAttributes		Get iDRAC attributes
@@ -53,7 +57,7 @@
        idrac category=Idrac command=SetAttributes
        idrac_attributes={'NTPConfigGroup.1.NTPEnable':'Enabled'}
        idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
-    tags: setntp
+    tags: enablentp
     ignore_errors: yes
 
   - name: Set NTP server
@@ -61,7 +65,7 @@
        idrac category=Idrac command=SetAttributes
        idrac_attributes={'NTPConfigGroup.1.NTP1':'ntp.server.com'}
        idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
-    tags: setntp
+    tags: enablentp
     ignore_errors: yes
 
   # Add more NTP servers as needed

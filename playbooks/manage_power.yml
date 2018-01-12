@@ -4,10 +4,14 @@
   name: PowerEdge iDRAC Manage System Power
   gather_facts: False
 
-  # WARNING: CAREFULLY REVIEW ALL TASKS AVAILABLE AND SELECT WHAT YOU WANT.
-  # RUNNING ALL TASKS BELOW WILL HAVE UNINTENDED CONSEQUENCES.
-  # ALTERNATIVELY, USE TAGS:
-  # Example: ansible-playbook manage_system_power.yml --tags=poweron
+  #         WARNING!             WARNING!             WARNING!
+  #
+  # Carefully review all tasks and select what you need by using tags.
+  # Running *ALL* tasks will have unintended consequences!
+  #
+  # Examples:
+  # ansible-playbook manage_system_power.yml --tags gracefulrestart
+  # ansible-playbook manage_system_power.yml --tags poweron
 
   # Commands available:
   #   PowerOn			Turn system power on
