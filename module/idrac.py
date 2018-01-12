@@ -134,7 +134,7 @@ options:
     description:
       - firmware installation option like Now or NextReboot
 
-author: "jose.delarosa@dell.com"
+author: "jose.delarosa@dell.com", github: jose-delarosa
 """
 
 import os
@@ -189,12 +189,11 @@ def import_scp(IDRAC_INFO, SHARE_INFO, scpfile, root_uri):
     if response.status_code == 202:		# success
         result['ret'] = True
         '''
-        Getting Job ID, but not really doing anything with it.
-        Ideally I should return the Job ID or wait for the task to complete
-        and then send result back to user. In its current implementation,
-        there isn't a way to know if the task finished successfully other
-        then verifying if the configuration settings specified in the SCP
-        file were implemented. 
+        I return the Job ID but not returning success/fail status unless I
+        wait for the task to complete (which can take 45-90 seconds).
+        There isn't a way to know if the task finished successfully other
+        then checking if the configuration settings in the SCP file were
+        applied to the server.
         '''
         data_dict = response.__dict__
         job_id_full = data_dict["headers"]["Location"]
@@ -223,11 +222,10 @@ def export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri):
     if response.status_code == 202:		# success
         result['ret'] = True
         '''
-        Getting Job ID, but not doing anything with it.
-        Ideally I should return the Job ID or wait for the task to complete
-        and then send result back to user. In its current implementation, there
-        isn't a way to know if the task finished successfully other than waiting
-        to see if the SCP file is eventually dropped in the SMB share.
+        I return the Job ID but not returning success/fail status unless I
+        wait for the task to complete (which can take 45-90 seconds).
+        There isn't a way to know if the task finished successfully other
+        than waiting to see if the SCP file is dropped in the SMB share.
         '''
         data_dict = response.__dict__
         job_id_full = data_dict["headers"]["Location"]
