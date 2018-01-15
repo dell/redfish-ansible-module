@@ -25,12 +25,12 @@
 
   tasks:
 
-  # ------------------------------------------------------------------------
-  - name: Set output file
+  # --- Get BIOS attributes ------------------------------------------------ 
+  - name: Define output file
     include: set_output_file.yml type=BiosAttributes
     tags: getattributes
 
-  - name: Get BIOS attributes
+  - name: Get attributes
     local_action: >
        idrac category=Bios command=GetAttributes idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
@@ -38,17 +38,17 @@
     ignore_errors: yes
     tags: getattributes
 
-  - name: Copy BIOS attributes to file
+  - name: Copy attributes to output file
     local_action: copy content={{ result | to_nice_json }}
        dest={{template}}.json
     tags: getattributes
 
-  # ------------------------------------------------------------------------
-  - name: Set output file
+  # --- Get device boot order ----------------------------------------------
+  - name: Define output file
     include: set_output_file.yml type=BiosBootOrder
     tags: getbootorder
 
-  - name: Get BIOS boot order
+  - name: Get device boot order
     local_action: >
        idrac category=Bios command=GetBootOrder idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
@@ -56,7 +56,7 @@
     ignore_errors: yes
     tags: getbootorder
 
-  - name: Copy BIOS boot order to file
+  - name: Copy boot order to output file
     local_action: copy content={{ result | to_nice_json }}
        dest={{template}}.json
     tags: getbootorder
