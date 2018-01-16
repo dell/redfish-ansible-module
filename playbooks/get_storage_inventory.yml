@@ -3,14 +3,20 @@
   name: PowerEdge storage inventory
   gather_facts: False
 
+  # You can use tags to run specific tasks.
+  #
+  # Examples:
+  # ansible-playbook manage_bios.yml --tags getcontrollerinventory
+  # ansible-playbook manage_bios.yml --tags getdiskinventory
+
   # Commands available:
-  #   GetControllerInventory   Storage controller inventory
-  #   GetDiskInventory         Disk inventory
+  #   GetControllerInventory   Get Storage controller inventory
+  #   GetDiskInventory         Get Disk inventory
 
   tasks:
 
-  # ------------------------------------------------------------------------
-  - name: Set output file
+  # --- Get Storage Controller Inventory -----------------------------------
+  - name: Define output file
     include: set_output_file.yml type=StorageControllerInventory
     tags: getcontrollerinventory
 
@@ -22,13 +28,13 @@
     ignore_errors: yes
     tags: getcontrollerinventory
 
-  - name: Place data in file
+  - name: Copy results to output file
     local_action: copy content={{ result | to_nice_json }}
              dest={{template}}.json
     tags: getcontrollerinventory
 
-  # ------------------------------------------------------------------------
-  - name: Set output file
+  # --- Get Disk Inventory -------------------------------------------------
+  - name: Define output file
     include: set_output_file.yml type=DiskInventory
     tags: getdiskinventory
 
@@ -40,7 +46,7 @@
     ignore_errors: yes
     tags: getdiskinventory
 
-  - name: Place data in file
+  - name: Copy results to output file
     local_action: copy content={{ result | to_nice_json }}
             dest={{template}}.json
     tags: getdiskinventory

@@ -7,7 +7,7 @@
 
   # Not supported in 12G servers
 
-  - name: Set output file
+  - name: Define output file
     include: set_output_file.yml type=PsuInventory
 
   - name: Get PSU Inventory
@@ -17,6 +17,6 @@
     register: result
     ignore_errors: yes
 
-  - name: Copy information to file
+  - name: Copy information to output file
     local_action: copy content={{ result | to_nice_json }}
        dest={{template}}.json

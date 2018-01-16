@@ -3,17 +3,20 @@
   name: PowerEdge iDRAC Logs
   gather_facts: False
 
-  # Logs available:
-  #   GetSeLogs	System Event Log
-  #   GetLcLogs	Lifecycle Log
-
   # You can use tags to run specific tasks.
-  # Example: ansible-playbook get_system_logs.yml --tags=selog
+  #
+  # Examples:
+  # ansible-playbook get_system_logs.yml --tags selogs
+  # ansible-playbook get_system_logs.yml --tags lclogs
+
+  # Commands available:
+  #   GetSELogs		Get System Event Logs
+  #   GetLCLogs		Get Lifecycle Logs
 
   tasks:
 
-  # ------------------------------------------------------------------------
-  - name: Set output file
+  # --- Get SE Logs --------------------------------------------------------
+  - name: Define output file
     include: set_output_file.yml type=SELogs
     tags: selogs
 
@@ -24,13 +27,13 @@
     register: result
     tags: selogs
 
-  - name: Place SE Logs in file
+  - name: Copy SE Logs to output file
     local_action: copy content={{ result | to_nice_json }}
              dest={{template}}.json
     tags: selogs
 
-  # ------------------------------------------------------------------------
-  - name: Set output file
+  # --- Get LC Logs --------------------------------------------------------
+  - name: Define output file
     include: set_output_file.yml type=LCLogs
     tags: lclogs
 
@@ -41,7 +44,7 @@
     register: result
     tags: lclogs
 
-  - name: Place LC Logs in file
+  - name: Copy LC Logs to output file
     local_action: copy content={{ result | to_nice_json }}
              dest={{template}}.json
     tags: lclogs

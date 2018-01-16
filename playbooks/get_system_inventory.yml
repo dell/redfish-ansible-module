@@ -5,7 +5,7 @@
 
   tasks:
 
-  - name: Set output file
+  - name: Define output file
     include: set_output_file.yml type=SystemInventory
 
   - name: Getting system inventory
@@ -14,6 +14,6 @@
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
 
-  - name: Copying results to file
+  - name: Copy results to output file
     local_action: copy content={{ result | to_nice_json }}
        dest={{template}}.json

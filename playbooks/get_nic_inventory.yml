@@ -5,7 +5,7 @@
 
   tasks:
 
-  - name: Set output file
+  - name: Define output file
     include: set_output_file.yml type=NicInventory
 
   - name: Get NIC Information
@@ -15,6 +15,6 @@
     register: result
     ignore_errors: yes
 
-  - name: Copy information to file
+  - name: Copy information to output file
     local_action: copy content={{ result | to_nice_json }}
        dest={{template}}.json
