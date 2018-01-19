@@ -9,7 +9,8 @@ idracuser: root
 idracpswd: calvin
 
 # Misc
-rootdir: /root             # local directory where all results are placed
+rootdir: /root			# local directory where all results are placed
+host: "{{inventory_hostname}}"	# shorter name for inventory_hostname
 
 # These variables are not used in playbooks yet. Need to figure out
 # how to include variables inside curly {} brackets.

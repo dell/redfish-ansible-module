@@ -55,16 +55,14 @@ The file */etc/ansible/hosts* should look like this:
 
 ```
 [myhosts]
-# host name       iDRAC IP/NAME          host alias
-host1.domain.com  idracip=192.168.0.101  host=webserver1
-host2.domain.com  idracip=192.168.0.102  host=webserver2
-host3.domain.com  idracip=192.168.0.103  host=dbserver1
+# hostname     iDRAC IP/NAME
+webserver1     idracip=192.168.0.101
+webserver2     idracip=192.168.0.102
+dbserver1      idracip=192.168.0.103
 ...
 ```
 
-The *host alias* entry can be a server's hostname, alias, etc. It doesn't have to be resolvable, it is just a name used to identify each server and shoule be unique. The host alias will be used in the filenames where the results for each server are placed (read more below).
-
-The iDRAC IP is critical as this is the IP that we connect to (we are not connecting to the host OS via ssh, but rather to the iDRAC via https), so be sure this information is correct. Please note that *idracip* can also be a DNS-resolvable name.
+The iDRAC IP is necessary as this is how we communicate with the host. We are not connecting to the host OS via ssh, but to the iDRAC via https, so be sure this information is correct. Please note that *idracip* can also be a DNS-resolvable name.
 
 The playbook names are self-explanatory, and they are the best source to learn how to use them. Every Redfish API supported by the Ansible module is included in the playbooks. If it's not in a playbook, a Redfish API has not been coded into the module yet.
 
@@ -136,7 +134,7 @@ $ cat webserver1_StorageControllerInventory_20170912_103733.json
 }
 ```
 
-These files are in the format *<hostalias>_<timestamp>_<datatype>* and each contains valuable server inventory. 
+These files are in the format *<host>_<timestamp>_<datatype>* and each contains valuable server inventory. 
 
 Some Redfish APIs are only available in 14G PowerEdge servers. In addition, availabilty of Redfish APIs varies in 13G and 12G servers (though we are working to make them uniform across all supported servers). If you run a task for a Redfish API that is not available in a server, you will see an error displayed during playbook execution:
 
