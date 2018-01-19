@@ -1073,12 +1073,11 @@ def main():
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "SCP":
+        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager"
         if command == "ExportSCP":
-            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration"
-            result = export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri + rf_uri)
+            result = export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri + rf_uri + ".ExportSystemConfiguration")
         elif command == "ImportSCP":
-            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration"
-            result = import_scp(IDRAC_INFO, SHARE_INFO, scpfile, root_uri + rf_uri)
+            result = import_scp(IDRAC_INFO, SHARE_INFO, scpfile, root_uri + rf_uri + ".ImportSystemConfiguration")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

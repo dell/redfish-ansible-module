@@ -1,6 +1,6 @@
 # Examples
 
-Scripts to perform some of the same tasks this Ansible module performs.
+Simple examples with curl and python scripts to perform some of the same tasks as the Ansible module. These scripts are independent of the Ansible module and can be used separately.
 
 # Using curl
 
