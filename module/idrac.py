@@ -578,39 +578,31 @@ def upload_firmware(IDRAC_INFO, root_uri, FWPath):
     response = requests.post(url, files=files, auth=(IDRAC_INFO['user'], IDRAC_INFO['pswd']), headers=headers, verify=False)
     if response.status_code == 201:
         result = { 'ret': True, 'msg': 'Firmare uploaded successfully', 'Version': '%s' % str(response.json()['Version']), 'Location':'%s' % response.headers['Location']}
-
-    elif response.status_code == 400:
-        result = { 'ret': False, 'msg': 'Not supported on this platform'}
-
     else:
-        result = { 'ret': False, 'msg': 'Failed to upload firmware image %s' % str(response.__dict__)}
+        result = { 'ret': False, 'msg': 'Error uploading firmware; status_code=%s' % response.status_code }
     return result
 
 def schedule_firmware_update(IDRAC_INFO, root_uri, InstallOption):
     fw = []
     response = send_get_request(IDRAC_INFO, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
 
-    if response.status_code == 400:
-        return { 'ret': False, 'msg': 'Not supported on this platform'}
-
-    elif response.status_code == 200:
+    if response.status_code == 200:
         data = response.json()
         for i in data['Members']:
             if 'Available' in i['@odata.id']:
                 fw.append(i['@odata.id'])
+    else:
+        return { 'ret': False, 'msg': 'Error getting firmware inventory; status_code=%s' % response.status_code }
 
     url = root_uri + '/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install'
-    payload = { "SoftwareIdentityURIs":fw, "InstallUpon":"InstallOption "}
+    payload = {'SoftwareIdentityURIs': fw, 'InstallUpon': InstallOption}
     headers = {'content-type': 'application/json'}
     response = send_post_request(IDRAC_INFO, url, payload, headers)
 
     if response.status_code == 202:
-        result = { 'ret': True, 'msg': 'firmware install job accepted' }
-
-    elif response.status_code == 400:
-        result = { 'ret': False, 'msg': 'Not supported on this platform' }
+        result = { 'ret': True, 'msg': 'Firmware install job accepted' }
     else:
-        result = { 'ret': True, 'msg': 'failed to schedule firmware install job', 'code':'%s' % str(response.__dict__)}
+        result =  { 'ret': False, 'msg': 'Error accepting firmware install; status_code=%s' % response.status_code }
     return result
 
 def get_idrac_attributes(IDRAC_INFO, root_uri):
