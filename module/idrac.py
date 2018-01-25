@@ -851,8 +851,9 @@ def get_nic_inventory(IDRAC_INFO, root_uri, rf_uri):
                 nic['SpeedMbps']  = data[u'SpeedMbps']
                 nic['MTU']        = data[u'MTUSize']
                 nic['AutoNeg']    = data[u'AutoNeg']
-                nic['Health']     = data[u'Status'][u'Health']
-                nic['State']      = data[u'Status'][u'State']
+                if 'Status' in data:	# not available when power is off
+                    nic['Health'] = data[u'Status'][u'Health']
+                    nic['State']  = data[u'Status'][u'State']
                 nic_details.append(nic)
 
             else:
@@ -889,8 +890,8 @@ def get_psu_inventory(IDRAC_INFO, root_uri, rf_uri):
                 psu['Model']           = data[u'Model']
                 psu['SerialNumber']    = data[u'SerialNumber']
                 psu['PartNumber']      = data[u'PartNumber']
-                # Not supported in 12G/13G, so commenting out for now
-                #psu['Manufacturer']    = data[u'Manufacturer']
+                if 'Manufacturer' in data:   # not available in all generations
+                    psu['Manufacturer'] = data[u'Manufacturer']
                 psu['FirmwareVersion'] = data[u'FirmwareVersion']
                 psu['PowerCapacityWatts'] = data[u'PowerCapacityWatts']
                 psu['PowerSupplyType'] = data[u'PowerSupplyType']

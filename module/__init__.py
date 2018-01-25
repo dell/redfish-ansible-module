@@ -1,2 +1,2 @@
 def main():
-    print("Enjoy our module")
+    print("Ansible module for Redfish")
