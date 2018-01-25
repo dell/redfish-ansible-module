@@ -19,7 +19,7 @@ except ImportError:
 ansible_path = ansible.__path__[0]
 redfish_module_path = ansible_path + '/modules/remote_management/redfish'
 module_utils_path = ansible_path + '/module_utils/'
-redfish_utils_file = module_utils_path + 'rf_utils.py' 
+redfish_utils_file = module_utils_path + 'redfish_utils.py' 
 
 if os.path.isdir(redfish_module_path): shutil.rmtree(redfish_module_path)
 if os.path.isfile(redfish_utils_file): os.remove(redfish_utils_file)

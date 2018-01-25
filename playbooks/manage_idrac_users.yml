@@ -49,7 +49,6 @@
        idrac category=Users command=AddUser idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}} userid={{userid}}
        username={{username}} userpswd={{userpswd}} userrole={{userrole}}
-    no_log: true
     tags: adduser
 
   - name: Enable iDRAC user
