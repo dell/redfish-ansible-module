@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC CPU Inventory
+  name: CPU Inventory
   gather_facts: False
 
   tasks:
@@ -10,8 +10,8 @@
 
   - name: Get CPU Inventory
     local_action: >
-       idrac category=Inventory command=GetCpuInventory idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Inventory command=GetCpuInventory baseuri={{baseuri}}
+       login={{login}} password={{password}}
     register: result
     ignore_errors: yes
 

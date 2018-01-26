@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge Firmware Update 
+  name: Firmware Update 
   gather_facts: False
 
   tasks:
@@ -21,14 +21,14 @@
 
   - name: Getting system inventory
     local_action: >
-        idrac category=Inventory command=GetSystemInventory idracip={{idracip}}
-        idracuser={{idracuser}} idracpswd={{idracpswd}}
+        redfish category=Inventory command=GetSystemInventory hosturl={{hosturl}}
+        login={{login}} password={{password}}
     register: result
 
   - name: compare firmware inventory
     local_action: >
-        idrac category=Firmware command=FirmwareCompare idracip={{idracip}}
-        idracuser={{idracuser}} idracpswd={{idracpswd}}
+        redfish category=Firmware command=FirmwareCompare hosturl={{hosturl}}
+        login={{login}} password={{password}}
         Model={{result.result.Model|replace('PowerEdge ','')}}
     register: firmware
 
@@ -54,8 +54,8 @@
 
   - name: upload firmware images
     local_action: >
-        idrac category=Firmware command=UploadFirmware idracip={{idracip}}
-        idracuser={{idracuser}} idracpswd={{idracpswd}}
+        redfish category=Firmware command=UploadFirmware hosturl={{hosturl}}
+        login={{login}} password={{password}}
         FWPath=/tmp/firmware/{{ item.path | basename}}
     register: fw_available
     when:
@@ -72,8 +72,8 @@
 
   - name: install firmware image
     local_action: >
-        idrac category=Firmware command=InstallFirmware idracip={{idracip}} 
-        idracuser={{idracuser}} idracpswd={{idracpswd}}
+        redfish category=Firmware command=InstallFirmware hosturl={{hosturl}} 
+        login={{login}} password={{password}}
         InstallOption=NowAndReboot
     when: schedule_fw_update_job is defined 
 

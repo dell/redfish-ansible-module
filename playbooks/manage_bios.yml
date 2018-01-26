@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge BIOS
+  name: Manage BIOS
   gather_facts: False
 
   #         WARNING!             WARNING!             WARNING!
@@ -32,8 +32,8 @@
 
   - name: Get attributes
     local_action: >
-       idrac category=Bios command=GetAttributes idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Bios command=GetAttributes baseuri={{baseuri}}
+       login={{login}} password={{password}}
     register: result
     ignore_errors: yes
     tags: getattributes
@@ -50,8 +50,8 @@
 
   - name: Get device boot order
     local_action: >
-       idrac category=Bios command=GetBootOrder idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Bios command=GetBootOrder baseuri={{baseuri}}
+       login={{login}} password={{password}}
     register: result
     ignore_errors: yes
     tags: getbootorder
@@ -64,39 +64,39 @@
   # ------------------------------------------------------------------------
   - name: Set one-time boot device to {{bootdevice}}
     local_action: >
-       idrac category=Bios command=SetOneTimeBoot idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} bootdevice={{bootdevice}}
+       redfish category=Bios command=SetOneTimeBoot baseuri={{baseuri}}
+       login={{login}} password={{password}} bootdevice={{bootdevice}}
     ignore_errors: yes
     tags: setonetimebootdevice
 
   # ------------------------------------------------------------------------
   - name: Set default settings
     local_action: >
-       idrac category=Bios command=SetDefaultSettings idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Bios command=SetDefaultSettings baseuri={{baseuri}}
+       login={{login}} password={{password}}
     ignore_errors: yes
     tags: setdefaultsettings
 
   # ------------------------------------------------------------------------
   - name: Set BootMode to UEFI
     local_action: >
-       idrac category=Bios command=SetAttributes bios_attributes={'BootMode':'Uefi'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Bios command=SetAttributes bios_attributes={'BootMode':'Uefi'}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: bootmodeuefi
     ignore_errors: yes
     
   # ------------------------------------------------------------------------
   - name: Set BootMode to Legacy BIOS
     local_action: >
-       idrac category=Bios command=SetAttributes bios_attributes={'BootMode':'Bios'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Bios command=SetAttributes bios_attributes={'BootMode':'Bios'}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: bootmodelegacybios
     ignore_errors: yes
     
   # ------------------------------------------------------------------------
   - name: Schedule Config Job - REBOOT
     local_action: >
-      idrac category=Bios command=ConfigJob idracip={{idracip}}
-      idracuser={{idracuser}} idracpswd={{idracpswd}}
+      redfish category=Bios command=ConfigJob baseuri={{baseuri}}
+      login={{login}} password={{password}}
     tags: reboot
     ignore_errors: yes

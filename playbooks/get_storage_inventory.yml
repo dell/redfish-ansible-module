@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge storage inventory
+  name: Storage inventory
   gather_facts: False
 
   # You can use tags to run specific tasks.
@@ -22,8 +22,8 @@
 
   - name: Get storage controller inventory
     local_action: >
-       idrac category=Storage command=GetControllerInventory idracip={{idracip}}
-            idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Storage command=GetControllerInventory baseuri={{baseuri}}
+            login={{login}} password={{password}}
     register: result
     ignore_errors: yes
     tags: getcontrollerinventory
@@ -40,8 +40,8 @@
 
   - name: Get disk inventory
     local_action: >
-       idrac category=Storage command=GetDiskInventory idracip={{idracip}}
-            idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Storage command=GetDiskInventory baseuri={{baseuri}}
+            login={{login}} password={{password}}
     register: result
     ignore_errors: yes
     tags: getdiskinventory

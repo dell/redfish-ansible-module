@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC Manage Server Configuration Profile (SCP)
+  name: Manage Server Configuration Profile (SCP)
   gather_facts: False
 
   #         WARNING!             WARNING!             WARNING!
@@ -27,8 +27,8 @@
 
   - name: Export SCP file
     local_action: >
-       idrac category=SCP command=ExportSCP idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=SCP command=ExportSCP baseuri={{baseuri}}
+       login={{login}} password={{password}}
        sharehost={{sharehost}} sharename={{sharename}}
        shareuser={{shareuser}} sharepswd={{sharepswd}}
        hostname={{host}}
@@ -36,8 +36,8 @@
 
   - name: Import SCP file
     local_action: >
-       idrac category=SCP command=ImportSCP idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=SCP command=ImportSCP baseuri={{baseuri}}
+       login={{login}} password={{password}}
        sharehost={{sharehost}} sharename={{sharename}}
        shareuser={{shareuser}} sharepswd={{sharepswd}}
        scpfile={{scpfile}}

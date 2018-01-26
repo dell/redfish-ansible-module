@@ -1,7 +1,7 @@
 ---
 
 - hosts: myhosts
-  name: PowerEdge iDRAC Manage Users
+  name: Manage Users
   gather_facts: False
 
   #         WARNING!             WARNING!             WARNING!
@@ -33,8 +33,8 @@
 
   - name: List all iDRAC users
     local_action: >
-       idrac category=Users command=ListUsers idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} 
+       redfish category=Users command=ListUsers baseuri={{baseuri}}
+       login={{login}} password={{password}} 
     register: result
     tags: listusers
 
@@ -46,30 +46,30 @@
   # When adding a user, you must enable it afterwards
   - name: Add iDRAC user
     local_action: >
-       idrac category=Users command=AddUser idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} userid={{userid}}
+       redfish category=Users command=AddUser baseuri={{baseuri}}
+       login={{login}} password={{password}} userid={{userid}}
        username={{username}} userpswd={{userpswd}} userrole={{userrole}}
     tags: adduser
 
   - name: Enable iDRAC user
     local_action: >
-       idrac category=Users command=EnableUser idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} userid={{userid}}
+       redfish category=Users command=EnableUser baseuri={{baseuri}}
+       login={{login}} password={{password}} userid={{userid}}
     tags: [enableuser, adduser]
 
   # ------------------------------------------------------------------------
   - name: Update iDRAC user role
     local_action: >
-       idrac category=Users command=UpdateUserRole idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} userid={{userid}}
+       redfish category=Users command=UpdateUserRole baseuri={{baseuri}}
+       login={{login}} password={{password}} userid={{userid}}
        userrole={{userrole}}
     tags: updateuser
 
   # ------------------------------------------------------------------------
   - name: Update iDRAC user password
     local_action: >
-       idrac category=Users command=UpdateUserPassword idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} userid={{userid}}
+       redfish category=Users command=UpdateUserPassword baseuri={{baseuri}}
+       login={{login}} password={{password}} userid={{userid}}
        userpswd={{userpswd}}
     no_log: true
     tags: updatepassword
@@ -78,13 +78,13 @@
   # Before a user can be deleted, it must first be disabled
   - name: Disable iDRAC user
     local_action: >
-       idrac category=Users command=DisableUser idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} userid={{userid}}
+       redfish category=Users command=DisableUser baseuri={{baseuri}}
+       login={{login}} password={{password}} userid={{userid}}
     tags: [disableuser, deleteuser]
 
   - name: Delete iDRAC user
     local_action: >
-       idrac category=Users command=DeleteUser idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} userid={{userid}}
+       redfish category=Users command=DeleteUser baseuri={{baseuri}}
+       login={{login}} password={{password}} userid={{userid}}
     tags: deleteuser
 

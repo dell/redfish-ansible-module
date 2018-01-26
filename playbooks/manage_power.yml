@@ -1,7 +1,7 @@
 ---
 
 - hosts: myhosts
-  name: PowerEdge iDRAC Manage System Power
+  name: Manage System Power
   gather_facts: False
 
   #         WARNING!             WARNING!             WARNING!
@@ -26,29 +26,29 @@
   # ------------------------------------------------------------------------
   - name: Turn system power on
     local_action: >
-       idrac category=Power command=PowerOn idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Power command=PowerOn baseuri={{baseuri}}
+       login={{login}} password={{password}}
     tags: poweron
 
   # ------------------------------------------------------------------------
   - name: Turn system power off
     local_action: >
-       idrac category=Power command=PowerOff idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Power command=PowerOff baseuri={{baseuri}}
+       login={{login}} password={{password}}
     tags: poweroff
 
   # ------------------------------------------------------------------------
   - name: Graceful system power restart
     local_action: >
-       idrac category=Power command=GracefulRestart idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Power command=GracefulRestart baseuri={{baseuri}}
+       login={{login}} password={{password}}
     tags: gracefulrestart
 
   # ------------------------------------------------------------------------
   # 14G only
   - name: Graceful system power shutdown
     local_action: >
-       idrac category=Power command=GracefulShutdown idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Power command=GracefulShutdown baseuri={{baseuri}}
+       login={{login}} password={{password}}
     tags: gracefulshutdown
 

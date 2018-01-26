@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC Logs
+  name: System Logs
   gather_facts: False
 
   # You can use tags to run specific tasks.
@@ -22,8 +22,8 @@
 
   - name: Get SE Logs
     local_action: >
-       idrac category=Logs command=GetSELogs idracip={{ idracip }}
-            idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+       redfish category=Logs command=GetSELogs baseuri={{ baseuri }}
+            login={{ login }} password={{ password }}
     register: result
     tags: selogs
 
@@ -39,8 +39,8 @@
 
   - name: Get LC Logs
     local_action: >
-       idrac category=Logs command=GetLCLogs idracip={{ idracip }}
-            idracuser={{ idracuser }} idracpswd={{ idracpswd }}
+       redfish category=Logs command=GetLCLogs baseuri={{ baseuri }}
+            login={{ login }} password={{ password }}
     register: result
     tags: lclogs
 

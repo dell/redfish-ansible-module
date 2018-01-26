@@ -1,8 +1,8 @@
-# idrac - manage Dell EMC iDRAC using Redfish APIs
+# redfish
 
 ## Synopsis
 
-* Out-of-band management of Dell EMC PowerEdge servers
+* Out-of-band management using Redfish APIs
 
 ## Requirements
 
@@ -44,7 +44,7 @@
 
   - name: Getting system inventory
     local_action: >
-       idrac category=Inventory command=GetInventory idracip={{idracip}}
+       redfish category=Inventory command=GetInventory idracip={{idracip}}
        idracuser={{idracuser}} idracpswd={{idracpswd}}
     register: result
 
@@ -54,7 +54,7 @@
 
   - name: Update iDRAC user password
     local_action: >
-       idrac category=Users command=UpdateUserPassword idracip={{ idracip }}
+       redfish category=Users command=UpdateUserPassword idracip={{ idracip }}
        idracuser={{ idracuser }} idracpswd={{ idracpswd }} userid={{ userid }}
        userpswd={{ userpswd }}
     tags: updatepassword

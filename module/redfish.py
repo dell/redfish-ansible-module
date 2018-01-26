@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# (c) 2017, Dell EMC Inc.
-#
 # This file is part of Ansible
 #
 # Ansible is free software: you can redistribute it and/or modify
@@ -23,9 +21,9 @@ ANSIBLE_METADATA = {'status': ['preview'],
                     'metadata_version': '1.1'}
 
 DOCUMENTATION = """
-module: idrac
+module: redfish
 version_added: "2.3"
-short_description: Manage Dell EMC hardware through iDRAC Redfish APIs
+short_description: Out-Of-Band management using Redfish APIs
 options:
   category:
     required: true
@@ -37,41 +35,41 @@ options:
     default: None
     description:
       - Command to execute on server
-  idracip:
+  baseuri:
     required: true
     default: None
     description:
-      - iDRAC IP address
-  idracuser:
+      - Base URI of OOB controller
+  login:
     required: false
     default: root
     description:
-      - iDRAC user name used for authentication
-  idracpswd:
+      - Login for authentication with OOB controller
+  password:
     required: false
     default: calvin
     description:
-      - iDRAC user passwore used for authentication
+      - Password for authentication with OOB controller
   userid:
     required: false
     default: None
     description:
-      - ID of iDRAC user to add/delete/modify
+      - ID of user to add/delete/modify
   username:
     required: false
     default: None
     description:
-      - name of iDRAC user to add/delete/modify
+      - name of user to add/delete/modify
   userpswd:
     required: false
     default: None
     description:
-      - password of iDRAC user to add/delete/modify
+      - password of user to add/delete/modify
   userrole:
     required: false
     default: None
     description:
-      - role of iDRAC user to add/delete/modify
+      - role of user to add/delete/modify
   sharehost:
     required: false
     default: None
@@ -150,9 +148,9 @@ def main():
         argument_spec = dict(
             category   = dict(required=True, type='str', default=None),
             command    = dict(required=True, type='str', default=None),
-            idracip    = dict(required=True, type='str', default=None),
-            idracuser  = dict(required=False, type='str', default='root'),
-            idracpswd  = dict(required=False, type='str', default='calvin', no_log=True),
+            baseuri    = dict(required=True, type='str', default=None),
+            login      = dict(required=False, type='str', default='root'),
+            password   = dict(required=False, type='str', default='calvin', no_log=True),
             userid     = dict(required=False, type='str', default=None),
             username   = dict(required=False, type='str', default=None),
             userpswd   = dict(required=False, type='str', default=None, no_log=True),
@@ -183,9 +181,9 @@ def main():
     # Disable insecure-certificate-warning message
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-    IDRAC_INFO = { 'ip'   : params['idracip'],
-                   'user' : params['idracuser'],
-                   'pswd' : params['idracpswd']
+    CTRL_INFO = { 'ip'   : params['baseuri'],
+                  'user' : params['login'],
+                  'pswd' : params['password']
                  }
     SHARE_INFO = { 'host' : params['sharehost'],
                    'name' : params['sharename'],
@@ -199,7 +197,7 @@ def main():
                  }
 
     # Build initial URI
-    root_uri = "https://" + params['idracip']
+    root_uri = "https://" + params['baseuri']
 
     # Get token
     # token = 
@@ -211,105 +209,105 @@ def main():
     if category == "Inventory":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
         if command == "GetSystemInventory":
-            result = rf_utils.get_system_inventory(IDRAC_INFO, root_uri + rf_uri)
+            result = rf_utils.get_system_inventory(CTRL_INFO, root_uri + rf_uri)
         elif command == "GetPsuInventory":
-            result = rf_utils.get_psu_inventory(IDRAC_INFO, root_uri, rf_uri)
+            result = rf_utils.get_psu_inventory(CTRL_INFO, root_uri, rf_uri)
         elif command == "GetCpuInventory":
             rf_uri = "/redfish/v1/Systems/System.Embedded.1/Processors"
-            result = rf_utils.get_cpu_inventory(IDRAC_INFO, root_uri, rf_uri)
+            result = rf_utils.get_cpu_inventory(CTRL_INFO, root_uri, rf_uri)
         elif command == "GetNicInventory":
             rf_uri = "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/"
-            result = rf_utils.get_nic_inventory(IDRAC_INFO, root_uri, rf_uri)
+            result = rf_utils.get_nic_inventory(CTRL_INFO, root_uri, rf_uri)
         elif command == "GetFanInventory":
             rf_uri = "/redfish/v1/Chassis/System.Embedded.1/Thermal"
-            result = rf_utils.get_fan_inventory(IDRAC_INFO, root_uri + rf_uri)
+            result = rf_utils.get_fan_inventory(CTRL_INFO, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Firmware":
         rf_uri = "/redfish/v1/UpdateService/FirmwareInventory/"
         if command == "GetInventory":
-           result = rf_utils.get_firmware_inventory(IDRAC_INFO, root_uri, rf_uri)
+           result = rf_utils.get_firmware_inventory(CTRL_INFO, root_uri, rf_uri)
 	elif command == "UploadFirmware":
-            result = rf_utils.upload_firmware(IDRAC_INFO, root_uri, params['FWPath'])
+            result = rf_utils.upload_firmware(CTRL_INFO, root_uri, params['FWPath'])
 	elif command == "FirmwareCompare":
-            result = rf_utils.compare_firmware(IDRAC_INFO, root_uri, "/tmp/Catalog", params['Model'])
+            result = rf_utils.compare_firmware(CTRL_INFO, root_uri, "/tmp/Catalog", params['Model'])
         elif command == "InstallFirmware":
-            result = rf_utils.schedule_firmware_update(IDRAC_INFO, root_uri, params['InstallOption'])
+            result = rf_utils.schedule_firmware_update(CTRL_INFO, root_uri, params['InstallOption'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Logs":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "GetSELogs":
-            result = rf_utils.get_selogs(IDRAC_INFO, root_uri + rf_uri)
+            result = rf_utils.get_selogs(CTRL_INFO, root_uri + rf_uri)
         elif command == "GetLCLogs":
-            result = rf_utils.get_lclogs(IDRAC_INFO, root_uri + rf_uri)
+            result = rf_utils.get_lclogs(CTRL_INFO, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Users":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "ListUsers":
-            result = rf_utils.list_users(IDRAC_INFO, USER_INFO, root_uri, rf_uri)
+            result = rf_utils.list_users(CTRL_INFO, USER_INFO, root_uri, rf_uri)
         else:
-            result = rf_utils.manage_users(command, IDRAC_INFO, USER_INFO, root_uri, rf_uri)
+            result = rf_utils.manage_users(command, CTRL_INFO, USER_INFO, root_uri, rf_uri)
 
     elif category == "Power":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
-        result = rf_utils.manage_system_power(command, IDRAC_INFO, root_uri + rf_uri)
+        result = rf_utils.manage_system_power(command, CTRL_INFO, root_uri + rf_uri)
 
     elif category == "Storage":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/"
         if command == "GetControllerInventory":
-            result = rf_utils.get_stor_cont_info(IDRAC_INFO, root_uri, rf_uri)
+            result = rf_utils.get_stor_cont_info(CTRL_INFO, root_uri, rf_uri)
         elif command == "GetDiskInventory":
-            result = rf_utils.get_disk_info(IDRAC_INFO, root_uri, rf_uri)
+            result = rf_utils.get_disk_info(CTRL_INFO, root_uri, rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "SCP":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager"
         if command == "ExportSCP":
-            result = rf_utils.export_scp(IDRAC_INFO, SHARE_INFO, hostname, root_uri + rf_uri + ".ExportSystemConfiguration")
+            result = rf_utils.export_scp(CTRL_INFO, SHARE_INFO, hostname, root_uri + rf_uri + ".ExportSystemConfiguration")
         elif command == "ImportSCP":
-            result = rf_utils.import_scp(IDRAC_INFO, SHARE_INFO, scpfile, root_uri + rf_uri + ".ImportSystemConfiguration")
+            result = rf_utils.import_scp(CTRL_INFO, SHARE_INFO, scpfile, root_uri + rf_uri + ".ImportSystemConfiguration")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Bios":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         if command == "GetAttributes":
-            result = rf_utils.get_bios_attributes(IDRAC_INFO, root_uri + rf_uri)
+            result = rf_utils.get_bios_attributes(CTRL_INFO, root_uri + rf_uri)
         elif command == "GetBootOrder":
-            result = rf_utils.get_bios_boot_order(IDRAC_INFO, root_uri + rf_uri)
+            result = rf_utils.get_bios_boot_order(CTRL_INFO, root_uri + rf_uri)
         elif command == "SetOneTimeBoot":
-            result = rf_utils.set_one_time_boot_device(IDRAC_INFO, bootdevice, root_uri + rf_uri)
+            result = rf_utils.set_one_time_boot_device(CTRL_INFO, bootdevice, root_uri + rf_uri)
         elif command == "SetDefaultSettings":
             rf_uri = "/redfish/v1/Systems/System.Embedded.1/Bios/Actions/Bios.ResetBios/"
-            result = rf_utils.set_bios_default_settings(IDRAC_INFO, root_uri + rf_uri)
+            result = rf_utils.set_bios_default_settings(CTRL_INFO, root_uri + rf_uri)
         elif command == "SetAttributes":
 	    rf_uri = '/redfish/v1/Systems/System.Embedded.1/Bios/Settings'
-	    result = rf_utils.set_bios_attributes(IDRAC_INFO, root_uri + rf_uri, params['bios_attributes'])
+	    result = rf_utils.set_bios_attributes(CTRL_INFO, root_uri + rf_uri, params['bios_attributes'])
         elif command == "ConfigJob":
             rf_uri = '/redfish/v1/Managers/iDRAC.Embedded.1/Jobs'
-            result = rf_utils.create_bios_config_job(IDRAC_INFO, root_uri + rf_uri)
+            result = rf_utils.create_bios_config_job(CTRL_INFO, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Idrac":
         if command == "SetDefaultSettings":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/DellManager.ResetToDefaults"
-            result = rf_utils.set_idrac_default_settings(IDRAC_INFO, root_uri + rf_uri)
+            result = rf_utils.set_idrac_default_settings(CTRL_INFO, root_uri + rf_uri)
         elif command == "GracefulRestart":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-            result = rf_utils.restart_idrac_gracefully(IDRAC_INFO, root_uri + rf_uri)
+            result = rf_utils.restart_idrac_gracefully(CTRL_INFO, root_uri + rf_uri)
         elif command == "GetAttributes":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-            result = rf_utils.get_idrac_attributes(IDRAC_INFO, root_uri + rf_uri)
+            result = rf_utils.get_idrac_attributes(CTRL_INFO, root_uri + rf_uri)
         elif command == "SetAttributes":
             rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Attributes"
-            result = rf_utils.set_idrac_attributes(IDRAC_INFO, root_uri + rf_uri, params['idrac_attributes'])
+            result = rf_utils.set_idrac_attributes(CTRL_INFO, root_uri + rf_uri, params['idrac_attributes'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

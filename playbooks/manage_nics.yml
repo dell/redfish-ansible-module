@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge BIOS
+  name: Manage NICs
   gather_facts: False
 
   #         WARNING!             WARNING!             WARNING!
@@ -20,68 +20,76 @@
   # ------------------------------------------------------------------------
   - name: Enable PXE Boot for NIC1
     local_action: >
-       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev1EnDis':'Enabled'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Bios command=SetAttributes
+       bios_attributes={'PxeDev1EnDis':'Enabled'}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic1
     ignore_errors: yes
     
   - name: Disable PXE Boot for NIC1
     local_action: >
-       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev1EnDis':'Disabled'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Bios command=SetAttributes
+       bios_attributes={'PxeDev1EnDis':'Disabled'}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic1
     ignore_errors: yes
     
   # ------------------------------------------------------------------------
   - name: Enable PXE Boot for NIC2
     local_action: >
-       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev2EnDis':'Enabled'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Bios command=SetAttributes
+       bios_attributes={'PxeDev2EnDis':'Enabled'}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic2
     ignore_errors: yes
     
   - name: Disable PXE Boot for NIC2
     local_action: >
-       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev2EnDis':'Disabled'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Bios command=SetAttributes
+       bios_attributes={'PxeDev2EnDis':'Disabled'}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic2
     ignore_errors: yes
     
   # ------------------------------------------------------------------------
   - name: Enable PXE Boot for NIC3
     local_action: >
-       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev3EnDis':'Enabled'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Bios command=SetAttributes
+       bios_attributes={'PxeDev3EnDis':'Enabled'}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic3
     ignore_errors: yes
     
   - name: Disable PXE Boot for NIC3
     local_action: >
-       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev3EnDis':'Disabled'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Bios command=SetAttributes
+       bios_attributes={'PxeDev3EnDis':'Disabled'}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic3
     ignore_errors: yes
     
   # ------------------------------------------------------------------------
   - name: Enable PXE Boot for NIC4
     local_action: >
-       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev4EnDis':'Enabled'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Bios command=SetAttributes
+       bios_attributes={'PxeDev4EnDis':'Enabled'}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic4
     ignore_errors: yes
     
   - name: Disable PXE Boot for NIC4
     local_action: >
-       idrac category=Bios command=SetAttributes bios_attributes={'PxeDev4EnDis':'Disabled'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Bios command=SetAttributes
+       bios_attributes={'PxeDev4EnDis':'Disabled'}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic4
     ignore_errors: yes
 
   # ------------------------------------------------------------------------
   - name: Schedule Config Job - REBOOT
     local_action: >
-      idrac category=Bios command=ConfigJob idracip={{idracip}}
-      idracuser={{idracuser}} idracpswd={{idracpswd}}
+      redfish category=Bios command=ConfigJob baseuri={{baseuri}}
+      login={{login}} password={{password}}
     tags: reboot
     ignore_errors: yes
 

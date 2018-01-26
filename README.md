@@ -49,20 +49,20 @@ For more details on what options are available in each category, refer to this [
 
 ## Example
 
-Clone this repository. The idrac module is in the *module* directory, it can be left there (there is a symlink to it in the *playbooks* directory). If you move it, be sure to define the ANSIBLE_LIBRARY environment variable.
+Clone this repository. The redfish module is in the *module* directory, it can be left there (there is a symlink to it in the *playbooks* directory). If you move it, be sure to define the ANSIBLE_LIBRARY environment variable.
 
 The file */etc/ansible/hosts* should look like this:
 
 ```
 [myhosts]
-# hostname     iDRAC IP/NAME
-webserver1     idracip=192.168.0.101
-webserver2     idracip=192.168.0.102
-dbserver1      idracip=192.168.0.103
+# hostname     OOB controller IP/NAME
+webserver1     baseuri=192.168.0.101
+webserver2     baseuri=192.168.0.102
+dbserver1      baseuri=192.168.0.103
 ...
 ```
 
-The iDRAC IP is necessary as this is how we communicate with the host. We are not connecting to the host OS via ssh, but to the iDRAC via https, so be sure this information is correct. Please note that *idracip* can also be a DNS-resolvable name.
+The OOB controller (i.e. BMC, iDRAC, iLo) IP is necessary as this is how we communicate with the host. We are not connecting to the host OS via ssh, but to the OOB controller via https, so be sure this information is correct. Please note that *baseuri* can also be a DNS-resolvable name.
 
 The playbook names are self-explanatory, and they are the best source to learn how to use them. Every Redfish API supported by the Ansible module is included in the playbooks. If it's not in a playbook, a Redfish API has not been coded into the module yet.
 

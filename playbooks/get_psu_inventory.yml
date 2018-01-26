@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC Power Supply (PSU) Inventory
+  name: Power Supply (PSU) Inventory
   gather_facts: False
 
   tasks:
@@ -12,8 +12,8 @@
 
   - name: Get PSU Inventory
     local_action: >
-       idrac category=Inventory command=GetPsuInventory idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Inventory command=GetPsuInventory baseuri={{baseuri}}
+       login={{login}} password={{password}}
     register: result
     ignore_errors: yes
 

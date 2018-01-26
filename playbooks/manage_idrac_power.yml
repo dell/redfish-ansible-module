@@ -1,11 +1,8 @@
 ---
 
 - hosts: myhosts
-  name: PowerEdge iDRAC - Manage iDRAC Power
+  name: Manage iDRAC Power
   gather_facts: False
-
-  # I AM PLACING THIS TASK IN A SEPARATE PLAYOOK TO AVOID ACCIDENTAL IDRAC
-  # REBOOTS.
 
   # Commands available:
   #   GracefulRestart		Restart iDRAC gracefully
@@ -15,5 +12,5 @@
   # ------------------------------------------------------------------------
   - name: Idrac Power graceful restart
     local_action: >
-       idrac category=Idrac command=GracefulRestart
-       idracip={{idracip}} idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Idrac command=GracefulRestart
+       baseuri={{baseuri}} login={{login}} password={{password}}

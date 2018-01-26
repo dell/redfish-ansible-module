@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC Get System Inventory
+  name: System Inventory
   gather_facts: False
 
   tasks:
@@ -10,8 +10,8 @@
 
   - name: Getting system inventory
     local_action: >
-       idrac category=Inventory command=GetSystemInventory idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Inventory command=GetSystemInventory baseuri={{baseuri}}
+       login={{login}} password={{password}}
     register: result
 
   - name: Copy results to output file

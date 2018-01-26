@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC NIC Inventory
+  name: NIC Inventory
   gather_facts: False
 
   tasks:
@@ -10,8 +10,8 @@
 
   - name: Get NIC Information
     local_action: >
-       idrac category=Inventory command=GetNicInventory idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Inventory command=GetNicInventory baseuri={{baseuri}}
+       login={{login}} password={{password}}
     register: result
     ignore_errors: yes
 

@@ -1,7 +1,7 @@
 ---
 
 - hosts: myhosts
-  name: PowerEdge iDRAC - Manage iDRAC Settings
+  name: Manage iDRAC Settings
   gather_facts: False
 
   #         WARNING!             WARNING!             WARNING!
@@ -29,8 +29,8 @@
 
   - name: Get iDRAC attributes
     local_action: >
-       idrac category=Idrac command=GetAttributes idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Idrac command=GetAttributes baseuri={{baseuri}}
+       login={{login}} password={{password}}
     register: result
     ignore_errors: yes
     tags: getattributes
@@ -44,9 +44,9 @@
   # 14G only
   - name: Set Timezone
     local_action: >
-       idrac category=Idrac command=SetAttributes
+       redfish category=Idrac command=SetAttributes
        idrac_attributes={'Time.1.Timezone':'US/Central'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: settimezone
     ignore_errors: yes
 
@@ -54,17 +54,17 @@
   # 14G only
   - name: Enable NTP
     local_action: >
-       idrac category=Idrac command=SetAttributes
+       redfish category=Idrac command=SetAttributes
        idrac_attributes={'NTPConfigGroup.1.NTPEnable':'Enabled'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: enablentp
     ignore_errors: yes
 
   - name: Set NTP server
     local_action: >
-       idrac category=Idrac command=SetAttributes
+       redfish category=Idrac command=SetAttributes
        idrac_attributes={'NTPConfigGroup.1.NTP1':'ntp.server.com'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       login={{login}} password={{password}} baseuri={{baseuri}}
     tags: enablentp
     ignore_errors: yes
 
@@ -75,7 +75,7 @@
   # Resetting to default values will reset everything and reboot the iDRAC
   - name: Idrac set default settings
     local_action: >
-       idrac category=Idrac command=SetDefaultSettings
-       idracip={{idracip}} idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Idrac command=SetDefaultSettings
+       baseuri={{baseuri}} login={{login}} password={{password}}
     tags: setdefaultsettings
 
