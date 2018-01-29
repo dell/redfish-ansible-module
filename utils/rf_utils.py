@@ -132,7 +132,7 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
         return result
     
-    def get_stor_cont_info(self, creds, root_uri, rf_uri):
+    def get_storge_controller_info(self, creds, root_uri, rf_uri):
         result = {}
         controllers_details = []
     
@@ -340,11 +340,11 @@ class RedfishUtils(object):
     
         return result
     
-    def get_selogs(self, creds, root_uri):
+    def get_se_logs(self, creds, uri):
         # System Event logs
         result = {}
         allentries = []
-        response = self.send_get_request(creds, root_uri + "/Logs/Sel")
+        response = self.send_get_request(creds, uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -362,11 +362,11 @@ class RedfishUtils(object):
         # This looks like: result{allentries[entry{}]}
         return result
     
-    def get_lclogs(self, creds, root_uri):
+    def get_lc_logs(self, creds, uri):
         # Lifecycle Controller logs
         result = {}
         allentries = []
-        response = self.send_get_request(creds, root_uri + "/Logs/Lclog")
+        response = self.send_get_request(creds, uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -412,11 +412,13 @@ class RedfishUtils(object):
     
         return result
     
-    def compare_firmware(self, creds, root_uri, catalog_file, model):
+    # This function compares the firmware levels in the system vs. the firmware levels
+    # available in the Catalog.gz file that it downloaded from ftp.dell.com
+    def compare_firmware(self, creds, root_uri, rf_uri, catalog_file, model):
         fw = []
         fw_list = {'ret':True, 'Firmwares':[]}
     
-        response = self.send_get_request(creds, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
+        response = self.send_get_request(creds, root_uri + rf_uri)
     
         if response.status_code == 400:
             return { 'ret': False, 'msg': 'Not supported on this platform'}
@@ -450,9 +452,9 @@ class RedfishUtils(object):
             fw_list['ret'] = False
         return fw_list
     
-    def upload_firmware(self, creds, root_uri, FWPath):
+    def upload_firmware(self, creds, root_uri, rf_uri, FWPath):
         result = {}
-        response = self.send_get_request(creds, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
+        response = self.send_get_request(creds, root_uri + rf_uri)
     
         if response.status_code == 400:
             return { 'ret': False, 'msg': 'Not supported on this platform'}
@@ -466,19 +468,18 @@ class RedfishUtils(object):
     
         files = {'file': (os.path.basename(FWPath), open(FWPath, 'rb'), 'multipart/form-data')}
         headers = {"if-match": ETag}
-        url = root_uri + '/redfish/v1/UpdateService/FirmwareInventory'
     
         # Calling POST directly rather than use send_post_request() - look into it?
-        response = requests.post(url, files=files, auth=(creds['user'], creds['pswd']), headers=headers, verify=False)
+        response = requests.post(root_uri + rf_uri, files=files, auth=(creds['user'], creds['pswd']), headers=headers, verify=False)
         if response.status_code == 201:
             result = { 'ret': True, 'msg': 'Firmare uploaded successfully', 'Version': '%s' % str(response.json()['Version']), 'Location':'%s' % response.headers['Location']}
         else:
             result = { 'ret': False, 'msg': 'Error uploading firmware; status_code=%s' % response.status_code }
         return result
     
-    def schedule_firmware_update(self, creds, root_uri, InstallOption):
+    def schedule_firmware_update(self, creds, root_uri, rf_uri, InstallOption):
         fw = []
-        response = self.send_get_request(creds, root_uri + '/redfish/v1/UpdateService/FirmwareInventory/')
+        response = self.send_get_request(creds, root_uri + rf_uri)
     
         if response.status_code == 200:
             data = response.json()

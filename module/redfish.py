@@ -179,6 +179,8 @@ def main():
     hostname   = module.params['hostname']
     scpfile    = module.params['scpfile']
     bootdevice = module.params['bootdevice']
+
+    # admin credentials used for authentication
     creds = { 'user': module.params['user'],
               'pswd': module.params['password']
     }
@@ -202,19 +204,17 @@ def main():
     # Get token - This may only work on HP systems
     # creds["token"] = rf_utils.init_session(creds, root_uri + "/redfish/v1/SessionService/Sessions/")
 
-    # Execute based on what we want. Notice that some rf_uri values have an
-    # ending slash ('/') and other don't. It's all by design and depends on
-    # how the URI is used in each function.
+    # Organize actions by Categories / Commands
     if category == "Inventory":
-        rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
+        rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         if command == "GetSystemInventory":
             result = rf_utils.get_system_inventory(creds, root_uri + rf_uri)
         elif command == "GetPsuInventory":
             result = rf_utils.get_psu_inventory(creds, root_uri, rf_uri)
         elif command == "GetCpuInventory":
-            result = rf_utils.get_cpu_inventory(creds, root_uri, rf_uri + "Processors")
+            result = rf_utils.get_cpu_inventory(creds, root_uri, rf_uri + "/Processors")
         elif command == "GetNicInventory":
-            result = rf_utils.get_nic_inventory(creds, root_uri, rf_uri + "EthernetInterfaces")
+            result = rf_utils.get_nic_inventory(creds, root_uri, rf_uri + "/EthernetInterfaces")
         elif command == "GetFanInventory":
             rf_uri = "/redfish/v1/Chassis/System.Embedded.1/Thermal"
             result = rf_utils.get_fan_inventory(creds, root_uri + rf_uri)
@@ -222,24 +222,24 @@ def main():
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Firmware":
-        rf_uri = "/redfish/v1/UpdateService/FirmwareInventory/"
+        rf_uri = "/redfish/v1/UpdateService/FirmwareInventory"
         if command == "GetInventory":
-           result = rf_utils.get_firmware_inventory(creds, root_uri, rf_uri)
-	elif command == "UploadFirmware":
-            result = rf_utils.upload_firmware(creds, root_uri, module.params['FWPath'])
+            result = rf_utils.get_firmware_inventory(creds, root_uri, rf_uri)
 	elif command == "FirmwareCompare":
-            result = rf_utils.compare_firmware(creds, root_uri, "/tmp/Catalog", module.params['Model'])
+            result = rf_utils.compare_firmware(creds, root_uri, rf_uri, "/tmp/Catalog", module.params['Model'])
+	elif command == "UploadFirmware":
+            result = rf_utils.upload_firmware(creds, root_uri, rf_uri, module.params['FWPath'])
         elif command == "InstallFirmware":
-            result = rf_utils.schedule_firmware_update(creds, root_uri, module.params['InstallOption'])
+            result = rf_utils.schedule_firmware_update(creds, root_uri, rf_uri, module.params['InstallOption'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Logs":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "GetSELogs":
-            result = rf_utils.get_selogs(creds, root_uri + rf_uri)
+            result = rf_utils.get_se_logs(creds, root_uri + rf_uri + "/Logs/Sel")
         elif command == "GetLCLogs":
-            result = rf_utils.get_lclogs(creds, root_uri + rf_uri)
+            result = rf_utils.get_lc_logs(creds, root_uri + rf_uri + "/Logs/Lclog")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
@@ -257,7 +257,7 @@ def main():
     elif category == "Storage":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/"
         if command == "GetControllerInventory":
-            result = rf_utils.get_stor_cont_info(creds, root_uri, rf_uri)
+            result = rf_utils.get_storage_controller_info(creds, root_uri, rf_uri)
         elif command == "GetDiskInventory":
             result = rf_utils.get_disk_info(creds, root_uri, rf_uri)
         else:
