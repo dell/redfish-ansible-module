@@ -44,12 +44,24 @@ For more details on what options are available in each category, refer to this [
 
   - PowerEdge 12G/13G/14G servers (some features only available in 14G)
   - Minimum iDRAC 7/8/9 FW 2.40.40.40
-  - *requests* python library ("pip install requests")
-  - SMB share to place SCP files
 
-## Example
+## Installation
 
-Clone this repository. The redfish module is in the *module* directory, it can be left there (there is a symlink to it in the *playbooks* directory). If you move it, be sure to define the ANSIBLE_LIBRARY environment variable.
+  - Clone this repository
+
+```
+$ git clone https://github.com/dell/idrac-ansible-module
+```
+  - Install Ansible + required Python libraries
+```
+pip install requirements.txt```
+```
+  - Copy modules to default Ansible module location
+```
+$ python install.py
+```
+
+## Examples
 
 The file */etc/ansible/hosts* should look like this:
 
