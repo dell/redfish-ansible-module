@@ -47,16 +47,15 @@ For more details on what options are available in each category, refer to this [
 
 ## Installation
 
-  - Clone this repository
-
+Clone this repository:
 ```
 $ git clone https://github.com/dell/idrac-ansible-module
 ```
-  - Install Ansible + required Python libraries
+Install Ansible + required Python libraries (make sure you have the proper repositories available):
 ```
-pip install requirements.txt```
+pip install requirements.txt
 ```
-  - Copy modules to default Ansible module location
+Copy module to default system location:
 ```
 $ python install.py
 ```
@@ -83,7 +82,7 @@ The playbook names are self-explanatory, and they are the best source to learn h
 $ cd playbooks
 $ ansible-playbook get_system_inventory.yml
   ...
-PLAY [PowerEdge iDRAC Get System Inventory] ************************************
+PLAY [Get System Inventory] ****************************************************
 
 TASK [Define timestamp] ********************************************************
 ok: [webserver1]
