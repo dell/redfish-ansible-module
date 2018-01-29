@@ -30,7 +30,7 @@
   - name: Get iDRAC attributes
     local_action: >
        redfish category=Idrac command=GetAttributes baseuri={{baseuri}}
-       login={{login}} password={{password}}
+       user={{user}} password={{password}}
     register: result
     ignore_errors: yes
     tags: getattributes
@@ -46,7 +46,7 @@
     local_action: >
        redfish category=Idrac command=SetAttributes
        idrac_attributes={'Time.1.Timezone':'US/Central'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: settimezone
     ignore_errors: yes
 
@@ -56,7 +56,7 @@
     local_action: >
        redfish category=Idrac command=SetAttributes
        idrac_attributes={'NTPConfigGroup.1.NTPEnable':'Enabled'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: enablentp
     ignore_errors: yes
 
@@ -64,7 +64,7 @@
     local_action: >
        redfish category=Idrac command=SetAttributes
        idrac_attributes={'NTPConfigGroup.1.NTP1':'ntp.server.com'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: enablentp
     ignore_errors: yes
 
@@ -76,6 +76,6 @@
   - name: Idrac set default settings
     local_action: >
        redfish category=Idrac command=SetDefaultSettings
-       baseuri={{baseuri}} login={{login}} password={{password}}
+       baseuri={{baseuri}} user={{user}} password={{password}}
     tags: setdefaultsettings
 

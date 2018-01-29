@@ -34,7 +34,7 @@
   - name: List all iDRAC users
     local_action: >
        redfish category=Users command=ListUsers baseuri={{baseuri}}
-       login={{login}} password={{password}} 
+       user={{user}} password={{password}} 
     register: result
     tags: listusers
 
@@ -47,21 +47,21 @@
   - name: Add iDRAC user
     local_action: >
        redfish category=Users command=AddUser baseuri={{baseuri}}
-       login={{login}} password={{password}} userid={{userid}}
+       user={{user}} password={{password}} userid={{userid}}
        username={{username}} userpswd={{userpswd}} userrole={{userrole}}
     tags: adduser
 
   - name: Enable iDRAC user
     local_action: >
        redfish category=Users command=EnableUser baseuri={{baseuri}}
-       login={{login}} password={{password}} userid={{userid}}
+       user={{user}} password={{password}} userid={{userid}}
     tags: [enableuser, adduser]
 
   # ------------------------------------------------------------------------
   - name: Update iDRAC user role
     local_action: >
        redfish category=Users command=UpdateUserRole baseuri={{baseuri}}
-       login={{login}} password={{password}} userid={{userid}}
+       user={{user}} password={{password}} userid={{userid}}
        userrole={{userrole}}
     tags: updateuser
 
@@ -69,7 +69,7 @@
   - name: Update iDRAC user password
     local_action: >
        redfish category=Users command=UpdateUserPassword baseuri={{baseuri}}
-       login={{login}} password={{password}} userid={{userid}}
+       user={{user}} password={{password}} userid={{userid}}
        userpswd={{userpswd}}
     no_log: true
     tags: updatepassword
@@ -79,12 +79,12 @@
   - name: Disable iDRAC user
     local_action: >
        redfish category=Users command=DisableUser baseuri={{baseuri}}
-       login={{login}} password={{password}} userid={{userid}}
+       user={{user}} password={{password}} userid={{userid}}
     tags: [disableuser, deleteuser]
 
   - name: Delete iDRAC user
     local_action: >
        redfish category=Users command=DeleteUser baseuri={{baseuri}}
-       login={{login}} password={{password}} userid={{userid}}
+       user={{user}} password={{password}} userid={{userid}}
     tags: deleteuser
 

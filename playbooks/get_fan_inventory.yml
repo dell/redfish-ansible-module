@@ -14,7 +14,7 @@
   - name: Get fans statistics
     local_action: >
        redfish category=Inventory command=GetFanInventory baseuri={{baseuri}}
-       login={{login}} password={{password}}
+       user={{user}} password={{password}}
     register: result
     ignore_errors: yes
 

@@ -5,7 +5,7 @@
 # for each individual host
 
 # iDRAC credentials (using default values)
-login: root
+user: root
 password: calvin
 
 # Local directory where all results are placed

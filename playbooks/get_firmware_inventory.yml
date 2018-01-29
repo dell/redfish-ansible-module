@@ -11,7 +11,7 @@
   - name: Get Firmware Inventory
     local_action: >
        redfish category=Firmware command=GetInventory baseuri={{baseuri}}
-       login={{login}} password={{password}}
+       user={{user}} password={{password}}
     register: result
     ignore_errors: yes
 

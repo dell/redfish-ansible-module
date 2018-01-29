@@ -13,4 +13,4 @@
   - name: Idrac Power graceful restart
     local_action: >
        redfish category=Idrac command=GracefulRestart
-       baseuri={{baseuri}} login={{login}} password={{password}}
+       baseuri={{baseuri}} user={{user}} password={{password}}

@@ -22,7 +22,7 @@
     local_action: >
        redfish category=Bios command=SetAttributes
        bios_attributes={'PxeDev1EnDis':'Enabled'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic1
     ignore_errors: yes
     
@@ -30,7 +30,7 @@
     local_action: >
        redfish category=Bios command=SetAttributes
        bios_attributes={'PxeDev1EnDis':'Disabled'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic1
     ignore_errors: yes
     
@@ -39,7 +39,7 @@
     local_action: >
        redfish category=Bios command=SetAttributes
        bios_attributes={'PxeDev2EnDis':'Enabled'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic2
     ignore_errors: yes
     
@@ -47,7 +47,7 @@
     local_action: >
        redfish category=Bios command=SetAttributes
        bios_attributes={'PxeDev2EnDis':'Disabled'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic2
     ignore_errors: yes
     
@@ -56,7 +56,7 @@
     local_action: >
        redfish category=Bios command=SetAttributes
        bios_attributes={'PxeDev3EnDis':'Enabled'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic3
     ignore_errors: yes
     
@@ -64,7 +64,7 @@
     local_action: >
        redfish category=Bios command=SetAttributes
        bios_attributes={'PxeDev3EnDis':'Disabled'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic3
     ignore_errors: yes
     
@@ -73,7 +73,7 @@
     local_action: >
        redfish category=Bios command=SetAttributes
        bios_attributes={'PxeDev4EnDis':'Enabled'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic4
     ignore_errors: yes
     
@@ -81,7 +81,7 @@
     local_action: >
        redfish category=Bios command=SetAttributes
        bios_attributes={'PxeDev4EnDis':'Disabled'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic4
     ignore_errors: yes
 
@@ -89,7 +89,7 @@
   - name: Schedule Config Job - REBOOT
     local_action: >
       redfish category=Bios command=ConfigJob baseuri={{baseuri}}
-      login={{login}} password={{password}}
+      user={{user}} password={{password}}
     tags: reboot
     ignore_errors: yes
 

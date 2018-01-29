@@ -23,7 +23,7 @@
   - name: Get storage controller inventory
     local_action: >
        redfish category=Storage command=GetControllerInventory baseuri={{baseuri}}
-            login={{login}} password={{password}}
+            user={{user}} password={{password}}
     register: result
     ignore_errors: yes
     tags: getcontrollerinventory
@@ -41,7 +41,7 @@
   - name: Get disk inventory
     local_action: >
        redfish category=Storage command=GetDiskInventory baseuri={{baseuri}}
-            login={{login}} password={{password}}
+            user={{user}} password={{password}}
     register: result
     ignore_errors: yes
     tags: getdiskinventory

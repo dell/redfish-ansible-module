@@ -11,7 +11,7 @@
   - name: Get NIC Information
     local_action: >
        redfish category=Inventory command=GetNicInventory baseuri={{baseuri}}
-       login={{login}} password={{password}}
+       user={{user}} password={{password}}
     register: result
     ignore_errors: yes
 

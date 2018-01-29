@@ -28,7 +28,7 @@
   - name: Export SCP file
     local_action: >
        redfish category=SCP command=ExportSCP baseuri={{baseuri}}
-       login={{login}} password={{password}}
+       user={{user}} password={{password}}
        sharehost={{sharehost}} sharename={{sharename}}
        shareuser={{shareuser}} sharepswd={{sharepswd}}
        hostname={{host}}
@@ -37,7 +37,7 @@
   - name: Import SCP file
     local_action: >
        redfish category=SCP command=ImportSCP baseuri={{baseuri}}
-       login={{login}} password={{password}}
+       user={{user}} password={{password}}
        sharehost={{sharehost}} sharename={{sharename}}
        shareuser={{shareuser}} sharepswd={{sharepswd}}
        scpfile={{scpfile}}

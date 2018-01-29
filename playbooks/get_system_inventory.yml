@@ -11,7 +11,7 @@
   - name: Getting system inventory
     local_action: >
        redfish category=Inventory command=GetSystemInventory baseuri={{baseuri}}
-       login={{login}} password={{password}}
+       user={{user}} password={{password}}
     register: result
 
   - name: Copy results to output file

@@ -23,7 +23,7 @@
   - name: Get SE Logs
     local_action: >
        redfish category=Logs command=GetSELogs baseuri={{ baseuri }}
-            login={{ login }} password={{ password }}
+            user={{ user }} password={{ password }}
     register: result
     tags: selogs
 
@@ -40,7 +40,7 @@
   - name: Get LC Logs
     local_action: >
        redfish category=Logs command=GetLCLogs baseuri={{ baseuri }}
-            login={{ login }} password={{ password }}
+            user={{ user }} password={{ password }}
     register: result
     tags: lclogs
 

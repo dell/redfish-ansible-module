@@ -40,11 +40,11 @@ options:
     default: None
     description:
       - Base URI of OOB controller
-  login:
+  user:
     required: false
     default: root
     description:
-      - Login for authentication with OOB controller
+      - User for authentication with OOB controller
   password:
     required: false
     default: calvin
@@ -149,7 +149,7 @@ def main():
             category   = dict(required=True, type='str', default=None),
             command    = dict(required=True, type='str', default=None),
             baseuri    = dict(required=True, type='str', default=None),
-            login      = dict(required=False, type='str', default='root'),
+            user       = dict(required=False, type='str', default='root'),
             password   = dict(required=False, type='str', default='calvin', no_log=True),
             userid     = dict(required=False, type='str', default=None),
             username   = dict(required=False, type='str', default=None),
@@ -179,10 +179,10 @@ def main():
     hostname   = module.params['hostname']
     scpfile    = module.params['scpfile']
     bootdevice = module.params['bootdevice']
-    CTRL_INFO = { 'ip'   : module.params['baseuri'],
-                  'user' : module.params['login'],
-                  'pswd' : module.params['password']
-                 }
+    creds = {
+        'user': module.params['user'],
+        'pswd': module.params['password']
+    }
     SHARE_INFO = { 'host' : module.params['sharehost'],
                    'name' : module.params['sharename'],
                    'user' : module.params['shareuser'],
@@ -194,15 +194,8 @@ def main():
                   'userrole' : module.params['userrole']
                  }
 
-    # create Redfish session
-    creds = {
-        'user': module.params['login'],
-        'pswd': module.params['password']
-    }
-
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
-
     rf_utils = RedfishUtils()
 
     # Get token - This may only work on HP systems
@@ -214,98 +207,98 @@ def main():
     if category == "Inventory":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
         if command == "GetSystemInventory":
-            result = rf_utils.get_system_inventory(CTRL_INFO, root_uri + rf_uri)
+            result = rf_utils.get_system_inventory(creds, root_uri + rf_uri)
         elif command == "GetPsuInventory":
-            result = rf_utils.get_psu_inventory(CTRL_INFO, root_uri, rf_uri)
+            result = rf_utils.get_psu_inventory(creds, root_uri, rf_uri)
         elif command == "GetCpuInventory":
-            result = rf_utils.get_cpu_inventory(CTRL_INFO, root_uri, rf_uri + "Processors")
+            result = rf_utils.get_cpu_inventory(creds, root_uri, rf_uri + "Processors")
         elif command == "GetNicInventory":
-            result = rf_utils.get_nic_inventory(CTRL_INFO, root_uri, rf_uri + "EthernetInterfaces")
+            result = rf_utils.get_nic_inventory(creds, root_uri, rf_uri + "EthernetInterfaces")
         elif command == "GetFanInventory":
             rf_uri = "/redfish/v1/Chassis/System.Embedded.1/Thermal"
-            result = rf_utils.get_fan_inventory(CTRL_INFO, root_uri + rf_uri)
+            result = rf_utils.get_fan_inventory(creds, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Firmware":
         rf_uri = "/redfish/v1/UpdateService/FirmwareInventory/"
         if command == "GetInventory":
-           result = rf_utils.get_firmware_inventory(CTRL_INFO, root_uri, rf_uri)
+           result = rf_utils.get_firmware_inventory(creds, root_uri, rf_uri)
 	elif command == "UploadFirmware":
-            result = rf_utils.upload_firmware(CTRL_INFO, root_uri, module.params['FWPath'])
+            result = rf_utils.upload_firmware(creds, root_uri, module.params['FWPath'])
 	elif command == "FirmwareCompare":
-            result = rf_utils.compare_firmware(CTRL_INFO, root_uri, "/tmp/Catalog", module.params['Model'])
+            result = rf_utils.compare_firmware(creds, root_uri, "/tmp/Catalog", module.params['Model'])
         elif command == "InstallFirmware":
-            result = rf_utils.schedule_firmware_update(CTRL_INFO, root_uri, module.params['InstallOption'])
+            result = rf_utils.schedule_firmware_update(creds, root_uri, module.params['InstallOption'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Logs":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "GetSELogs":
-            result = rf_utils.get_selogs(CTRL_INFO, root_uri + rf_uri)
+            result = rf_utils.get_selogs(creds, root_uri + rf_uri)
         elif command == "GetLCLogs":
-            result = rf_utils.get_lclogs(CTRL_INFO, root_uri + rf_uri)
+            result = rf_utils.get_lclogs(creds, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Users":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "ListUsers":
-            result = rf_utils.list_users(CTRL_INFO, USER_INFO, root_uri, rf_uri)
+            result = rf_utils.list_users(creds, USER_INFO, root_uri, rf_uri)
         else:
-            result = rf_utils.manage_users(command, CTRL_INFO, USER_INFO, root_uri, rf_uri)
+            result = rf_utils.manage_users(command, creds, USER_INFO, root_uri, rf_uri)
 
     elif category == "Power":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
-        result = rf_utils.manage_system_power(command, CTRL_INFO, root_uri + rf_uri)
+        result = rf_utils.manage_system_power(command, creds, root_uri + rf_uri)
 
     elif category == "Storage":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/"
         if command == "GetControllerInventory":
-            result = rf_utils.get_stor_cont_info(CTRL_INFO, root_uri, rf_uri)
+            result = rf_utils.get_stor_cont_info(creds, root_uri, rf_uri)
         elif command == "GetDiskInventory":
-            result = rf_utils.get_disk_info(CTRL_INFO, root_uri, rf_uri)
+            result = rf_utils.get_disk_info(creds, root_uri, rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "SCP":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager"
         if command == "ExportSCP":
-            result = rf_utils.export_scp(CTRL_INFO, SHARE_INFO, hostname, root_uri + rf_uri + ".ExportSystemConfiguration")
+            result = rf_utils.export_scp(creds, SHARE_INFO, hostname, root_uri + rf_uri + ".ExportSystemConfiguration")
         elif command == "ImportSCP":
-            result = rf_utils.import_scp(CTRL_INFO, SHARE_INFO, scpfile, root_uri + rf_uri + ".ImportSystemConfiguration")
+            result = rf_utils.import_scp(creds, SHARE_INFO, scpfile, root_uri + rf_uri + ".ImportSystemConfiguration")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Bios":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         if command == "GetAttributes":
-            result = rf_utils.get_bios_attributes(CTRL_INFO, root_uri + rf_uri)
+            result = rf_utils.get_bios_attributes(creds, root_uri + rf_uri)
         elif command == "GetBootOrder":
-            result = rf_utils.get_bios_boot_order(CTRL_INFO, root_uri + rf_uri)
+            result = rf_utils.get_bios_boot_order(creds, root_uri + rf_uri)
         elif command == "SetOneTimeBoot":
-            result = rf_utils.set_one_time_boot_device(CTRL_INFO, bootdevice, root_uri + rf_uri)
+            result = rf_utils.set_one_time_boot_device(creds, bootdevice, root_uri + rf_uri)
         elif command == "SetDefaultSettings":
-            result = rf_utils.set_bios_default_settings(CTRL_INFO, root_uri + rf_uri + "/Bios/Actions/Bios.ResetBios")
+            result = rf_utils.set_bios_default_settings(creds, root_uri + rf_uri + "/Bios/Actions/Bios.ResetBios")
         elif command == "SetAttributes":
-	    result = rf_utils.set_bios_attributes(CTRL_INFO, root_uri + rf_uri + "/Bios/Settings", module.params['bios_attributes'])
+	    result = rf_utils.set_bios_attributes(creds, root_uri + rf_uri + "/Bios/Settings", module.params['bios_attributes'])
         elif command == "ConfigJob":
             rf_uri = '/redfish/v1/Managers/iDRAC.Embedded.1/Jobs'
-            result = rf_utils.create_bios_config_job(CTRL_INFO, root_uri + rf_uri)
+            result = rf_utils.create_bios_config_job(creds, root_uri + rf_uri)
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Idrac":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "SetDefaultSettings":
-            result = rf_utils.set_idrac_default_settings(CTRL_INFO, root_uri + rf_uri + "/Actions/Oem/DellManager.ResetToDefaults")
+            result = rf_utils.set_idrac_default_settings(creds, root_uri + rf_uri + "/Actions/Oem/DellManager.ResetToDefaults")
         elif command == "GracefulRestart":
-            result = rf_utils.restart_idrac_gracefully(CTRL_INFO, root_uri + rf_uri)
+            result = rf_utils.restart_idrac_gracefully(creds, root_uri + rf_uri)
         elif command == "GetAttributes":
-            result = rf_utils.get_idrac_attributes(CTRL_INFO, root_uri + rf_uri)
+            result = rf_utils.get_idrac_attributes(creds, root_uri + rf_uri)
         elif command == "SetAttributes":
-            result = rf_utils.set_idrac_attributes(CTRL_INFO, root_uri + rf_uri + "/Attributes", module.params['idrac_attributes'])
+            result = rf_utils.set_idrac_attributes(creds, root_uri + rf_uri + "/Attributes", module.params['idrac_attributes'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

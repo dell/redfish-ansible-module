@@ -33,7 +33,7 @@
   - name: Get attributes
     local_action: >
        redfish category=Bios command=GetAttributes baseuri={{baseuri}}
-       login={{login}} password={{password}}
+       user={{user}} password={{password}}
     register: result
     ignore_errors: yes
     tags: getattributes
@@ -51,7 +51,7 @@
   - name: Get device boot order
     local_action: >
        redfish category=Bios command=GetBootOrder baseuri={{baseuri}}
-       login={{login}} password={{password}}
+       user={{user}} password={{password}}
     register: result
     ignore_errors: yes
     tags: getbootorder
@@ -65,7 +65,7 @@
   - name: Set one-time boot device to {{bootdevice}}
     local_action: >
        redfish category=Bios command=SetOneTimeBoot baseuri={{baseuri}}
-       login={{login}} password={{password}} bootdevice={{bootdevice}}
+       user={{user}} password={{password}} bootdevice={{bootdevice}}
     ignore_errors: yes
     tags: setonetimebootdevice
 
@@ -73,7 +73,7 @@
   - name: Set default settings
     local_action: >
        redfish category=Bios command=SetDefaultSettings baseuri={{baseuri}}
-       login={{login}} password={{password}}
+       user={{user}} password={{password}}
     ignore_errors: yes
     tags: setdefaultsettings
 
@@ -81,7 +81,7 @@
   - name: Set BootMode to UEFI
     local_action: >
        redfish category=Bios command=SetAttributes bios_attributes={'BootMode':'Uefi'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: bootmodeuefi
     ignore_errors: yes
     
@@ -89,7 +89,7 @@
   - name: Set BootMode to Legacy BIOS
     local_action: >
        redfish category=Bios command=SetAttributes bios_attributes={'BootMode':'Bios'}
-       login={{login}} password={{password}} baseuri={{baseuri}}
+       user={{user}} password={{password}} baseuri={{baseuri}}
     tags: bootmodelegacybios
     ignore_errors: yes
     
@@ -97,6 +97,6 @@
   - name: Schedule Config Job - REBOOT
     local_action: >
       redfish category=Bios command=ConfigJob baseuri={{baseuri}}
-      login={{login}} password={{password}}
+      user={{user}} password={{password}}
     tags: reboot
     ignore_errors: yes
