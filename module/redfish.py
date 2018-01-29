@@ -179,20 +179,21 @@ def main():
     hostname   = module.params['hostname']
     scpfile    = module.params['scpfile']
     bootdevice = module.params['bootdevice']
-    creds = {
-        'user': module.params['user'],
-        'pswd': module.params['password']
+    creds = { 'user': module.params['user'],
+              'pswd': module.params['password']
     }
-    SHARE_INFO = { 'host' : module.params['sharehost'],
+    # share information for exporting/importing SCP files
+    share = { 'host' : module.params['sharehost'],
                    'name' : module.params['sharename'],
                    'user' : module.params['shareuser'],
                    'pswd' : module.params['sharepswd']
-                 }
-    USER_INFO = { 'userid'   : module.params['userid'],
-                  'username' : module.params['username'],
-                  'userpswd' : module.params['userpswd'],
-                  'userrole' : module.params['userrole']
-                 }
+    }
+    # user to add/modify/delete
+    user = { 'userid'   : module.params['userid'],
+             'username' : module.params['username'],
+             'userpswd' : module.params['userpswd'],
+             'userrole' : module.params['userrole']
+    }
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
@@ -245,9 +246,9 @@ def main():
     elif category == "Users":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "ListUsers":
-            result = rf_utils.list_users(creds, USER_INFO, root_uri, rf_uri)
+            result = rf_utils.list_users(creds, user, root_uri, rf_uri)
         else:
-            result = rf_utils.manage_users(command, creds, USER_INFO, root_uri, rf_uri)
+            result = rf_utils.manage_users(command, creds, user, root_uri, rf_uri)
 
     elif category == "Power":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
@@ -265,9 +266,9 @@ def main():
     elif category == "SCP":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager"
         if command == "ExportSCP":
-            result = rf_utils.export_scp(creds, SHARE_INFO, hostname, root_uri + rf_uri + ".ExportSystemConfiguration")
+            result = rf_utils.export_scp(creds, share, hostname, root_uri + rf_uri + ".ExportSystemConfiguration")
         elif command == "ImportSCP":
-            result = rf_utils.import_scp(creds, SHARE_INFO, scpfile, root_uri + rf_uri + ".ImportSystemConfiguration")
+            result = rf_utils.import_scp(creds, share, scpfile, root_uri + rf_uri + ".ImportSystemConfiguration")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

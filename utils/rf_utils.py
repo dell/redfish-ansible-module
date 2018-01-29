@@ -55,10 +55,10 @@ class RedfishUtils(object):
             raise			# Do we let module exit or should we return an error value?
         return response
     
-    def send_patch_request(self, idrac, uri, pyld, hdrs):
+    def send_patch_request(self, creds, uri, pyld, hdrs):
         try:
             response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,
-                               verify=False, auth=(idrac['user'], idrac['pswd']))
+                               verify=False, auth=(creds['user'], creds['pswd']))
         except:
             raise			# Do we let module exit or should we return an error value?
         return response
@@ -72,15 +72,15 @@ class RedfishUtils(object):
         token = response.headers["X-Auth-Token"]
         return token
 
-    def import_scp(self, creds, SHARE_INFO, scpfile, root_uri):
+    def import_scp(self, creds, share, scpfile, root_uri):
         result = {}
         payload = { "ShutdownType" : "Forced",
                     "ShareParameters" : { "Target" : "ALL",
                          "ShareType" : "CIFS",
-                         "IPAddress" : SHARE_INFO['host'],
-                         "ShareName" : SHARE_INFO['name'],
-                         "UserName"  : SHARE_INFO['user'],
-                         "Password"  : SHARE_INFO['pswd'],
+                         "IPAddress" : share['host'],
+                         "ShareName" : share['name'],
+                         "UserName"  : share['user'],
+                         "Password"  : share['pswd'],
                          "FileName"  : scpfile }
                   }
         response = self.send_post_request(creds, root_uri, payload, HEADERS)
@@ -101,7 +101,7 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
         return result
     
-    def export_scp(self, creds, SHARE_INFO, hostname, root_uri):
+    def export_scp(self, creds, share, hostname, root_uri):
         result = {}
         # timestamp to add to SCP XML file name
         ts = str(datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S"))
@@ -109,10 +109,10 @@ class RedfishUtils(object):
                     "ExportUse" : "Default",
                     "ShareParameters" : { "Target" : "ALL",
                          "ShareType" : "CIFS",
-                         "IPAddress" : SHARE_INFO['host'],
-                         "ShareName" : SHARE_INFO['name'],
-                         "UserName"  : SHARE_INFO['user'],
-                         "Password"  : SHARE_INFO['pswd'],
+                         "IPAddress" : share['host'],
+                         "ShareName" : share['name'],
+                         "UserName"  : share['user'],
+                         "Password"  : share['pswd'],
                          "FileName"  : hostname + "_SCP_" + ts + ".xml" }
                   }
         response = self.send_post_request(creds, root_uri, payload, HEADERS)
@@ -249,7 +249,7 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def list_users(self, creds, USER_INFO, root_uri, rf_uri):
+    def list_users(self, creds, user, root_uri, rf_uri):
         result = {}
         uri = root_uri + rf_uri + "/Accounts/"
         allusers = []
@@ -279,16 +279,16 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def manage_users(self, command, creds, USER_INFO, root_uri, rf_uri):
+    def manage_users(self, command, creds, user, root_uri, rf_uri):
         result = {}
-        uri = root_uri + rf_uri + "/Accounts/" + USER_INFO['userid']
+        uri = root_uri + rf_uri + "/Accounts/" + user['userid']
     
         if command == "AddUser":
-            user    = {'UserName': USER_INFO['username']}
-            pswd    = {'Password': USER_INFO['userpswd']}
-            roleid  = {'RoleId': USER_INFO['userrole']}
-            enabled = {'Enabled': True}
-            for payload in user,pswd,roleid,enabled:
+            username = {'UserName': user['username']}
+            pswd     = {'Password': user['userpswd']}
+            roleid   = {'RoleId': user['userrole']}
+            enabled  = {'Enabled': True}
+            for payload in username,pswd,roleid,enabled:
                 response = self.send_patch_request(creds, uri, payload, HEADERS)
                 if response.status_code == 200:		# success
                     result['ret'] = True
@@ -312,7 +312,7 @@ class RedfishUtils(object):
                 result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     
         elif command == "UpdateUserRole":
-            payload = {'RoleId': USER_INFO['userrole']}
+            payload = {'RoleId': user['userrole']}
             response = self.send_patch_request(creds, uri, payload, HEADERS)
             if response.status_code == 200:		# success
                 result['ret'] = True
@@ -320,7 +320,7 @@ class RedfishUtils(object):
                 result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
     
         elif command == "UpdateUserPassword":
-            payload = {'Password': USER_INFO['userpswd']}
+            payload = {'Password': user['userpswd']}
             response = self.send_patch_request(creds, uri, payload, HEADERS)
             if response.status_code == 200:		# success
                 result['ret'] = True
