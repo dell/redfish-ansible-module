@@ -35,20 +35,23 @@ class RedfishUtils(object):
     def __init__(self):
         return
 
-#   def get_auth_token(self, CTRL_INFO):
-#       return token
-
-    def send_get_request(self, idrac, uri):
+    def send_get_request(self, creds, uri):
+        headers = {}
+        if 'token' in creds:
+            headers = {"X-Auth-Token": creds['token']}
         try:
-            response = requests.get(uri, verify=False, auth=(idrac['user'], idrac['pswd']))
+            response = requests.get(uri, headers, verify=False, auth=(creds['user'], creds['pswd']))
         except:
             raise			# Do we let module exit or should we return an error value?
         return response
     
-    def send_post_request(self, idrac, uri, pyld, hdrs,fileName=None):
+    def send_post_request(self, creds, uri, pyld, hdrs, fileName=None):
+        headers = {}
+        if 'token' in creds:
+            headers = {"X-Auth-Token": creds['token']}
         try:
-            response = requests.post(uri, data=json.dumps(pyld), headers=hdrs,files=fileName,
-                               verify=False, auth=(idrac['user'], idrac['pswd']))
+            response = requests.post(uri, data=json.dumps(pyld), headers=hdrs, files=fileName,
+                               verify=False, auth=(creds['user'], creds['pswd']))
         except:
             raise			# Do we let module exit or should we return an error value?
         return response
@@ -61,6 +64,15 @@ class RedfishUtils(object):
             raise			# Do we let module exit or should we return an error value?
         return response
     
+    def init_session(self, creds, sessions_uri):
+        response = self.send_post_request(creds,
+                                   sessions_uri,
+                                   {"Password": creds["pswd"], "UserName": creds["user"]},
+                                   HEADERS)
+        
+        token = response.headers["X-Auth-Token"]
+        return token
+
     def import_scp(self, CTRL_INFO, SHARE_INFO, scpfile, root_uri):
         result = {}
         payload = { "ShutdownType" : "Forced",
@@ -776,9 +788,9 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def get_system_inventory(self, CTRL_INFO, root_uri):
+    def get_system_inventory(self, creds, root_uri):
         result = {}
-        response = self.send_get_request(CTRL_INFO, root_uri)
+        response = self.send_get_request(creds, root_uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()

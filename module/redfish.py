@@ -171,37 +171,42 @@ def main():
         supports_check_mode=False
     )
 
-    params = module.params
-    category   = params['category']
-    command    = params['command']
-    hostname   = params['hostname']
-    scpfile    = params['scpfile']
-    bootdevice = params['bootdevice']
-
     # Disable insecure-certificate-warning message
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-    CTRL_INFO = { 'ip'   : params['baseuri'],
-                  'user' : params['login'],
-                  'pswd' : params['password']
+    category   = module.params['category']
+    command    = module.params['command']
+    hostname   = module.params['hostname']
+    scpfile    = module.params['scpfile']
+    bootdevice = module.params['bootdevice']
+    CTRL_INFO = { 'ip'   : module.params['baseuri'],
+                  'user' : module.params['login'],
+                  'pswd' : module.params['password']
                  }
-    SHARE_INFO = { 'host' : params['sharehost'],
-                   'name' : params['sharename'],
-                   'user' : params['shareuser'],
-                   'pswd' : params['sharepswd']
+    SHARE_INFO = { 'host' : module.params['sharehost'],
+                   'name' : module.params['sharename'],
+                   'user' : module.params['shareuser'],
+                   'pswd' : module.params['sharepswd']
                  }
-    USER_INFO = { 'userid'   : params['userid'],
-                  'username' : params['username'],
-                  'userpswd' : params['userpswd'],
-                  'userrole' : params['userrole']
+    USER_INFO = { 'userid'   : module.params['userid'],
+                  'username' : module.params['username'],
+                  'userpswd' : module.params['userpswd'],
+                  'userrole' : module.params['userrole']
                  }
 
-    # Build initial URI
-    root_uri = "https://" + params['baseuri']
+    # create Redfish session
+    creds = {
+        'user': module.params['login'],
+        'pswd': module.params['password']
+    }
 
-    # Get token
-    # token = 
+    # Build root URI
+    root_uri = "https://" + module.params['baseuri']
+
     rf_utils = RedfishUtils()
+
+    # Get token - This may only work on HP systems
+    # creds["token"] = rf_utils.init_session(creds, root_uri + "/redfish/v1/SessionService/Sessions/")
 
     # Execute based on what we want. Notice that some rf_uri values have an
     # ending slash ('/') and other don't. It's all by design and depends on
@@ -213,11 +218,9 @@ def main():
         elif command == "GetPsuInventory":
             result = rf_utils.get_psu_inventory(CTRL_INFO, root_uri, rf_uri)
         elif command == "GetCpuInventory":
-            rf_uri = "/redfish/v1/Systems/System.Embedded.1/Processors"
-            result = rf_utils.get_cpu_inventory(CTRL_INFO, root_uri, rf_uri)
+            result = rf_utils.get_cpu_inventory(CTRL_INFO, root_uri, rf_uri + "Processors")
         elif command == "GetNicInventory":
-            rf_uri = "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/"
-            result = rf_utils.get_nic_inventory(CTRL_INFO, root_uri, rf_uri)
+            result = rf_utils.get_nic_inventory(CTRL_INFO, root_uri, rf_uri + "EthernetInterfaces")
         elif command == "GetFanInventory":
             rf_uri = "/redfish/v1/Chassis/System.Embedded.1/Thermal"
             result = rf_utils.get_fan_inventory(CTRL_INFO, root_uri + rf_uri)
@@ -229,11 +232,11 @@ def main():
         if command == "GetInventory":
            result = rf_utils.get_firmware_inventory(CTRL_INFO, root_uri, rf_uri)
 	elif command == "UploadFirmware":
-            result = rf_utils.upload_firmware(CTRL_INFO, root_uri, params['FWPath'])
+            result = rf_utils.upload_firmware(CTRL_INFO, root_uri, module.params['FWPath'])
 	elif command == "FirmwareCompare":
-            result = rf_utils.compare_firmware(CTRL_INFO, root_uri, "/tmp/Catalog", params['Model'])
+            result = rf_utils.compare_firmware(CTRL_INFO, root_uri, "/tmp/Catalog", module.params['Model'])
         elif command == "InstallFirmware":
-            result = rf_utils.schedule_firmware_update(CTRL_INFO, root_uri, params['InstallOption'])
+            result = rf_utils.schedule_firmware_update(CTRL_INFO, root_uri, module.params['InstallOption'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
@@ -284,11 +287,9 @@ def main():
         elif command == "SetOneTimeBoot":
             result = rf_utils.set_one_time_boot_device(CTRL_INFO, bootdevice, root_uri + rf_uri)
         elif command == "SetDefaultSettings":
-            rf_uri = "/redfish/v1/Systems/System.Embedded.1/Bios/Actions/Bios.ResetBios/"
-            result = rf_utils.set_bios_default_settings(CTRL_INFO, root_uri + rf_uri)
+            result = rf_utils.set_bios_default_settings(CTRL_INFO, root_uri + rf_uri + "/Bios/Actions/Bios.ResetBios")
         elif command == "SetAttributes":
-	    rf_uri = '/redfish/v1/Systems/System.Embedded.1/Bios/Settings'
-	    result = rf_utils.set_bios_attributes(CTRL_INFO, root_uri + rf_uri, params['bios_attributes'])
+	    result = rf_utils.set_bios_attributes(CTRL_INFO, root_uri + rf_uri + "/Bios/Settings", module.params['bios_attributes'])
         elif command == "ConfigJob":
             rf_uri = '/redfish/v1/Managers/iDRAC.Embedded.1/Jobs'
             result = rf_utils.create_bios_config_job(CTRL_INFO, root_uri + rf_uri)
@@ -296,18 +297,15 @@ def main():
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Idrac":
+        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "SetDefaultSettings":
-            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/DellManager.ResetToDefaults"
-            result = rf_utils.set_idrac_default_settings(CTRL_INFO, root_uri + rf_uri)
+            result = rf_utils.set_idrac_default_settings(CTRL_INFO, root_uri + rf_uri + "/Actions/Oem/DellManager.ResetToDefaults")
         elif command == "GracefulRestart":
-            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
             result = rf_utils.restart_idrac_gracefully(CTRL_INFO, root_uri + rf_uri)
         elif command == "GetAttributes":
-            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
             result = rf_utils.get_idrac_attributes(CTRL_INFO, root_uri + rf_uri)
         elif command == "SetAttributes":
-            rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Attributes"
-            result = rf_utils.set_idrac_attributes(CTRL_INFO, root_uri + rf_uri, params['idrac_attributes'])
+            result = rf_utils.set_idrac_attributes(CTRL_INFO, root_uri + rf_uri + "/Attributes", module.params['idrac_attributes'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
