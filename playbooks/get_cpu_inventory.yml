@@ -6,7 +6,7 @@
   tasks:
 
   - name: Set output file
-    include: set_output_file.yml type=CpuInventory
+    include_tasks: set_output_file.yml type=CpuInventory
 
   - name: Get CPU Inventory
     local_action: >

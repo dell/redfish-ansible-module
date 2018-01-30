@@ -27,7 +27,7 @@
 
   # --- Get BIOS attributes ------------------------------------------------ 
   - name: Define output file
-    include: set_output_file.yml type=BiosAttributes
+    include_tasks: set_output_file.yml type=BiosAttributes
     tags: getattributes
 
   - name: Get attributes
@@ -45,7 +45,7 @@
 
   # --- Get device boot order ----------------------------------------------
   - name: Define output file
-    include: set_output_file.yml type=BiosBootOrder
+    include_tasks: set_output_file.yml type=BiosBootOrder
     tags: getbootorder
 
   - name: Get device boot order

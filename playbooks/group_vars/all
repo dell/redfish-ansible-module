@@ -15,13 +15,13 @@ rootdir: /root
 host: "{{inventory_hostname}}"
 
 # These variables are not used in playbooks yet. Need to figure out
-# how to include variables inside curly {} brackets.
+# how to include_tasks variables inside curly {} brackets.
 ntpserver1: ntp1.srv.com
 ntpserver2: ntp2.srv.com
 ntpserver3: ntp3.srv.com
 timezone: "US/Central"
 
-# Device to boot from. Options include: None, Pxe, Cd, Floppy, Hdd, BiosSetup,
+# Device to boot from. Options include_tasks: None, Pxe, Cd, Floppy, Hdd, BiosSetup,
 # Utilities, UefiTarget & SDCard
 bootdevice: Hdd
 
@@ -30,7 +30,8 @@ sharehost: 10.9.165.171
 sharename: share2
 shareuser: dell
 sharepswd: 111111
-scpfile: r740-scp.xml
+# name of SCP file to use for importing - apply to same server models each time
+scpfile: SCP-only-for-R740s.xml
 
 # For managing users - userid 2 is default root user, be mindful!
 userid: 3                  # user id of user to add/delete/modify (1-16)

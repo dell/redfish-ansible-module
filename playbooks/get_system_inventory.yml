@@ -6,7 +6,7 @@
   tasks:
 
   - name: Define output file
-    include: set_output_file.yml type=SystemInventory
+    include_tasks: set_output_file.yml type=SystemInventory
 
   - name: Getting system inventory
     local_action: >

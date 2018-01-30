@@ -6,7 +6,7 @@
   tasks:
 
   - name: Set output file
-    include: set_output_file.yml type=FirmwareInventory
+    include_tasks: set_output_file.yml type=FirmwareInventory
 
   - name: Get Firmware Inventory
     local_action: >

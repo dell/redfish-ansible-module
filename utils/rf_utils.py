@@ -132,7 +132,7 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
         return result
     
-    def get_storge_controller_info(self, creds, root_uri, rf_uri):
+    def get_storage_controller_info(self, creds, root_uri, rf_uri):
         result = {}
         controllers_details = []
     

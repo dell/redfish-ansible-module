@@ -17,7 +17,7 @@
 
   # --- Get SE Logs --------------------------------------------------------
   - name: Define output file
-    include: set_output_file.yml type=SELogs
+    include_tasks: set_output_file.yml type=SELogs
     tags: selogs
 
   - name: Get SE Logs
@@ -34,7 +34,7 @@
 
   # --- Get LC Logs --------------------------------------------------------
   - name: Define output file
-    include: set_output_file.yml type=LCLogs
+    include_tasks: set_output_file.yml type=LCLogs
     tags: lclogs
 
   - name: Get LC Logs

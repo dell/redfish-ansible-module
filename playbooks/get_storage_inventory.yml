@@ -17,7 +17,7 @@
 
   # --- Get Storage Controller Inventory -----------------------------------
   - name: Define output file
-    include: set_output_file.yml type=StorageControllerInventory
+    include_tasks: set_output_file.yml type=StorageControllerInventory
     tags: getcontrollerinventory
 
   - name: Get storage controller inventory
@@ -35,7 +35,7 @@
 
   # --- Get Disk Inventory -------------------------------------------------
   - name: Define output file
-    include: set_output_file.yml type=DiskInventory
+    include_tasks: set_output_file.yml type=DiskInventory
     tags: getdiskinventory
 
   - name: Get disk inventory

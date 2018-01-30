@@ -24,7 +24,7 @@
   # ------------------------------------------------------------------------
   # 14G only
   - name: Set output file
-    include: set_output_file.yml type=IdracAttributes
+    include_tasks: set_output_file.yml type=IdracAttributes
     tags: getattributes
 
   - name: Get iDRAC attributes
