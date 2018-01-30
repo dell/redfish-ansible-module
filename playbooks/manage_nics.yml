@@ -88,7 +88,7 @@
   # ------------------------------------------------------------------------
   - name: Schedule Config Job - REBOOT
     local_action: >
-      redfish category=Bios command=ConfigJob baseuri={{baseuri}}
+      redfish category=Idrac command=ConfigJob baseuri={{baseuri}}
       user={{user}} password={{password}}
     tags: reboot
     ignore_errors: yes

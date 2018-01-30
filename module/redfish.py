@@ -234,41 +234,16 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    elif category == "Logs":
-        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-        if command == "GetSELogs":
-            result = rf_utils.get_se_logs(creds, root_uri + rf_uri + "/Logs/Sel")
-        elif command == "GetLCLogs":
-            result = rf_utils.get_lc_logs(creds, root_uri + rf_uri + "/Logs/Lclog")
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
-    elif category == "Users":
-        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-        if command == "ListUsers":
-            result = rf_utils.list_users(creds, user, root_uri, rf_uri)
-        else:
-            result = rf_utils.manage_users(command, creds, user, root_uri, rf_uri)
-
     elif category == "Power":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         result = rf_utils.manage_system_power(command, creds, root_uri + rf_uri)
 
     elif category == "Storage":
-        rf_uri = "/redfish/v1/Systems/System.Embedded.1/Storage/Controllers/"
+        rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         if command == "GetControllerInventory":
-            result = rf_utils.get_storage_controller_info(creds, root_uri, rf_uri)
+            result = rf_utils.get_storage_controller_info(creds, root_uri, rf_uri + "/Storage/Controllers/")
         elif command == "GetDiskInventory":
-            result = rf_utils.get_disk_info(creds, root_uri, rf_uri)
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
-    elif category == "SCP":
-        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager"
-        if command == "ExportSCP":
-            result = rf_utils.export_scp(creds, share, hostname, root_uri + rf_uri + ".ExportSystemConfiguration")
-        elif command == "ImportSCP":
-            result = rf_utils.import_scp(creds, share, scpfile, root_uri + rf_uri + ".ImportSystemConfiguration")
+            result = rf_utils.get_disk_info(creds, root_uri, rf_uri + "/Storage/Controllers/")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
@@ -283,23 +258,56 @@ def main():
         elif command == "SetDefaultSettings":
             result = rf_utils.set_bios_default_settings(creds, root_uri + rf_uri + "/Bios/Actions/Bios.ResetBios")
         elif command == "SetAttributes":
-	    result = rf_utils.set_bios_attributes(creds, root_uri + rf_uri + "/Bios/Settings", module.params['bios_attributes'])
-        elif command == "ConfigJob":
-            rf_uri = '/redfish/v1/Managers/iDRAC.Embedded.1/Jobs'
-            result = rf_utils.create_bios_config_job(creds, root_uri + rf_uri)
+	    result = rf_utils.set_bios_attributes(creds, root_uri + rf_uri + "/Bios/Settings",
+                                                   module.params['bios_attributes'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
+    # Dell-specific
+    elif category == "Logs":
+        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
+        if command == "GetSELogs":
+            result = rf_utils.get_se_logs(creds, root_uri + rf_uri + "/Logs/Sel")
+        elif command == "GetLCLogs":
+            result = rf_utils.get_lc_logs(creds, root_uri + rf_uri + "/Logs/Lclog")
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
+
+    # Dell-specific
+    elif category == "SCP":
+        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
+        if command == "ExportSCP":
+            result = rf_utils.export_scp(creds, share, hostname,
+                              root_uri + rf_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration")
+        elif command == "ImportSCP":
+            result = rf_utils.import_scp(creds, share, scpfile,
+                              root_uri + rf_uri + "/Actions/Oem/EID_674_Manager.ImportSystemConfiguration")
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
+
+    # Dell-specific
+    elif category == "UserManagement":
+        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
+        if command == "ListUsers":
+            result = rf_utils.list_users(creds, user, root_uri, rf_uri)
+        else:
+            result = rf_utils.manage_users(command, creds, user, root_uri, rf_uri)
+
+    # Dell-specific
     elif category == "Idrac":
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "SetDefaultSettings":
-            result = rf_utils.set_idrac_default_settings(creds, root_uri + rf_uri + "/Actions/Oem/DellManager.ResetToDefaults")
+            result = rf_utils.set_idrac_default_settings(creds,
+                                     root_uri + rf_uri + "/Actions/Oem/DellManager.ResetToDefaults")
         elif command == "GracefulRestart":
             result = rf_utils.restart_idrac_gracefully(creds, root_uri + rf_uri)
         elif command == "GetAttributes":
             result = rf_utils.get_idrac_attributes(creds, root_uri + rf_uri)
         elif command == "SetAttributes":
-            result = rf_utils.set_idrac_attributes(creds, root_uri + rf_uri + "/Attributes", module.params['idrac_attributes'])
+            result = rf_utils.set_idrac_attributes(creds,
+                                     root_uri + rf_uri + "/Attributes", module.params['idrac_attributes'])
+        elif command == "ConfigJob":
+            result = rf_utils.create_bios_config_job(creds, root_uri + rf_uri + "/Jobs")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

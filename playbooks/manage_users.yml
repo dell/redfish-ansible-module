@@ -28,12 +28,12 @@
 
   # ------------------------------------------------------------------------
   - name: Set output file
-    include_tasks: set_output_file.yml type=IdracUsers
+    include_tasks: set_output_file.yml type=Users
     tags: listusers
 
-  - name: List all iDRAC users
+  - name: List all users
     local_action: >
-       redfish category=Users command=ListUsers baseuri={{baseuri}}
+       redfish category=UserManagement command=ListUsers baseuri={{baseuri}}
        user={{user}} password={{password}} 
     register: result
     tags: listusers
@@ -44,31 +44,31 @@
 
   # ------------------------------------------------------------------------
   # When adding a user, you must enable it afterwards
-  - name: Add iDRAC user
+  - name: Add user
     local_action: >
-       redfish category=Users command=AddUser baseuri={{baseuri}}
+       redfish category=UserManagement command=AddUser baseuri={{baseuri}}
        user={{user}} password={{password}} userid={{userid}}
        username={{username}} userpswd={{userpswd}} userrole={{userrole}}
     tags: adduser
 
-  - name: Enable iDRAC user
+  - name: Enable user
     local_action: >
-       redfish category=Users command=EnableUser baseuri={{baseuri}}
+       redfish category=UserManagement command=EnableUser baseuri={{baseuri}}
        user={{user}} password={{password}} userid={{userid}}
     tags: [enableuser, adduser]
 
   # ------------------------------------------------------------------------
-  - name: Update iDRAC user role
+  - name: Update user role
     local_action: >
-       redfish category=Users command=UpdateUserRole baseuri={{baseuri}}
+       redfish category=UserManagement command=UpdateUserRole baseuri={{baseuri}}
        user={{user}} password={{password}} userid={{userid}}
        userrole={{userrole}}
     tags: updateuser
 
   # ------------------------------------------------------------------------
-  - name: Update iDRAC user password
+  - name: Update user password
     local_action: >
-       redfish category=Users command=UpdateUserPassword baseuri={{baseuri}}
+       redfish category=UserManagement command=UpdateUserPassword baseuri={{baseuri}}
        user={{user}} password={{password}} userid={{userid}}
        userpswd={{userpswd}}
     no_log: true
@@ -76,15 +76,15 @@
 
   # ------------------------------------------------------------------------
   # Before a user can be deleted, it must first be disabled
-  - name: Disable iDRAC user
+  - name: Disable user
     local_action: >
-       redfish category=Users command=DisableUser baseuri={{baseuri}}
+       redfish category=UserManagement command=DisableUser baseuri={{baseuri}}
        user={{user}} password={{password}} userid={{userid}}
     tags: [disableuser, deleteuser]
 
-  - name: Delete iDRAC user
+  - name: Delete user
     local_action: >
-       redfish category=Users command=DeleteUser baseuri={{baseuri}}
+       redfish category=UserManagement command=DeleteUser baseuri={{baseuri}}
        user={{user}} password={{password}} userid={{userid}}
     tags: deleteuser
 
