@@ -199,13 +199,30 @@ def main():
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
-    rf_utils = RedfishUtils()
-
-    # Get token - This may only work on HP systems
-    # creds["token"] = rf_utils.init_session(creds, root_uri + "/redfish/v1/SessionService/Sessions/")
+    rf_utils = RedfishUtils(creds, root_uri)
 
     # Organize actions by Categories / Commands
-    if category == "Inventory":
+    if category == "UserManagement":
+        result = rf_utils._find_account_service()     # find accounts_uri
+        if result['ret'] == True:	# Go on only if we find an account service
+            if command == "ListUsers":
+                result = rf_utils.list_users(user)
+            elif command == "AddUser":
+                result = rf_utils.add_user(user)
+            elif command == "EnableUser":
+                result = rf_utils.enable_user(user)
+            elif command == "DeleteUser":
+                result = rf_utils.delete_user(user)
+            elif command == "DisableUser":
+                result = rf_utils.disable_user(user)
+            elif command == "UpdateUserRole":
+                result = rf_utils.update_user_role(user)
+            elif command == "UpdateUserPassword":
+                result = rf_utils.update_user_password(user)
+            else:
+                result = { 'ret': False, 'msg': 'Invalid Command'}
+
+    elif category == "Inventory":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         if command == "GetSystemInventory":
             result = rf_utils.get_system_inventory(creds, root_uri + rf_uri)
@@ -284,14 +301,6 @@ def main():
                               root_uri + rf_uri + "/Actions/Oem/EID_674_Manager.ImportSystemConfiguration")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
-
-    # Dell-specific
-    elif category == "UserManagement":
-        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-        if command == "ListUsers":
-            result = rf_utils.list_users(creds, user, root_uri, rf_uri)
-        else:
-            result = rf_utils.manage_users(command, creds, user, root_uri, rf_uri)
 
     # Dell-specific
     elif category == "Idrac":

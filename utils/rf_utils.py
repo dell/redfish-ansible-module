@@ -31,15 +31,21 @@ HEADERS = {'content-type': 'application/json'}
 
 class RedfishUtils(object):
 
-    def __init__(self):
+    def __init__(self, creds, root_uri):
+        self.root_uri = root_uri
+        self.creds = creds
+        self._init_session()
+        self.default_system_id = None
+        self.default_chassis_id = None
+        self.default_manager_id = None
         return
 
-    def send_get_request(self, creds, uri):
+    def send_get_request(self, uri):
         headers = {}
-        if 'token' in creds:
-            headers = {"X-Auth-Token": creds['token']}
+        if 'token' in self.creds:
+            headers = {"X-Auth-Token": self.creds['token']}
         try:
-            response = requests.get(uri, headers, verify=False, auth=(creds['user'], creds['pswd']))
+            response = requests.get(uri, headers, verify=False, auth=(self.creds['user'], self.creds['pswd']))
         except:
             raise			# Do we let module exit or should we return an error value?
         return response
@@ -63,14 +69,23 @@ class RedfishUtils(object):
             raise			# Do we let module exit or should we return an error value?
         return response
     
-    def init_session(self, creds, sessions_uri):
-        response = self.send_post_request(creds,
-                                   sessions_uri,
-                                   {"Password": creds["pswd"], "UserName": creds["user"]},
-                                   HEADERS)
+    def _init_session(self):
+        pass
 
-        token = response.headers["X-Auth-Token"]
-        return token
+    def _find_account_service(self):
+        response = self.send_get_request(self.root_uri + "/redfish/v1")
+        data = response.json()
+        if 'AccountService' not in data:
+            return { 'ret': False, 'msg': "AccountService does not exist" }
+        else:
+            account_service = data["AccountService"]["@odata.id"]
+            response = self.send_get_request(self.root_uri + account_service)
+            data = response.json()
+            accounts = data['Accounts']['@odata.id']
+            if accounts[-1:] == '/':
+                accounts = accounts[:-1]
+            self.accounts_uri = accounts
+            return { 'ret': True }
 
     def import_scp(self, creds, share, scpfile, root_uri):
         result = {}
@@ -249,13 +264,12 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def list_users(self, creds, user, root_uri, rf_uri):
+    def list_users(self, user):
         result = {}
-        uri = root_uri + rf_uri + "/Accounts/"
         allusers = []
         allusers_details = []
     
-        response = self.send_get_request(creds, uri)
+        response = self.send_get_request(self.root_uri + self.accounts_uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -264,7 +278,9 @@ class RedfishUtils(object):
     
             # for each user, get details
             for uri in allusers:
-                response = self.send_get_request(creds, root_uri + uri)
+                response = self.send_get_request(self.root_uri + uri)
+                # return { 'ret': True, 'msg': self.root_uri + uri }
+
                 # check status_code again?
                 data = response.json()
                 if not data[u'UserName'] == "": # only care if name is not empty
@@ -279,65 +295,74 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def manage_users(self, command, creds, user, root_uri, rf_uri):
+    def add_user(self, user):
         result = {}
-        uri = root_uri + rf_uri + "/Accounts/" + user['userid']
-    
-        if command == "AddUser":
-            username = {'UserName': user['username']}
-            pswd     = {'Password': user['userpswd']}
-            roleid   = {'RoleId': user['userrole']}
-            enabled  = {'Enabled': True}
-            for payload in username,pswd,roleid,enabled:
-                response = self.send_patch_request(creds, uri, payload, HEADERS)
-                if response.status_code == 200:		# success
-                    result['ret'] = True
-                else:
-                    result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
-    
-        elif command == "DisableUser":
-            payload = {'Enabled': False}
-            response = self.send_patch_request(creds, uri, payload, HEADERS)
+        uri = self.root_uri + self.accounts_uri + "/" + user['userid']
+        username = {'UserName': user['username']}
+        pswd     = {'Password': user['userpswd']}
+        roleid   = {'RoleId': user['userrole']}
+        enabled  = {'Enabled': True}
+        for payload in username,pswd,roleid,enabled:
+            response = self.send_patch_request(self.creds, uri, payload, HEADERS)
             if response.status_code == 200:		# success
                 result['ret'] = True
             else:
                 result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
-    
-        elif command == "EnableUser":
-            payload = {'Enabled': True}
-            response = self.send_patch_request(creds, uri, payload, HEADERS)
-            if response.status_code == 200:		# success
-                result['ret'] = True
-            else:
-                result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
-    
-        elif command == "UpdateUserRole":
-            payload = {'RoleId': user['userrole']}
-            response = self.send_patch_request(creds, uri, payload, HEADERS)
-            if response.status_code == 200:		# success
-                result['ret'] = True
-            else:
-                result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
-    
-        elif command == "UpdateUserPassword":
-            payload = {'Password': user['userpswd']}
-            response = self.send_patch_request(creds, uri, payload, HEADERS)
-            if response.status_code == 200:		# success
-                result['ret'] = True
-            else:
-                result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
-    
-        elif command == "DeleteUser":
-            payload = {'UserName': ""}
-            response = self.send_patch_request(creds, uri, payload, HEADERS)
-            if response.status_code == 200:		# success
-                result['ret'] = True
-            else:
-                result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
-    
+        return result
+
+    def enable_user(self, user):
+        result = {}
+        uri = self.root_uri + self.accounts_uri + "/" + user['userid']
+        payload = {'Enabled': True}
+        response = self.send_patch_request(self.creds, uri, payload, HEADERS)
+        if response.status_code == 200:		# success
+            result['ret'] = True
         else:
-            result = { 'ret': False, 'msg': "Invalid Command" }
-    
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+        return result
+
+    def delete_user(self, user):
+        result = {}
+        uri = self.root_uri + self.accounts_uri + "/" + user['userid']
+        payload = {'UserName': ""}
+        response = self.send_patch_request(self.creds, uri, payload, HEADERS)
+        if response.status_code == 200:		# success
+            result['ret'] = True
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+        return result
+
+    def disable_user(self, user):
+        result = {}
+        uri = self.root_uri + self.accounts_uri + "/" + user['userid']
+        payload = {'Enabled': False}
+        response = self.send_patch_request(self.creds, uri, payload, HEADERS)
+        if response.status_code == 200:		# success
+            result['ret'] = True
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+        return result
+
+    def update_user_role(self, user):
+        result = {}
+        uri = self.root_uri + self.accounts_uri + "/" + user['userid']
+        payload = {'RoleId': user['userrole']}
+        response = self.send_patch_request(self.creds, uri, payload, HEADERS)
+        if response.status_code == 200:		# success
+            result['ret'] = True
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+        return result
+
+    def update_user_password(self, user):
+        result = {}
+        uri = self.root_uri + self.accounts_uri + "/" + user['userid']
+        payload = {'Password': user['userpswd']}
+        response = self.send_patch_request(self.creds, uri, payload, HEADERS)
+        if response.status_code == 200:		# success
+            result['ret'] = True
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
     def get_se_logs(self, creds, uri):
