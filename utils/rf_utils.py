@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# (c) 2017, Dell EMC Inc.
+# (c) 2017-2018, Dell EMC Inc.
 #
 # This file is part of Ansible
 #
@@ -50,21 +50,24 @@ class RedfishUtils(object):
             raise			# Do we let module exit or should we return an error value?
         return response
     
-    def send_post_request(self, creds, uri, pyld, hdrs, fileName=None):
+    def send_post_request(self, uri, pyld, hdrs, fileName=None):
         headers = {}
-        if 'token' in creds:
-            headers = {"X-Auth-Token": creds['token']}
+        if 'token' in self.creds:
+            headers = {"X-Auth-Token": self.creds['token']}
         try:
             response = requests.post(uri, data=json.dumps(pyld), headers=hdrs, files=fileName,
-                               verify=False, auth=(creds['user'], creds['pswd']))
+                               verify=False, auth=(self.creds['user'], self.creds['pswd']))
         except:
             raise			# Do we let module exit or should we return an error value?
         return response
     
-    def send_patch_request(self, creds, uri, pyld, hdrs):
+    def send_patch_request(self, uri, pyld, hdrs):
+        headers = {}
+        if 'token' in self.creds:
+            headers = {"X-Auth-Token": self.creds['token']}
         try:
             response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,
-                               verify=False, auth=(creds['user'], creds['pswd']))
+                               verify=False, auth=(self.creds['user'], self.creds['pswd']))
         except:
             raise			# Do we let module exit or should we return an error value?
         return response
@@ -72,8 +75,8 @@ class RedfishUtils(object):
     def _init_session(self):
         pass
 
-    def _find_account_service(self):
-        response = self.send_get_request(self.root_uri + "/redfish/v1")
+    def _find_account_service(self, rf_uri):
+        response = self.send_get_request(self.root_uri + rf_uri)
         data = response.json()
         if 'AccountService' not in data:
             return { 'ret': False, 'msg': "AccountService does not exist" }
@@ -87,7 +90,17 @@ class RedfishUtils(object):
             self.accounts_uri = accounts
             return { 'ret': True }
 
-    def import_scp(self, creds, share, scpfile, root_uri):
+    def _find_storage_service(self, rf_uri):
+        response = self.send_get_request(self.root_uri + rf_uri)
+        data = response.json()
+        if 'SimpleStorage' not in data:
+            return { 'ret': False, 'msg': "Storage Service does not exist" }
+        else:
+            storage_service = data["SimpleStorage"]["@odata.id"]
+            self.storage_uri = storage_service
+            return { 'ret': True }
+
+    def import_scp(self, share, scpfile, root_uri):
         result = {}
         payload = { "ShutdownType" : "Forced",
                     "ShareParameters" : { "Target" : "ALL",
@@ -98,7 +111,7 @@ class RedfishUtils(object):
                          "Password"  : share['pswd'],
                          "FileName"  : scpfile }
                   }
-        response = self.send_post_request(creds, root_uri, payload, HEADERS)
+        response = self.send_post_request(root_uri, payload, HEADERS)
         if response.status_code == 202:		# success
             result['ret'] = True
             '''
@@ -116,7 +129,7 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
         return result
     
-    def export_scp(self, creds, share, hostname, root_uri):
+    def export_scp(self, share, hostname, root_uri):
         result = {}
         # timestamp to add to SCP XML file name
         ts = str(datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S"))
@@ -130,7 +143,7 @@ class RedfishUtils(object):
                          "Password"  : share['pswd'],
                          "FileName"  : hostname + "_SCP_" + ts + ".xml" }
                   }
-        response = self.send_post_request(creds, root_uri, payload, HEADERS)
+        response = self.send_post_request(root_uri, payload, HEADERS)
         if response.status_code == 202:		# success
             result['ret'] = True
             '''
@@ -147,13 +160,13 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
         return result
     
-    def get_storage_controller_info(self, creds, root_uri, rf_uri):
+    def get_storage_controller_info(self):
         result = {}
         controllers_details = []
     
         # Get a list of all storage controllers and build respective URIs
         controller_list = []
-        response = self.send_get_request(creds, root_uri + rf_uri)
+        response = self.send_get_request(self.root_uri + self.storage_uri)
         if response.status_code == 200:             # success
             result['ret'] = True
             data = response.json()
@@ -162,8 +175,8 @@ class RedfishUtils(object):
                 controller_list.append(controller[u'@odata.id'])
     
             for c in controller_list:
-                uri = root_uri + c
-                response = self.send_get_request(creds, uri)
+                uri = self.root_uri + c
+                response = self.send_get_request(uri)
                 if response.status_code == 200:             # success
                     data = response.json()
     
@@ -180,13 +193,13 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def get_disk_info(self, creds, root_uri, rf_uri):
+    def get_disk_info(self):
         result = {}
         disks_details = []
     
         # Get a list of all storage controllers and build respective URIs
         controller_list = []
-        response = self.send_get_request(creds, root_uri + rf_uri)
+        response = self.send_get_request(self.root_uri + self.storage_uri)
         if response.status_code == 200:             # success
             result['ret'] = True
             data = response.json()
@@ -195,8 +208,8 @@ class RedfishUtils(object):
                 controller_list.append(controller[u'@odata.id'])
     
             for c in controller_list:
-                uri = root_uri + c
-                response = self.send_get_request(creds, uri)
+                uri = self.root_uri + c
+                response = self.send_get_request(uri)
                 if response.status_code == 200:             # success
                     data = response.json()
     
@@ -218,36 +231,36 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def restart_idrac_gracefully(self, creds, root_uri):
+    def restart_idrac_gracefully(self, root_uri):
         result = {}
         uri = root_uri + "/Actions/Manager.Reset"
         payload = {'ResetType': 'GracefulRestart'}
-        response = self.send_post_request(creds, uri, payload, HEADERS)
+        response = self.send_post_request(uri, payload, HEADERS)
         if response.status_code == 204:		# success
             result['ret'] = True
         else:
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def manage_system_power(self, command, creds, root_uri):
+    def manage_system_power(self, command, root_uri):
         result = {}
         uri = root_uri + "/Actions/ComputerSystem.Reset"
     
         if command == "PowerOn":
             payload = {'ResetType': 'On'}
-            response = self.send_post_request(creds, uri, payload, HEADERS)
+            response = self.send_post_request(uri, payload, HEADERS)
     
         elif command == "PowerOff":
             payload = {'ResetType': 'ForceOff'}
-            response = self.send_post_request(creds, uri, payload, HEADERS)
+            response = self.send_post_request(uri, payload, HEADERS)
     
         elif command == "GracefulRestart":
             payload = {'ResetType': 'GracefulRestart'}
-            response = self.send_post_request(creds, uri, payload, HEADERS)
+            response = self.send_post_request(uri, payload, HEADERS)
     
         elif command == "GracefulShutdown":
             payload = {'ResetType': 'GracefulShutdown'}
-            response = self.send_post_request(creds, uri, payload, HEADERS)
+            response = self.send_post_request(uri, payload, HEADERS)
     
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
@@ -303,7 +316,7 @@ class RedfishUtils(object):
         roleid   = {'RoleId': user['userrole']}
         enabled  = {'Enabled': True}
         for payload in username,pswd,roleid,enabled:
-            response = self.send_patch_request(self.creds, uri, payload, HEADERS)
+            response = self.send_patch_request(uri, payload, HEADERS)
             if response.status_code == 200:		# success
                 result['ret'] = True
             else:
@@ -314,7 +327,7 @@ class RedfishUtils(object):
         result = {}
         uri = self.root_uri + self.accounts_uri + "/" + user['userid']
         payload = {'Enabled': True}
-        response = self.send_patch_request(self.creds, uri, payload, HEADERS)
+        response = self.send_patch_request(uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result['ret'] = True
         else:
@@ -325,7 +338,7 @@ class RedfishUtils(object):
         result = {}
         uri = self.root_uri + self.accounts_uri + "/" + user['userid']
         payload = {'UserName': ""}
-        response = self.send_patch_request(self.creds, uri, payload, HEADERS)
+        response = self.send_patch_request(uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result['ret'] = True
         else:
@@ -336,7 +349,7 @@ class RedfishUtils(object):
         result = {}
         uri = self.root_uri + self.accounts_uri + "/" + user['userid']
         payload = {'Enabled': False}
-        response = self.send_patch_request(self.creds, uri, payload, HEADERS)
+        response = self.send_patch_request(uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result['ret'] = True
         else:
@@ -347,7 +360,7 @@ class RedfishUtils(object):
         result = {}
         uri = self.root_uri + self.accounts_uri + "/" + user['userid']
         payload = {'RoleId': user['userrole']}
-        response = self.send_patch_request(self.creds, uri, payload, HEADERS)
+        response = self.send_patch_request(uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result['ret'] = True
         else:
@@ -358,18 +371,18 @@ class RedfishUtils(object):
         result = {}
         uri = self.root_uri + self.accounts_uri + "/" + user['userid']
         payload = {'Password': user['userpswd']}
-        response = self.send_patch_request(self.creds, uri, payload, HEADERS)
+        response = self.send_patch_request(uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result['ret'] = True
         else:
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def get_se_logs(self, creds, uri):
+    def get_se_logs(self, uri):
         # System Event logs
         result = {}
         allentries = []
-        response = self.send_get_request(creds, uri)
+        response = self.send_get_request(uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -387,11 +400,11 @@ class RedfishUtils(object):
         # This looks like: result{allentries[entry{}]}
         return result
     
-    def get_lc_logs(self, creds, uri):
+    def get_lc_logs(self, uri):
         # Lifecycle Controller logs
         result = {}
         allentries = []
-        response = self.send_get_request(creds, uri)
+        response = self.send_get_request(uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -410,11 +423,11 @@ class RedfishUtils(object):
         # This looks like: result{allentries[entry{}]}
         return result
     
-    def get_firmware_inventory(self, creds, root_uri, rf_uri):
+    def get_firmware_inventory(self, root_uri, rf_uri):
         result = {}
         devices = []
     
-        response = self.send_get_request(creds, root_uri + rf_uri)
+        response = self.send_get_request(root_uri + rf_uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -424,7 +437,7 @@ class RedfishUtils(object):
                 if "Installed" in d:
                     # Get details for each device that is relevant
                     uri = root_uri + rf_uri + d
-                    response = self.send_get_request(creds, uri)
+                    response = self.send_get_request(uri)
                     if response.status_code == 200:	# success
                         data = response.json()
                         result[data[u'Name']] = data[u'Version']
@@ -439,12 +452,11 @@ class RedfishUtils(object):
     
     # This function compares the firmware levels in the system vs. the firmware levels
     # available in the Catalog.gz file that it downloaded from ftp.dell.com
-    def compare_firmware(self, creds, root_uri, rf_uri, catalog_file, model):
+    def compare_firmware(self, root_uri, rf_uri, catalog_file, model):
         fw = []
         fw_list = {'ret':True, 'Firmwares':[]}
     
-        response = self.send_get_request(creds, root_uri + rf_uri)
-    
+        response = self.send_get_request(root_uri + rf_uri)
         if response.status_code == 400:
             return { 'ret': False, 'msg': 'Not supported on this platform'}
     
@@ -477,16 +489,14 @@ class RedfishUtils(object):
             fw_list['ret'] = False
         return fw_list
     
-    def upload_firmware(self, creds, root_uri, rf_uri, FWPath):
+    def upload_firmware(self, root_uri, rf_uri, FWPath):
         result = {}
-        response = self.send_get_request(creds, root_uri + rf_uri)
+        response = self.send_get_request(root_uri + rf_uri)
     
         if response.status_code == 400:
             return { 'ret': False, 'msg': 'Not supported on this platform'}
-    
         elif response.status_code == 200:
             ETag = response.headers['ETag']
-    
         else:
             result = { 'ret': False, 'msg': 'Failed to get update service etag %s' % str(root_uri)}
             return result
@@ -495,16 +505,16 @@ class RedfishUtils(object):
         headers = {"if-match": ETag}
     
         # Calling POST directly rather than use send_post_request() - look into it?
-        response = requests.post(root_uri + rf_uri, files=files, auth=(creds['user'], creds['pswd']), headers=headers, verify=False)
+        response = requests.post(root_uri + rf_uri, files=files, auth=(self.creds['user'], self.creds['pswd']), headers=headers, verify=False)
         if response.status_code == 201:
             result = { 'ret': True, 'msg': 'Firmare uploaded successfully', 'Version': '%s' % str(response.json()['Version']), 'Location':'%s' % response.headers['Location']}
         else:
             result = { 'ret': False, 'msg': 'Error uploading firmware; status_code=%s' % response.status_code }
         return result
     
-    def schedule_firmware_update(self, creds, root_uri, rf_uri, InstallOption):
+    def schedule_firmware_update(self, root_uri, rf_uri, InstallOption):
         fw = []
-        response = self.send_get_request(creds, root_uri + rf_uri)
+        response = self.send_get_request(root_uri + rf_uri)
     
         if response.status_code == 200:
             data = response.json()
@@ -516,7 +526,7 @@ class RedfishUtils(object):
     
         url = root_uri + '/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install'
         payload = {'SoftwareIdentityURIs': fw, 'InstallUpon': InstallOption}
-        response = self.send_post_request(creds, url, payload, HEADERS)
+        response = self.send_post_request(url, payload, HEADERS)
     
         if response.status_code == 202:
             result = { 'ret': True, 'msg': 'Firmware install job accepted' }
@@ -524,9 +534,9 @@ class RedfishUtils(object):
             result =  { 'ret': False, 'msg': 'Error accepting firmware install; status_code=%s' % response.status_code }
         return result
     
-    def get_idrac_attributes(self, creds, root_uri):
+    def get_idrac_attributes(self, root_uri):
         result = {}
-        response = self.send_get_request(creds, root_uri + "/Attributes")
+        response = self.send_get_request(root_uri + "/Attributes")
         if response.status_code == 200:             # success
             data = response.json()
             for attribute in data[u'Attributes'].items():
@@ -540,9 +550,9 @@ class RedfishUtils(object):
     
         return result
     
-    def get_bios_attributes(self, creds, root_uri):
+    def get_bios_attributes(self, root_uri):
         result = {}
-        response = self.send_get_request(creds, root_uri + "/Bios")
+        response = self.send_get_request(root_uri + "/Bios")
         if response.status_code == 200:		# success
             data = response.json()
             for attribute in data[u'Attributes'].items():
@@ -556,15 +566,15 @@ class RedfishUtils(object):
     
         return result
     
-    def get_bios_boot_order(self, creds, root_uri):
+    def get_bios_boot_order(self, root_uri):
         # Get boot mode first as it will determine what attribute to read
         result = {}
-        response = self.send_get_request(creds, root_uri + "/Bios")
+        response = self.send_get_request(root_uri + "/Bios")
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
             boot_mode = data[u'Attributes']["BootMode"]
-            response = self.send_get_request(creds, root_uri + "/BootSources")
+            response = self.send_get_request(root_uri + "/BootSources")
             if response.status_code == 200:		# success
                 data = response.json()
                 if boot_mode == "Uefi":
@@ -582,10 +592,10 @@ class RedfishUtils(object):
     
         return result
     
-    def get_fan_inventory(self, creds, root_uri):
+    def get_fan_inventory(self, root_uri):
         result = {}
         fan_details = []
-        response = self.send_get_request(creds, root_uri)
+        response = self.send_get_request(root_uri)
         if response.status_code == 200:             # success
             result['ret'] = True
             data = response.json()
@@ -607,10 +617,10 @@ class RedfishUtils(object):
     
         return result
     
-    def set_bios_default_settings(self, creds, root_uri):
+    def set_bios_default_settings(self, root_uri):
         result = {}
         payload = {}
-        response = self.send_post_request(creds, root_uri, payload, HEADERS)
+        response = self.send_post_request(root_uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result = { 'ret': True, 'msg': 'SetBiosDefaultSettings completed'}
         elif response.status_code == 405:
@@ -619,20 +629,20 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def set_one_time_boot_device(self, creds, bootdevice, root_uri):
+    def set_one_time_boot_device(self, bootdevice, root_uri):
         result = {}
         payload = {"Boot": {"BootSourceOverrideTarget": bootdevice}}
-        response = self.send_patch_request(creds, root_uri, payload, HEADERS)
+        response = self.send_patch_request(root_uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result = { 'ret': True, 'msg': 'SetOneTimeBoot completed'}
         else:
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def set_idrac_default_settings(self, creds, root_uri):
+    def set_idrac_default_settings(self, root_uri):
         result = {}
         payload = {"ResetType": "All"}
-        response = self.send_post_request(creds, root_uri, payload, HEADERS)
+        response = self.send_post_request(root_uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result = { 'ret': True, 'msg': 'SetIdracDefaultSettings completed'}
         elif response.status_code == 405:
@@ -641,13 +651,13 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def set_idrac_attributes(self, creds, root_uri, idrac_attributes):
+    def set_idrac_attributes(self, root_uri, idrac_attributes):
         result = {}
         idrac_attributes = idrac_attributes.replace("'","\"")
         payload = {"Attributes": json.loads(idrac_attributes) }
-        response = self.send_patch_request(creds, root_uri, payload, HEADERS)
+        response = self.send_patch_request(root_uri, payload, HEADERS)
         if response.status_code == 200:
-            result = { 'ret': True, 'msg': 'iDRac Attributes set as pending values'}
+            result = { 'ret': True, 'msg': 'iDRAC Attributes set as pending values'}
         elif response.status_code == 405:
             result = { 'ret': False, 'msg': "Resource not supported" }
         else:
@@ -655,11 +665,11 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
         return result
     
-    def set_bios_attributes(self, creds, root_uri, bios_attributes):
+    def set_bios_attributes(self, root_uri, bios_attributes):
         result = {}
         bios_attributes=bios_attributes.replace("'","\"")
         payload = {"Attributes": json.loads(bios_attributes) }
-        response = self.send_patch_request(creds, root_uri, payload, HEADERS)
+        response = self.send_patch_request(root_uri, payload, HEADERS)
         if response.status_code == 200:
             result = { 'ret': True, 'msg': 'BIOS Attributes set as pending values'}
         elif response.status_code == 400:
@@ -670,9 +680,9 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % str(response.status_code) }
         return result
     
-    def create_bios_config_job(self, creds, url):
+    def create_bios_config_job(self, url):
         payload = {"TargetSettingsURI":"/redfish/v1/Systems/System.Embedded.1/Bios/Settings", "RebootJobType":"PowerCycle"}
-        response = self.send_post_request(creds, url, payload, HEADERS)
+        response = self.send_post_request(url, payload, HEADERS)
         if response.status_code == 200:
             result = { 'ret': True, 'msg': 'Config job created'}
         elif response.status_code == 400:
@@ -683,13 +693,13 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % str(response.status_code) }
         return result
     
-    def get_cpu_inventory(self, creds, root_uri, rf_uri):
+    def get_cpu_inventory(self, root_uri, rf_uri):
         result = {}
         cpu_details = []
     
         # Get a list of all CPUs and build respective URIs
         cpu_list = []
-        response = self.send_get_request(creds, root_uri + rf_uri)
+        response = self.send_get_request(root_uri + rf_uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -699,7 +709,7 @@ class RedfishUtils(object):
     
             for c in cpu_list:
                 uri = root_uri + c
-                response = self.send_get_request(creds, uri)
+                response = self.send_get_request(uri)
                 if response.status_code == 200:             # success
                     data = response.json()
                     cpu = {}
@@ -722,13 +732,13 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def get_nic_inventory(self, creds, root_uri, rf_uri):
+    def get_nic_inventory(self, root_uri, rf_uri):
         result = {}
         nic_details = []
     
         # Get a list of all network controllers and build respective URIs
         nic_list = []
-        response = self.send_get_request(creds, root_uri + rf_uri)
+        response = self.send_get_request(root_uri + rf_uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -738,7 +748,7 @@ class RedfishUtils(object):
     
             for n in nic_list:
                 uri = root_uri + n
-                response = self.send_get_request(creds, uri)
+                response = self.send_get_request(uri)
                 if response.status_code == 200:             # success
                     data = response.json()
                     nic = {}
@@ -770,13 +780,13 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def get_psu_inventory(self, creds, root_uri, rf_uri):
+    def get_psu_inventory(self, root_uri, rf_uri):
         result = {}
         psu_details = []
     
         # Get a list of all PSUs and build respective URIs
         psu_list = []
-        response = self.send_get_request(creds, root_uri + rf_uri)
+        response = self.send_get_request(root_uri + rf_uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -786,7 +796,7 @@ class RedfishUtils(object):
     
             for p in psu_list:
                 uri = root_uri + p
-                response = self.send_get_request(creds, uri)
+                response = self.send_get_request(uri)
                 if response.status_code == 200:             # success
                     data = response.json()
     
@@ -813,9 +823,9 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def get_system_inventory(self, creds, root_uri):
+    def get_system_inventory(self, root_uri):
         result = {}
-        response = self.send_get_request(creds, root_uri)
+        response = self.send_get_request(root_uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()

@@ -24,7 +24,7 @@
 |           | GracefulShutdown       | manage_system_power.yml    |                    |
 | Storage   | GetControllerInventory | get_storage_inventory.yml  | [r740_StorageControllerInventory_YYYYMMDD_hhmmss.json](../sample_output_files/r740_StorageControllerInventory_YYYYMMDD_hhmmss.json) |
 |           | GetDiskInventory       | get_storage_inventory.yml  | [r740_DiskInventory_YYYYMMDD_hhmmss.json](../sample_output_files/r740_DiskInventory_YYYYMMDD_hhmmss.json) |
-| Users     | ListUsers              | manage_idrac_users.yml     | [r740_IdracUsers_YYYYMMDD_hhmmss.json](../sample_output_files/r740_IdracUsers_YYYYMMDD_hhmmss.json) |
+| UserManagement | ListUsers         | manage_users.yml           | [r740_Users_YYYYMMDD_hhmmss.json](../sample_output_files/r740_IdracUsers_YYYYMMDD_hhmmss.json) |
 |           | AddUser                | manage_idrac_users.yml     |                    |
 |           | EnableUser             | manage_idrac_users.yml     |                    |
 |           | UpdateUserRole         | manage_idrac_users.yml     |                    |
