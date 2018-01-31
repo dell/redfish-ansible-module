@@ -10,7 +10,7 @@ To learn more about Ansible, click [here](http://docs.ansible.com/).
 
 ## Why Redfish
 
-Redfish is an open industry-standard specification and schema designed for modern and secure management of platform hardware. On PowerEdge servers the Redfish management APIs are available via the iDRAC, which can be used by IT administrators to easily monitor and manage at scale their entire infrastructure using a wide array of clients on devices such as laptops, tablets and smart phones. 
+Redfish is an open industry-standard specification and schema designed for modern and secure management of platform hardware. On PowerEdge servers the Redfish management APIs are available via the iDRAC, which can be used by IT administrators to easily monitor and manage at scale their entire infrastructure using a wide array of clients on devices such as laptops, tablets and smart phones.
 
 To learn more about Redfish, click [here](https://www.dmtf.org/standards/redfish).
 
@@ -134,9 +134,9 @@ $ cat webserver1_StorageControllerInventory_20170912_103733.json
 }
 ```
 
-These files are in the format *<host>_<timestamp>_<datatype>* and each contains valuable server inventory. 
+These files are in the format *<host>_<timestamp>_<datatype>* and each contains valuable server inventory.
 
-Some Redfish APIs are only available in 14G PowerEdge servers. In addition, availabilty of Redfish APIs varies in 13G and 12G servers (though we are working to make them uniform across all supported servers). If you run a task for a Redfish API that is not available in a server, you will see an error displayed during playbook execution:
+Some Redfish APIs are only available in 14G PowerEdge servers. In addition, availability of Redfish APIs varies in 13G and 12G servers (though we are working to make them uniform across all supported servers). If you run a task for a Redfish API that is not available in a server, you will see an error displayed during playbook execution:
 
 ```
 TASK [Get Firmware Inventory] *********************************************************************
@@ -168,7 +168,7 @@ null
 null
 ```
 
-It should be straight-forward to extract the same data from hundreds of files using shell scripts and organize it accordingly. In the near future scripts will be made available to facilitate data orgnization. For additional help with qt, refer to this [manual](https://shapeshed.com/jq-json/). 
+It should be straight-forward to extract the same data from hundreds of files using shell scripts and organize it accordingly. In the near future scripts will be made available to facilitate data orgnization. For additional help with qt, refer to this [manual](https://shapeshed.com/jq-json/).
 
 ## Support
 
