@@ -297,19 +297,10 @@ def main():
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     # Dell-specific
-    elif category == "SCP":
-        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-        if command == "ExportSCP":
-            result = rf_utils.export_scp(share, hostname,
-                              root_uri + rf_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration")
-        elif command == "ImportSCP":
-            result = rf_utils.import_scp(share, scpfile,
-                              root_uri + rf_uri + "/Actions/Oem/EID_674_Manager.ImportSystemConfiguration")
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
-    # Dell-specific
     elif category == "Idrac":
+        # execute only if we find a manager
+        # result = rf_utils._find_log_service("/redfish/v1/Managers")
+
         rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
         if command == "SetDefaultSettings":
             result = rf_utils.set_idrac_default_settings(root_uri + rf_uri + "/Actions/Oem/DellManager.ResetToDefaults")
@@ -321,6 +312,18 @@ def main():
             result = rf_utils.set_idrac_attributes(root_uri + rf_uri + "/Attributes", module.params['idrac_attributes'])
         elif command == "ConfigJob":
             result = rf_utils.create_bios_config_job(root_uri + rf_uri + "/Jobs")
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
+
+    # Dell-specific
+    elif category == "SCP":
+        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
+        if command == "ExportSCP":
+            result = rf_utils.export_scp(share, hostname,
+                              root_uri + rf_uri + "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration")
+        elif command == "ImportSCP":
+            result = rf_utils.import_scp(share, scpfile,
+                              root_uri + rf_uri + "/Actions/Oem/EID_674_Manager.ImportSystemConfiguration")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

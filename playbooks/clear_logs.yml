@@ -1,0 +1,17 @@
+---
+- hosts: myhosts
+  name: Clear System Logs
+  gather_facts: False
+
+  # Example:
+  # ansible-playbook clear_logs.yml
+
+  # Commands available:
+  #   ClearLogs		Clear all system logs
+
+  tasks:
+
+  - name: Clear Logs
+    local_action: >
+       redfish category=Logs command=ClearLogs baseuri={{ baseuri }}
+            user={{ user }} password={{ password }}

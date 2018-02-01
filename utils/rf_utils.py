@@ -125,6 +125,7 @@ class RedfishUtils(object):
 
         # Find all entries in LogServices
         response = self.send_get_request(self.root_uri + self.logs_uri)
+        # I should really be checking for response.status_code
         data = response.json()
         for log_svcs_entry in data[u'Members']:
             response = self.send_get_request(self.root_uri + log_svcs_entry[u'@odata.id'])
@@ -156,7 +157,19 @@ class RedfishUtils(object):
     def clear_logs(self):
         result = {}
 
-
+        # Find all entries in LogServices
+        response = self.send_get_request(self.root_uri + self.logs_uri)
+        # I should really be checking for response.status_code
+        data = response.json()
+        for log_svcs_entry in data[u'Members']:
+            response = self.send_get_request(self.root_uri + log_svcs_entry["@odata.id"])
+            _data = response.json()
+            # Check to make sure option is available, otherwise error is ugly
+            if "Actions" in _data:
+                if "#LogService.ClearLog" in _data[u"Actions"]:
+                    self.send_post_request(self.root_uri + 
+                                 _data[u"Actions"]["#LogService.ClearLog"]["target"], {}, HEADERS)
+        result['ret'] = True		# assume we're successful
         return result
 
     def import_scp(self, share, scpfile, root_uri):
@@ -435,51 +448,6 @@ class RedfishUtils(object):
             result['ret'] = True
         else:
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
-        return result
-    
-    def get_se_logs(self, uri):
-        # System Event logs
-        result = {}
-        allentries = []
-        response = self.send_get_request(self.root_uri + uri)
-        if response.status_code == 200:		# success
-            result['ret'] = True
-            data = response.json()
-            for logEntry in data[u'Members']:
-                # I only extract some fields
-                entry = {}
-                entry['Name']    = logEntry[u'Name']
-                entry['Created'] = logEntry[u'Created']
-                entry['Message'] = logEntry[u'Message']
-                allentries.append(entry)
-            result["entries"] = allentries
-        else:
-            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
-    
-        # This looks like: result{allentries[entry{}]}
-        return result
-    
-    def get_lc_logs(self, uri):
-        # Lifecycle Controller logs
-        result = {}
-        allentries = []
-        response = self.send_get_request(self.root_uri + uri)
-        if response.status_code == 200:		# success
-            result['ret'] = True
-            data = response.json()
-            for logEntry in data[u'Members']:
-                # I only extract some fields
-                entry = {}
-                entry['Name']     = logEntry[u'Name']
-                entry['Created']  = logEntry[u'Created']
-                entry['Message']  = logEntry[u'Message']
-                entry['Severity'] = logEntry[u'Severity']
-                allentries.append(entry)
-            result["entries"] = allentries
-        else:
-            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
-    
-        # This looks like: result{allentries[entry{}]}
         return result
     
     def get_firmware_inventory(self, root_uri, rf_uri):
