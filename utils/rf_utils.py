@@ -120,8 +120,21 @@ class RedfishUtils(object):
             response = self.send_get_request(self.root_uri + systems)
             data = response.json()
             for member in data[u'Members']:
-                systems_uri = member[u'@odata.id']
-            self.systems_uri = systems_uri
+                systems_service = member[u'@odata.id']
+            self.systems_uri = systems_service
+            return { 'ret': True }
+
+    def _find_update_service(self, uri):
+        response = self.send_get_request(self.root_uri + uri)
+        data = response.json()
+        if 'UpdateService' not in data:
+            return { 'ret': False, 'msg': "UpdateService does not exist" }
+        else:
+            update = data["UpdateService"]["@odata.id"]
+            response = self.send_get_request(self.root_uri + update)
+            data = response.json()
+            update_service = data['FirmwareInventory'][u'@odata.id']
+            self.update_uri = update_service
             return { 'ret': True }
 
     def _find_chassis_service(self, uri):
@@ -134,8 +147,8 @@ class RedfishUtils(object):
             response = self.send_get_request(self.root_uri + chassis)
             data = response.json()
             for member in data[u'Members']:
-                chassis_uri = member[u'@odata.id']
-            self.chassis_uri = chassis_uri
+                chassis_service = member[u'@odata.id']
+            self.chassis_uri = chassis_service
             return { 'ret': True }
 
     def _find_manager(self, uri):
@@ -148,8 +161,8 @@ class RedfishUtils(object):
             response = self.send_get_request(self.root_uri + manager)
             data = response.json()
             for member in data[u'Members']:
-                manager_uri = member[u'@odata.id']
-            self.manager_uri = manager_uri
+                manager_service = member[u'@odata.id']
+            self.manager_uri = manager_service
             return { 'ret': True }
 
     def _find_log_service(self, uri):
@@ -499,20 +512,21 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def get_firmware_inventory(self, root_uri, rf_uri):
+    def get_firmware_inventory(self):
         result = {}
         devices = []
     
-        response = self.send_get_request(root_uri + rf_uri)
+        # return { 'ret': True, 'msg': self.root_uri + self.update_uri}
+        response = self.send_get_request(self.root_uri + self.update_uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
             for device in data[u'Members']:
                 d = device[u'@odata.id']
-                d = d.replace(rf_uri, "")	# leave just device name
+                d = d.replace(self.update_uri, "")	# leave just device name
                 if "Installed" in d:
                     # Get details for each device that is relevant
-                    uri = root_uri + rf_uri + d
+                    uri = self.root_uri + self.update_uri + d
                     response = self.send_get_request(uri)
                     if response.status_code == 200:	# success
                         data = response.json()

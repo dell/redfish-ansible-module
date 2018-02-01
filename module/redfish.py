@@ -264,17 +264,19 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    elif category == "Firmware":
-        rf_uri = "/redfish/v1/UpdateService/FirmwareInventory"
+    elif category == "UpdateService":
+        # execute only if we find an Update service
+        result = rf_utils._find_update_service("/redfish/v1")
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "GetInventory":
-            result = rf_utils.get_firmware_inventory(root_uri, rf_uri)
+            result = rf_utils.get_firmware_inventory()
 	elif command == "FirmwareCompare":
-            result = rf_utils.compare_firmware(root_uri, rf_uri, "/tmp/Catalog", module.params['Model'])
+            result = rf_utils.compare_firmware("/tmp/Catalog", module.params['Model'])
 	elif command == "UploadFirmware":
-            result = rf_utils.upload_firmware(root_uri, rf_uri, module.params['FWPath'])
+            result = rf_utils.upload_firmware(module.params['FWPath'])
         elif command == "InstallFirmware":
-            result = rf_utils.schedule_firmware_update(root_uri, rf_uri, module.params['InstallOption'])
+            result = rf_utils.schedule_firmware_update(module.params['InstallOption'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

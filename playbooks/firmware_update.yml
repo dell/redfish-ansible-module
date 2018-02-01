@@ -27,7 +27,7 @@
 
   - name: compare firmware inventory
     local_action: >
-        redfish category=Firmware command=FirmwareCompare baseuri={{baseuri}}
+        redfish category=UpdateService command=FirmwareCompare baseuri={{baseuri}}
         user={{user}} password={{password}}
         Model={{result.result.Model|replace('PowerEdge ','')}}
     register: firmware
@@ -54,7 +54,7 @@
 
   - name: upload firmware images
     local_action: >
-        redfish category=Firmware command=UploadFirmware baseuri={{baseuri}}
+        redfish category=UpdateService command=UploadFirmware baseuri={{baseuri}}
         user={{user}} password={{password}}
         FWPath=/tmp/firmware/{{ item.path | basename}}
     register: fw_available
@@ -72,7 +72,7 @@
 
   - name: install firmware image
     local_action: >
-        redfish category=Firmware command=InstallFirmware baseuri={{baseuri}} 
+        redfish category=UpdateService command=InstallFirmware baseuri={{baseuri}} 
         user={{user}} password={{password}}
         InstallOption=NowAndReboot
     when: schedule_fw_update_job is defined 
