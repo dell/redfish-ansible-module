@@ -236,6 +236,17 @@ def main():
             else:
                 result = { 'ret': False, 'msg': 'Invalid Command'}
 
+    elif category == "Logs":
+        # execute only if we find a log service
+        result = rf_utils._find_log_service("/redfish/v1/Managers")
+        if result['ret'] == True:
+            if command == "GetLogs":
+                result = rf_utils.get_logs()
+            elif command == "ClearLogs":
+                result = rf_utils.clear_logs()
+            else:
+                result = { 'ret': False, 'msg': 'Invalid Command'}
+
     elif category == "Inventory":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
         if command == "GetSystemInventory":
@@ -282,16 +293,6 @@ def main():
         elif command == "SetAttributes":
 	    result = rf_utils.set_bios_attributes(root_uri + rf_uri + "/Bios/Settings",
                                                    module.params['bios_attributes'])
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
-    # Dell-specific
-    elif category == "Logs":
-        rf_uri = "/redfish/v1/Managers/iDRAC.Embedded.1"
-        if command == "GetSELogs":
-            result = rf_utils.get_se_logs(root_uri + rf_uri + "/Logs/Sel")
-        elif command == "GetLCLogs":
-            result = rf_utils.get_lc_logs(root_uri + rf_uri + "/Logs/Lclog")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

@@ -1,0 +1,28 @@
+---
+- hosts: myhosts
+  name: System Logs
+  gather_facts: False
+
+  # You can use tags to run specific tasks.
+  #
+  # Examples:
+  # ansible-playbook get_logs.yml
+
+  # Commands available:
+  #   GetLogs		Get System Event Logs
+
+  tasks:
+
+  # --- Get SE Logs --------------------------------------------------------
+  - name: Define output file
+    include_tasks: set_output_file.yml type=Logs
+
+  - name: Get SE Logs
+    local_action: >
+       redfish category=Logs command=GetLogs baseuri={{ baseuri }}
+            user={{ user }} password={{ password }}
+    register: result
+
+  - name: Copy SE Logs to output file
+    local_action: copy content={{ result | to_nice_json }}
+             dest={{template}}.json

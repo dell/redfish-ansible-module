@@ -100,6 +100,65 @@ class RedfishUtils(object):
             self.storage_uri = storage_service
             return { 'ret': True }
 
+    def _find_log_service(self, rf_uri):
+        # First, get manager ID
+        response = self.send_get_request(self.root_uri + rf_uri)
+        data = response.json()
+        for member in data[u'Members']:
+            manager_id_uri = member[u'@odata.id']
+
+        # Once we have the manager ID, search for LogServices
+        response = self.send_get_request(self.root_uri + manager_id_uri)
+        data = response.json()
+
+        if 'LogServices' not in data:
+            return { 'ret': False, 'msg': "LogServices does not exist" }
+        else:
+            log_service = data["LogServices"]["@odata.id"]
+            self.logs_uri = log_service
+            return { 'ret': True }
+
+    def get_logs(self):
+        log_svcs_uri_list = []
+        list_of_logs = []
+        result = {}
+
+        # Find all entries in LogServices
+        response = self.send_get_request(self.root_uri + self.logs_uri)
+        data = response.json()
+        for log_svcs_entry in data[u'Members']:
+            response = self.send_get_request(self.root_uri + log_svcs_entry[u'@odata.id'])
+            _data = response.json()
+            log_svcs_uri_list.append(_data['Entries'][u'@odata.id'])
+
+        # For each entry in LogServices, get log name and all log entries
+        for log_svcs_uri in log_svcs_uri_list:
+            logs = {}
+            list_of_log_entries = []
+            response = self.send_get_request(self.root_uri + log_svcs_uri)
+            data = response.json()
+            logs['Description'] = data['Description']
+            # Get all log entries for each type of log found
+            for logEntry in data[u'Members']:
+                entry = {}
+                # I only extract some fields - Are these entry names standard?
+                entry['Name']     = logEntry[u'Name']
+                entry['Created']  = logEntry[u'Created']
+                entry['Message']  = logEntry[u'Message']
+                entry['Severity'] = logEntry[u'Severity']
+                list_of_log_entries.append(entry)
+            logs['entries'] = list_of_log_entries
+            list_of_logs.append(logs)
+        result['ret'] = True		# setting to True since we're successful
+        result['list_of_logs'] = list_of_logs
+        return result         # list_of_logs[logs{list_of_log_entries[entry{}]}]
+
+    def clear_logs(self):
+        result = {}
+
+
+        return result
+
     def import_scp(self, share, scpfile, root_uri):
         result = {}
         payload = { "ShutdownType" : "Forced",
@@ -382,7 +441,7 @@ class RedfishUtils(object):
         # System Event logs
         result = {}
         allentries = []
-        response = self.send_get_request(uri)
+        response = self.send_get_request(self.root_uri + uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -404,7 +463,7 @@ class RedfishUtils(object):
         # Lifecycle Controller logs
         result = {}
         allentries = []
-        response = self.send_get_request(uri)
+        response = self.send_get_request(self.root_uri + uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
