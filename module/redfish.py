@@ -205,55 +205,68 @@ def main():
 
     # Organize by Categories / Commands
     if category == "UserManagement":
-        # execute only if we find an account service
+        # execute only if we find an Account service
         result = rf_utils._find_account_service("/redfish/v1")
-        if result['ret'] == True:
-            if command == "ListUsers":
-                result = rf_utils.list_users(user)
-            elif command == "AddUser":
-                result = rf_utils.add_user(user)
-            elif command == "EnableUser":
-                result = rf_utils.enable_user(user)
-            elif command == "DeleteUser":
-                result = rf_utils.delete_user(user)
-            elif command == "DisableUser":
-                result = rf_utils.disable_user(user)
-            elif command == "UpdateUserRole":
-                result = rf_utils.update_user_role(user)
-            elif command == "UpdateUserPassword":
-                result = rf_utils.update_user_password(user)
-            else:
-                result = { 'ret': False, 'msg': 'Invalid Command'}
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
+
+        if command == "ListUsers":
+            result = rf_utils.list_users(user)
+        elif command == "AddUser":
+            result = rf_utils.add_user(user)
+        elif command == "EnableUser":
+            result = rf_utils.enable_user(user)
+        elif command == "DeleteUser":
+            result = rf_utils.delete_user(user)
+        elif command == "DisableUser":
+            result = rf_utils.disable_user(user)
+        elif command == "UpdateUserRole":
+            result = rf_utils.update_user_role(user)
+        elif command == "UpdateUserPassword":
+            result = rf_utils.update_user_password(user)
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Storage":
-        # execute only if we find a storage service
+        # execute only if we find a Storage service
         result = rf_utils._find_storage_service("/redfish/v1/Systems/System.Embedded.1")
-        if result['ret'] == True:
-            if command == "GetControllerInventory":
-                result = rf_utils.get_storage_controller_info()
-            elif command == "GetDiskInventory":
-                result = rf_utils.get_disk_info()
-            else:
-                result = { 'ret': False, 'msg': 'Invalid Command'}
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
+
+        if command == "GetControllerInventory":
+            result = rf_utils.get_storage_controller_info()
+        elif command == "GetDiskInventory":
+            result = rf_utils.get_disk_info()
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Inventory":
-        rf_uri = "/redfish/v1/Systems/System.Embedded.1"
+        # execute only if we find a Systems service
+        result = rf_utils._find_systems_service("/redfish/v1")
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
+
         if command == "GetSystemInventory":
-            result = rf_utils.get_system_inventory(root_uri + rf_uri)
+            result = rf_utils.get_system_inventory()
         elif command == "GetPsuInventory":
-            result = rf_utils.get_psu_inventory(root_uri, rf_uri)
+            result = rf_utils.get_psu_inventory()
         elif command == "GetCpuInventory":
-            result = rf_utils.get_cpu_inventory(root_uri, rf_uri + "/Processors")
+            result = rf_utils.get_cpu_inventory("/Processors")
         elif command == "GetNicInventory":
-            result = rf_utils.get_nic_inventory(root_uri, rf_uri + "/EthernetInterfaces")
-        elif command == "GetFanInventory":
-            rf_uri = "/redfish/v1/Chassis/System.Embedded.1/Thermal"
-            result = rf_utils.get_fan_inventory(root_uri + rf_uri)
+            result = rf_utils.get_nic_inventory("/EthernetInterfaces")
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
+
+    elif category == "Chassis":
+        # execute only if we find a Chassis service
+        result = rf_utils._find_chassis_service("/redfish/v1")
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
+
+        if command == "GetFanInventory":
+            result = rf_utils.get_fan_inventory("/Thermal")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Firmware":
         rf_uri = "/redfish/v1/UpdateService/FirmwareInventory"
+
         if command == "GetInventory":
             result = rf_utils.get_firmware_inventory(root_uri, rf_uri)
 	elif command == "FirmwareCompare":
@@ -266,11 +279,15 @@ def main():
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Power":
-        rf_uri = "/redfish/v1/Systems/System.Embedded.1"
-        result = rf_utils.manage_system_power(command, root_uri + rf_uri)
+        # execute only if we find a Systems service
+        result = rf_utils._find_systems_service("/redfish/v1")
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
+
+        result = rf_utils.manage_system_power(command, "/Actions/ComputerSystem.Reset")
 
     elif category == "Bios":
         rf_uri = "/redfish/v1/Systems/System.Embedded.1"
+
         if command == "GetAttributes":
             result = rf_utils.get_bios_attributes(root_uri + rf_uri)
         elif command == "GetBootOrder":
@@ -286,20 +303,23 @@ def main():
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Logs":
-        # execute only if we find a log service
+        # execute only if we find a Log service
         result = rf_utils._find_log_service("/redfish/v1/Managers")
-        if result['ret'] == True:
-            if command == "GetLogs":
-                result = rf_utils.get_logs()
-            elif command == "ClearLogs":
-                result = rf_utils.clear_logs()
-            else:
-                result = { 'ret': False, 'msg': 'Invalid Command'}
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
+
+        if command == "GetLogs":
+            result = rf_utils.get_logs()
+        elif command == "ClearLogs":
+            result = rf_utils.clear_logs()
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
 
     # Using Dell extension
     elif category == "Idrac":
-        # execute only if we find a manager
+        # execute only if we find a Manager service
         result = rf_utils._find_manager("/redfish/v1")
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
+
         if command == "SetDefaultSettings":
             result = rf_utils.set_idrac_default_settings("/Actions/Oem/DellManager.ResetToDefaults")
         elif command == "GracefulRestart":
@@ -315,8 +335,10 @@ def main():
 
     # Using Dell extension
     elif category == "SCP":
-        # execute only if we find a manager
+        # execute only if we find a Manager service
         result = rf_utils._find_manager("/redfish/v1")
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
+
         if command == "ExportSCP":
             result = rf_utils.export_scp(share, hostname, "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration")
         elif command == "ImportSCP":

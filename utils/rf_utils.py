@@ -85,8 +85,8 @@ class RedfishUtils(object):
     def _init_session(self):
         pass
 
-    def _find_account_service(self, rf_uri):
-        response = self.send_get_request(self.root_uri + rf_uri)
+    def _find_account_service(self, uri):
+        response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         if 'AccountService' not in data:
             return { 'ret': False, 'msg': "AccountService does not exist" }
@@ -100,8 +100,8 @@ class RedfishUtils(object):
             self.accounts_uri = accounts
             return { 'ret': True }
 
-    def _find_storage_service(self, rf_uri):
-        response = self.send_get_request(self.root_uri + rf_uri)
+    def _find_storage_service(self, uri):
+        response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         if 'SimpleStorage' not in data:
             return { 'ret': False, 'msg': "Storage Service does not exist" }
@@ -110,8 +110,36 @@ class RedfishUtils(object):
             self.storage_uri = storage_service
             return { 'ret': True }
 
-    def _find_manager(self, rf_uri):
-        response = self.send_get_request(self.root_uri + rf_uri)
+    def _find_systems_service(self, uri):
+        response = self.send_get_request(self.root_uri + uri)
+        data = response.json()
+        if 'Systems' not in data:
+            return { 'ret': False, 'msg': "Systems does not exist" }
+        else:
+            systems = data["Systems"]["@odata.id"]
+            response = self.send_get_request(self.root_uri + systems)
+            data = response.json()
+            for member in data[u'Members']:
+                systems_uri = member[u'@odata.id']
+            self.systems_uri = systems_uri
+            return { 'ret': True }
+
+    def _find_chassis_service(self, uri):
+        response = self.send_get_request(self.root_uri + uri)
+        data = response.json()
+        if 'Chassis' not in data:
+            return { 'ret': False, 'msg': "Chassis does not exist" }
+        else:
+            chassis = data["Chassis"]["@odata.id"]
+            response = self.send_get_request(self.root_uri + chassis)
+            data = response.json()
+            for member in data[u'Members']:
+                chassis_uri = member[u'@odata.id']
+            self.chassis_uri = chassis_uri
+            return { 'ret': True }
+
+    def _find_manager(self, uri):
+        response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         if 'Managers' not in data:
             return { 'ret': False, 'msg': "Manager does not exist" }
@@ -124,9 +152,9 @@ class RedfishUtils(object):
             self.manager_uri = manager_uri
             return { 'ret': True }
 
-    def _find_log_service(self, rf_uri):
+    def _find_log_service(self, uri):
         # First, get manager ID
-        response = self.send_get_request(self.root_uri + rf_uri)
+        response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         for member in data[u'Members']:
             manager_id_uri = member[u'@odata.id']
@@ -337,25 +365,23 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def manage_system_power(self, command, root_uri):
+    def manage_system_power(self, command, uri):
         result = {}
-        uri = root_uri + "/Actions/ComputerSystem.Reset"
-    
         if command == "PowerOn":
             payload = {'ResetType': 'On'}
-            response = self.send_post_request(uri, payload, HEADERS)
+            response = self.send_post_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
     
         elif command == "PowerOff":
             payload = {'ResetType': 'ForceOff'}
-            response = self.send_post_request(uri, payload, HEADERS)
+            response = self.send_post_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
     
         elif command == "GracefulRestart":
             payload = {'ResetType': 'GracefulRestart'}
-            response = self.send_post_request(uri, payload, HEADERS)
+            response = self.send_post_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
     
         elif command == "GracefulShutdown":
             payload = {'ResetType': 'GracefulShutdown'}
-            response = self.send_post_request(uri, payload, HEADERS)
+            response = self.send_post_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
     
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
@@ -642,10 +668,10 @@ class RedfishUtils(object):
     
         return result
     
-    def get_fan_inventory(self, root_uri):
+    def get_fan_inventory(self, uri):
         result = {}
         fan_details = []
-        response = self.send_get_request(root_uri)
+        response = self.send_get_request(self.root_uri + self.chassis_uri + uri)
         if response.status_code == 200:             # success
             result['ret'] = True
             data = response.json()
@@ -743,13 +769,13 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % str(response.status_code) }
         return result
     
-    def get_cpu_inventory(self, root_uri, rf_uri):
+    def get_cpu_inventory(self, uri):
         result = {}
         cpu_details = []
     
         # Get a list of all CPUs and build respective URIs
         cpu_list = []
-        response = self.send_get_request(root_uri + rf_uri)
+        response = self.send_get_request(self.root_uri + self.systems_uri + uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -758,7 +784,7 @@ class RedfishUtils(object):
                 cpu_list.append(cpu[u'@odata.id'])
     
             for c in cpu_list:
-                uri = root_uri + c
+                uri = self.root_uri + c
                 response = self.send_get_request(uri)
                 if response.status_code == 200:             # success
                     data = response.json()
@@ -782,13 +808,13 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def get_nic_inventory(self, root_uri, rf_uri):
+    def get_nic_inventory(self, uri):
         result = {}
         nic_details = []
     
         # Get a list of all network controllers and build respective URIs
         nic_list = []
-        response = self.send_get_request(root_uri + rf_uri)
+        response = self.send_get_request(self.root_uri + self.systems_uri + uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -797,7 +823,7 @@ class RedfishUtils(object):
                 nic_list.append(nic[u'@odata.id'])
     
             for n in nic_list:
-                uri = root_uri + n
+                uri = self.root_uri + n
                 response = self.send_get_request(uri)
                 if response.status_code == 200:             # success
                     data = response.json()
@@ -830,13 +856,13 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def get_psu_inventory(self, root_uri, rf_uri):
+    def get_psu_inventory(self):
         result = {}
         psu_details = []
     
         # Get a list of all PSUs and build respective URIs
         psu_list = []
-        response = self.send_get_request(root_uri + rf_uri)
+        response = self.send_get_request(self.root_uri + self.systems_uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
@@ -845,7 +871,7 @@ class RedfishUtils(object):
                 psu_list.append(psu[u'@odata.id'])
     
             for p in psu_list:
-                uri = root_uri + p
+                uri = self.root_uri + p
                 response = self.send_get_request(uri)
                 if response.status_code == 200:             # success
                     data = response.json()
@@ -873,9 +899,9 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def get_system_inventory(self, root_uri):
+    def get_system_inventory(self):
         result = {}
-        response = self.send_get_request(root_uri)
+        response = self.send_get_request(self.root_uri + self.systems_uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
