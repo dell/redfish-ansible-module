@@ -44,34 +44,44 @@ class RedfishUtils(object):
         headers = {}
         if 'token' in self.creds:
             headers = {"X-Auth-Token": self.creds['token']}
-        try:
-            response = requests.get(uri, headers, verify=False, auth=(self.creds['user'], self.creds['pswd']))
-        except:
-            raise			# Do we let module exit or should we return an error value?
-        return response
+        response = requests.get(uri, headers, verify=False, auth=(self.creds['user'], self.creds['pswd']))
+        if response.status_code < 300:
+            return response
+        else:
+            raise Exception(response.text)
     
     def send_post_request(self, uri, pyld, hdrs, fileName=None):
         headers = {}
         if 'token' in self.creds:
             headers = {"X-Auth-Token": self.creds['token']}
-        try:
-            response = requests.post(uri, data=json.dumps(pyld), headers=hdrs, files=fileName,
+        response = requests.post(uri, data=json.dumps(pyld), headers=hdrs, files=fileName,
                                verify=False, auth=(self.creds['user'], self.creds['pswd']))
-        except:
-            raise			# Do we let module exit or should we return an error value?
-        return response
+        if response.status_code < 300:
+            return response
+        else:
+            raise Exception(response.text)
     
     def send_patch_request(self, uri, pyld, hdrs):
         headers = {}
         if 'token' in self.creds:
             headers = {"X-Auth-Token": self.creds['token']}
-        try:
-            response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,
+        response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,
                                verify=False, auth=(self.creds['user'], self.creds['pswd']))
-        except:
-            raise			# Do we let module exit or should we return an error value?
-        return response
+        if response.status_code < 300:
+            return response
+        else:
+            raise Exception(response.text)
     
+    def send_delete_request(self, uri, pyld, hdrs):
+        headers = {}
+        if 'token' in self.creds:
+            headers = {"X-Auth-Token": self.creds['token']}
+        response = requests.delete(uri, verify=False, auth=(self.creds['user'], self.creds['pswd']))
+        if response.status_code < 300:
+            return response
+        else:
+            raise Exception(response.text)
+
     def _init_session(self):
         pass
 
@@ -98,6 +108,20 @@ class RedfishUtils(object):
         else:
             storage_service = data["SimpleStorage"]["@odata.id"]
             self.storage_uri = storage_service
+            return { 'ret': True }
+
+    def _find_manager(self, rf_uri):
+        response = self.send_get_request(self.root_uri + rf_uri)
+        data = response.json()
+        if 'Managers' not in data:
+            return { 'ret': False, 'msg': "Manager does not exist" }
+        else:
+            manager = data["Managers"]["@odata.id"]
+            response = self.send_get_request(self.root_uri + manager)
+            data = response.json()
+            for member in data[u'Members']:
+                manager_uri = member[u'@odata.id']
+            self.manager_uri = manager_uri
             return { 'ret': True }
 
     def _find_log_service(self, rf_uri):
@@ -172,7 +196,7 @@ class RedfishUtils(object):
         result['ret'] = True		# assume we're successful
         return result
 
-    def import_scp(self, share, scpfile, root_uri):
+    def import_scp(self, share, scpfile, uri):
         result = {}
         payload = { "ShutdownType" : "Forced",
                     "ShareParameters" : { "Target" : "ALL",
@@ -183,7 +207,7 @@ class RedfishUtils(object):
                          "Password"  : share['pswd'],
                          "FileName"  : scpfile }
                   }
-        response = self.send_post_request(root_uri, payload, HEADERS)
+        response = self.send_post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
         if response.status_code == 202:		# success
             result['ret'] = True
             '''
@@ -201,7 +225,7 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
         return result
     
-    def export_scp(self, share, hostname, root_uri):
+    def export_scp(self, share, hostname, uri):
         result = {}
         # timestamp to add to SCP XML file name
         ts = str(datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S"))
@@ -215,7 +239,7 @@ class RedfishUtils(object):
                          "Password"  : share['pswd'],
                          "FileName"  : hostname + "_SCP_" + ts + ".xml" }
                   }
-        response = self.send_post_request(root_uri, payload, HEADERS)
+        response = self.send_post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
         if response.status_code == 202:		# success
             result['ret'] = True
             '''
@@ -303,11 +327,10 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def restart_idrac_gracefully(self, root_uri):
+    def restart_idrac_gracefully(self, uri):
         result = {}
-        uri = root_uri + "/Actions/Manager.Reset"
         payload = {'ResetType': 'GracefulRestart'}
-        response = self.send_post_request(uri, payload, HEADERS)
+        response = self.send_post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
         if response.status_code == 204:		# success
             result['ret'] = True
         else:
@@ -561,9 +584,9 @@ class RedfishUtils(object):
             result =  { 'ret': False, 'msg': 'Error accepting firmware install; status_code=%s' % response.status_code }
         return result
     
-    def get_idrac_attributes(self, root_uri):
+    def get_idrac_attributes(self, uri):
         result = {}
-        response = self.send_get_request(root_uri + "/Attributes")
+        response = self.send_get_request(self.root_uri + self.manager_uri + uri)
         if response.status_code == 200:             # success
             data = response.json()
             for attribute in data[u'Attributes'].items():
@@ -666,10 +689,10 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def set_idrac_default_settings(self, root_uri):
+    def set_idrac_default_settings(self, uri):
         result = {}
         payload = {"ResetType": "All"}
-        response = self.send_post_request(root_uri, payload, HEADERS)
+        response = self.send_post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result = { 'ret': True, 'msg': 'SetIdracDefaultSettings completed'}
         elif response.status_code == 405:
@@ -678,11 +701,11 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def set_idrac_attributes(self, root_uri, idrac_attributes):
+    def set_idrac_attributes(self, uri, idrac_attributes):
         result = {}
         idrac_attributes = idrac_attributes.replace("'","\"")
         payload = {"Attributes": json.loads(idrac_attributes) }
-        response = self.send_patch_request(root_uri, payload, HEADERS)
+        response = self.send_patch_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
         if response.status_code == 200:
             result = { 'ret': True, 'msg': 'iDRAC Attributes set as pending values'}
         elif response.status_code == 405:
@@ -707,9 +730,9 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % str(response.status_code) }
         return result
     
-    def create_bios_config_job(self, url):
+    def create_bios_config_job(self, uri):
         payload = {"TargetSettingsURI":"/redfish/v1/Systems/System.Embedded.1/Bios/Settings", "RebootJobType":"PowerCycle"}
-        response = self.send_post_request(url, payload, HEADERS)
+        response = self.send_post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
         if response.status_code == 200:
             result = { 'ret': True, 'msg': 'Config job created'}
         elif response.status_code == 400:
