@@ -155,7 +155,7 @@ class RedfishUtils(object):
             self.manager_uri = manager_service
             return { 'ret': True }
 
-    def get_logs(self):
+    def view_logs(self):
         log_svcs_uri_list = []
         list_of_logs = []
         result = {}
@@ -227,7 +227,7 @@ class RedfishUtils(object):
         result['ret'] = True		# assume we're successful
         return result
 
-    def import_dellemc_scp(self, share, scpfile, uri):
+    def import_dell_scp(self, share, scpfile, uri):
         result = {}
         payload = { "ShutdownType" : "Forced",
                     "ShareParameters" : { "Target" : "ALL",
@@ -256,7 +256,7 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
         return result
     
-    def export_dellemc_scp(self, share, hostname, uri):
+    def export_dell_scp(self, share, hostname, uri):
         result = {}
         # timestamp to add to SCP XML file name
         ts = str(datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S"))
@@ -374,7 +374,7 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def restart_idrac_gracefully(self, uri):
+    def restart_manager_gracefully(self, uri):
         result = {}
         payload = {'ResetType': 'GracefulRestart'}
         response = self.send_post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
@@ -548,7 +548,7 @@ class RedfishUtils(object):
     
     # This function compares the firmware levels in the system vs. the firmware levels
     # available in the Catalog.gz file that it downloaded from ftp.dell.com
-    def compare_firmware(self, root_uri, rf_uri, catalog_file, model):
+    def compare_firmware_inventory(self, root_uri, rf_uri, catalog_file, model):
         fw = []
         fw_list = {'ret':True, 'Firmwares':[]}
     
@@ -630,7 +630,7 @@ class RedfishUtils(object):
             result =  { 'ret': False, 'msg': 'Error accepting firmware install; status_code=%s' % response.status_code }
         return result
     
-    def get_idrac_attributes(self, uri):
+    def get_manager_attributes(self, uri):
         result = {}
         response = self.send_get_request(self.root_uri + self.manager_uri + uri)
         if response.status_code == 200:             # success
@@ -735,25 +735,25 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def set_idrac_default_settings(self, uri):
+    def set_manager_default_settings(self, uri):
         result = {}
         payload = {"ResetType": "All"}
         response = self.send_post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
         if response.status_code == 200:		# success
-            result = { 'ret': True, 'msg': 'SetIdracDefaultSettings completed'}
+            result = { 'ret': True, 'msg': 'SetManagerDefaultSettings completed'}
         elif response.status_code == 405:
             result = { 'ret': False, 'msg': "Resource not supported" }
         else:
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def set_idrac_attributes(self, uri, idrac_attributes):
+    def set_manager_attributes(self, uri, manager_attributes):
         result = {}
-        idrac_attributes = idrac_attributes.replace("'","\"")
-        payload = {"Attributes": json.loads(idrac_attributes) }
+        manager_attributes = manager_attributes.replace("'","\"")
+        payload = {"Attributes": json.loads(manager_attributes) }
         response = self.send_patch_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
         if response.status_code == 200:
-            result = { 'ret': True, 'msg': 'iDRAC Attributes set as pending values'}
+            result = { 'ret': True, 'msg': 'Manager attributes set as pending values'}
         elif response.status_code == 405:
             result = { 'ret': False, 'msg': "Resource not supported" }
         else:

@@ -4,7 +4,7 @@
 # require custom values place these variables in /etc/ansible/hosts to override
 # for each individual host
 
-# iDRAC credentials (using default values)
+# Default credentials
 user: root
 password: calvin
 
@@ -25,16 +25,16 @@ timezone: "US/Central"
 # Utilities, UefiTarget & SDCard
 bootdevice: Hdd
 
-# For SCP files
+# Dell - SCP files
 sharehost: 10.9.165.171
 sharename: share2
 shareuser: dell
 sharepswd: 111111
 # name of SCP file to use for importing - apply to same server models each time
-scpfile: SCP-only-for-R740s.xml
+scpfile: SCP-for-server-model-x.xml
 
 # For managing users - userid 2 is default root user, be mindful!
 userid: 3                  # user id of user to add/delete/modify (1-16)
-username: jose             # user name to add/delete/modify
+username: dauser           # user name to add/delete/modify
 userpswd: pa$$w0rd         # user password to add/delete/modify
 userrole: Operator         # user role to add/delete/modify

@@ -10,7 +10,7 @@
 
   - name: Get Firmware Inventory
     local_action: >
-       redfish category=UpdateService command=GetInventory baseuri={{baseuri}}
+       redfish category=Update command=GetFirmwareInventory baseuri={{baseuri}}
        user={{user}} password={{password}}
     register: result
     ignore_errors: yes

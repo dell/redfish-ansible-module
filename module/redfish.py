@@ -112,11 +112,11 @@ options:
     default: None
     description:
       - dict where we specify BIOS attributes to set
-  idrac_attributes:
+  manager_attributes:
     required: false
     default: None
     description:
-      - dict where we specify IDRAC attributes to set
+      - dict where we specify manager attributes to set
   FWPath:
     required: false
     default: None
@@ -164,7 +164,7 @@ def main():
             shareuser  = dict(required=False, type='str', default=None),
             sharepswd  = dict(required=False, type='str', default=None, no_log=True),
             bootdevice = dict(required=False, type='str', default=None),
-            idrac_attributes = dict(required=False, type='str', default=None),
+            manager_attributes = dict(required=False, type='str', default=None),
             bios_attributes = dict(required=False, type='str', default=None),
 	    FWPath     = dict(required=False, type='str', default=None),
 	    Model      = dict(required=False, type='str', default=None),
@@ -205,7 +205,32 @@ def main():
     rf_utils = RedfishUtils(creds, root_uri)
 
     # Organize by Categories / Commands
-    if category == "UserManagement":
+    if category == "Inventory":
+        # execute only if we find a Systems service
+        result = rf_utils._find_systems_service(rf_uri)
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
+
+        # General
+        if command == "GetSystemInventory":
+            result = rf_utils.get_system_inventory()
+
+        # Components
+        elif command == "GetPsuInventory":
+            result = rf_utils.get_psu_inventory()
+        elif command == "GetCpuInventory":
+            result = rf_utils.get_cpu_inventory("/Processors")
+        elif command == "GetNicInventory":
+            result = rf_utils.get_nic_inventory("/EthernetInterfaces")
+
+        # Storage
+        elif command == "GetStorageControllerInventory":
+            result = rf_utils.get_storage_controller_info()
+        elif command == "GetDiskInventory":
+            result = rf_utils.get_disk_info()
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
+
+    elif category == "UserManagement":
         # execute only if we find an Account service
         result = rf_utils._find_account_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
@@ -227,34 +252,6 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    elif category == "Storage":
-        # execute only if we find a Systems service
-        result = rf_utils._find_systems_service(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
-
-        if command == "GetControllerInventory":
-            result = rf_utils.get_storage_controller_info()
-        elif command == "GetDiskInventory":
-            result = rf_utils.get_disk_info()
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
-    elif category == "Inventory":
-        # execute only if we find a Systems service
-        result = rf_utils._find_systems_service(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
-
-        if command == "GetSystemInventory":
-            result = rf_utils.get_system_inventory()
-        elif command == "GetPsuInventory":
-            result = rf_utils.get_psu_inventory()
-        elif command == "GetCpuInventory":
-            result = rf_utils.get_cpu_inventory("/Processors")
-        elif command == "GetNicInventory":
-            result = rf_utils.get_nic_inventory("/EthernetInterfaces")
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
     elif category == "Chassis":
         # execute only if we find a Chassis service
         result = rf_utils._find_chassis_service(rf_uri)
@@ -265,45 +262,24 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    elif category == "UpdateService":
-        # execute only if we find an Update service
-        result = rf_utils._find_update_service(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
-
-        if command == "GetInventory":
-            result = rf_utils.get_firmware_inventory()
-	elif command == "FirmwareCompare":
-            result = rf_utils.compare_firmware("/tmp/Catalog", module.params['Model'])
-	elif command == "UploadFirmware":
-            result = rf_utils.upload_firmware(module.params['FWPath'])
-        elif command == "InstallFirmware":
-            result = rf_utils.schedule_firmware_update(module.params['InstallOption'])
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
-    elif category == "Power":
+    elif category == "Systems":
         # execute only if we find a Systems service
         result = rf_utils._find_systems_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
-        result = rf_utils.manage_system_power(command, "/Actions/ComputerSystem.Reset")
-
-    elif category == "Bios":
-        # execute only if we find a Systems service
-        result = rf_utils._find_systems_service(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
-
-        if command == "GetAttributes":
+        if command == "PowerOn" or command == "PowerOff" or command == "GracefulRestart" or command == "GracefulShutdown":
+            result = rf_utils.manage_system_power(command, "/Actions/ComputerSystem.Reset")
+        elif command == "GetBiosAttributes":
             result = rf_utils.get_bios_attributes("/Bios")
-        elif command == "GetBootOrder":
+        elif command == "GetBiosBootOrder":
             result = rf_utils.get_bios_boot_order("/Bios", "/BootSources")
         elif command == "SetOneTimeBoot":
             result = rf_utils.set_one_time_boot_device(bootdevice)
-        elif command == "SetDefaultSettings":
+        elif command == "SetBiosDefaultSettings":
             result = rf_utils.set_bios_default_settings("/Bios/Actions/Bios.ResetBios")
-        elif command == "SetAttributes":
+        elif command == "SetBiosAttributes":
 	    result = rf_utils.set_bios_attributes("/Bios/Settings", module.params['bios_attributes'])
-        elif command == "CreateConfigJob":
+        elif command == "CreateBiosConfigJob":
             # execute only if we find a Manager service
             result = rf_utils._find_manager(rf_uri)
             if result['ret'] == False: module.fail_json(msg=result['msg'])
@@ -311,45 +287,49 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    elif category == "Logs":
+    # Specific to Dell
+    elif category == "Update":
+        # execute only if we find an Update service
+        result = rf_utils._find_update_service(rf_uri)
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
+
+        if command == "GetFirmwareInventory":
+            result = rf_utils.get_firmware_inventory()
+	elif command == "CompareFirmwareInventory":
+            result = rf_utils.compare_firmware_inventory("/tmp/Catalog", module.params['Model'])
+	elif command == "UploadFirmware":
+            result = rf_utils.upload_firmware(module.params['FWPath'])
+        elif command == "ScheduleUpdate":
+            result = rf_utils.schedule_firmware_update(module.params['InstallOption'])
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
+
+    # Specific to Dell
+    elif category == "Manager":
         # execute only if we find a Manager service
         result = rf_utils._find_manager(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
-        if command == "GetLogs":
-            result = rf_utils.get_logs()
+        if command == "ManagerGracefulRestart":
+            result = rf_utils.restart_manager_gracefully("/Actions/Manager.Reset")
+        elif command == "GetManagerAttributes":
+            result = rf_utils.get_manager_attributes("/Attributes")
+        elif command == "SetManagerAttributes":
+            result = rf_utils.set_manager_attributes("/Attributes", module.params['manager_attributes'])
+        elif command == "SetDefaultManagerSettings":
+            result = rf_utils.set_manager_default_settings("/Actions/Oem/DellManager.ResetToDefaults")
+
+        # Logs
+        elif command == "ViewLogs":
+            result = rf_utils.view_logs()
         elif command == "ClearLogs":
             result = rf_utils.clear_logs()
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    # Specific to Dell
-    elif category == "Idrac":
-        # execute only if we find a Manager service
-        result = rf_utils._find_manager(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
-
-        if command == "SetDefaultSettings":
-            result = rf_utils.set_idrac_default_settings("/Actions/Oem/DellManager.ResetToDefaults")
-        elif command == "GracefulRestart":
-            result = rf_utils.restart_idrac_gracefully("/Actions/Manager.Reset")
-        elif command == "GetAttributes":
-            result = rf_utils.get_idrac_attributes("/Attributes")
-        elif command == "SetAttributes":
-            result = rf_utils.set_idrac_attributes("/Attributes", module.params['idrac_attributes'])
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
-    # Specific to Dell
-    elif category == "DellEMC_SCP":
-        # execute only if we find a Manager service
-        result = rf_utils._find_manager(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
-
-        if command == "ExportSCP":
-            result = rf_utils.export_dellemc_scp(share, hostname, "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration")
-        elif command == "ImportSCP":
-            result = rf_utils.import_dellemc_scp(share, scpfile, "/Actions/Oem/EID_674_Manager.ImportSystemConfiguration")
+        # SCP
+        elif command == "ExportDellSCP":
+            result = rf_utils.export_dell_scp(share, hostname, "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration")
+        elif command == "ImportDellSCP":
+            result = rf_utils.import_dell_scp(share, scpfile, "/Actions/Oem/EID_674_Manager.ImportSystemConfiguration")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

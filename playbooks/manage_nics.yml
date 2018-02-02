@@ -8,19 +8,20 @@
   # Carefully review all tasks and select what you need by using tags.
   # Running *ALL* tasks will have unintended consequences!
   #
-  # Updating BIOS settings requires a reboot to implement, so be sure
-  # to pass the 'reboot' tag accordingly.
+  # Updating BIOS settings requires creating a configuration job to implement
+  # (which then reboots the system), so pass the 'createbiosconfigjob' tag 
+  # accordingly.
   #
   # Examples:
   # ansible-playbook manage_nics.yml --tags enablepxenic2
-  # ansible-playbook manage_nics.yml --tags "disablepxenic1,reboot"
+  # ansible-playbook manage_nics.yml --tags "disablepxenic1,createbiosconfigjob"
 
   tasks:
 
   # ------------------------------------------------------------------------
   - name: Enable PXE Boot for NIC1
     local_action: >
-       redfish category=Bios command=SetAttributes
+       redfish category=Systems command=SetBiosAttributes
        bios_attributes={'PxeDev1EnDis':'Enabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic1
@@ -28,7 +29,7 @@
     
   - name: Disable PXE Boot for NIC1
     local_action: >
-       redfish category=Bios command=SetAttributes
+       redfish category=Systems command=SetBiosAttributes
        bios_attributes={'PxeDev1EnDis':'Disabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic1
@@ -37,7 +38,7 @@
   # ------------------------------------------------------------------------
   - name: Enable PXE Boot for NIC2
     local_action: >
-       redfish category=Bios command=SetAttributes
+       redfish category=Systems command=SetBiosAttributes
        bios_attributes={'PxeDev2EnDis':'Enabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic2
@@ -45,7 +46,7 @@
     
   - name: Disable PXE Boot for NIC2
     local_action: >
-       redfish category=Bios command=SetAttributes
+       redfish category=Systems command=SetBiosAttributes
        bios_attributes={'PxeDev2EnDis':'Disabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic2
@@ -54,7 +55,7 @@
   # ------------------------------------------------------------------------
   - name: Enable PXE Boot for NIC3
     local_action: >
-       redfish category=Bios command=SetAttributes
+       redfish category=Systems command=SetBiosAttributes
        bios_attributes={'PxeDev3EnDis':'Enabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic3
@@ -62,7 +63,7 @@
     
   - name: Disable PXE Boot for NIC3
     local_action: >
-       redfish category=Bios command=SetAttributes
+       redfish category=Systems command=SetBiosAttributes
        bios_attributes={'PxeDev3EnDis':'Disabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic3
@@ -71,7 +72,7 @@
   # ------------------------------------------------------------------------
   - name: Enable PXE Boot for NIC4
     local_action: >
-       redfish category=Bios command=SetAttributes
+       redfish category=Systems command=SetBiosAttributes
        bios_attributes={'PxeDev4EnDis':'Enabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
     tags: enablepxenic4
@@ -79,17 +80,17 @@
     
   - name: Disable PXE Boot for NIC4
     local_action: >
-       redfish category=Bios command=SetAttributes
+       redfish category=Systems command=SetBiosAttributes
        bios_attributes={'PxeDev4EnDis':'Disabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
     tags: disablepxenic4
     ignore_errors: yes
 
   # ------------------------------------------------------------------------
-  - name: Schedule Config Job - REBOOT
+  - name: Schedule Config Job - reboot
     local_action: >
-      redfish category=Idrac command=ConfigJob baseuri={{baseuri}}
+      redfish category=System command=CreateBiosConfigJob baseuri={{baseuri}}
       user={{user}} password={{password}}
-    tags: reboot
+    tags: createbiosconfigjob
     ignore_errors: yes
 

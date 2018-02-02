@@ -26,21 +26,21 @@
   # ------------------------------------------------------------------------
   - name: Turn system power on
     local_action: >
-       redfish category=Power command=PowerOn baseuri={{baseuri}}
+       redfish category=Systems command=PowerOn baseuri={{baseuri}}
        user={{user}} password={{password}}
     tags: poweron
 
   # ------------------------------------------------------------------------
   - name: Turn system power off
     local_action: >
-       redfish category=Power command=PowerOff baseuri={{baseuri}}
+       redfish category=Systems command=PowerOff baseuri={{baseuri}}
        user={{user}} password={{password}}
     tags: poweroff
 
   # ------------------------------------------------------------------------
   - name: Graceful system power restart
     local_action: >
-       redfish category=Power command=GracefulRestart baseuri={{baseuri}}
+       redfish category=Systems command=GracefulRestart baseuri={{baseuri}}
        user={{user}} password={{password}}
     tags: gracefulrestart
 
@@ -48,7 +48,7 @@
   # 14G only
   - name: Graceful system power shutdown
     local_action: >
-       redfish category=Power command=GracefulShutdown baseuri={{baseuri}}
+       redfish category=Systems command=GracefulShutdown baseuri={{baseuri}}
        user={{user}} password={{password}}
     tags: gracefulshutdown
 

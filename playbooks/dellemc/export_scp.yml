@@ -13,14 +13,11 @@
   # For information on how to prepare an SCP file for import, please refer
   # to http://dell.to/2iCy2O9
 
-  # Options available:
-  #   ExportSCP 	Export SCP
-
   tasks:
 
   - name: Export SCP file
     local_action: >
-       redfish category=DellEMC_SCP command=ExportSCP baseuri={{baseuri}}
+       redfish category=Manager command=ExportDellSCP baseuri={{baseuri}}
        user={{user}} password={{password}}
        sharehost={{sharehost}} sharename={{sharename}}
        shareuser={{shareuser}} sharepswd={{sharepswd}}

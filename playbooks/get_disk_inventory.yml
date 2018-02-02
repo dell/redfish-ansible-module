@@ -1,0 +1,20 @@
+---
+- hosts: myhosts
+  name: Get disk inventory
+  gather_facts: False
+
+  tasks:
+
+  - name: Define output file
+    include_tasks: set_output_file.yml type=DiskInventory
+
+  - name: Get disk inventory
+    local_action: >
+       redfish category=Inventory command=GetDiskInventory baseuri={{baseuri}}
+            user={{user}} password={{password}}
+    register: result
+    ignore_errors: yes
+
+  - name: Copy results to output file
+    local_action: copy content={{ result | to_nice_json }}
+            dest={{template}}.json

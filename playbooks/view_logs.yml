@@ -1,13 +1,10 @@
 ---
 - hosts: myhosts
-  name: Get System Logs
+  name: View System Logs
   gather_facts: False
 
   # Example:
-  # ansible-playbook get_logs.yml
-
-  # Commands available:
-  #   GetLogs		Get System Logs
+  # ansible-playbook view_logs.yml
 
   tasks:
 
@@ -16,7 +13,7 @@
 
   - name: Get Logs
     local_action: >
-       redfish category=Logs command=GetLogs baseuri={{ baseuri }}
+       redfish category=Manager command=ViewLogs baseuri={{ baseuri }}
             user={{ user }} password={{ password }}
     register: result
 

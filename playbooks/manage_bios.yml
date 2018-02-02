@@ -9,11 +9,12 @@
   # Running *ALL* tasks will have unintended consequences!
   #
   # Updating BIOS settings requires creating a configuration job to implement
-  # (which then reboots the system), so pass the 'createconfigjob' tag accordingly.
+  # (which then reboots the system), so pass the 'createbiosconfigjob' tag
+  # accordingly.
   #
   # Examples:
   # ansible-playbook manage_bios.yml --tags getattributes
-  # ansible-playbook manage_bios.yml --tags "bootmodeuefi,createconfigjob"
+  # ansible-playbook manage_bios.yml --tags "bootmodeuefi,createbiosconfigjob"
 
   # Commands available:
   #   GetAttributes 		Get BIOS attributes
@@ -32,7 +33,7 @@
 
   - name: Get attributes
     local_action: >
-       redfish category=Bios command=GetAttributes baseuri={{baseuri}}
+       redfish category=System command=GetBiosAttributes baseuri={{baseuri}}
        user={{user}} password={{password}}
     register: result
     ignore_errors: yes
@@ -50,7 +51,7 @@
 
   - name: Get device boot order
     local_action: >
-       redfish category=Bios command=GetBootOrder baseuri={{baseuri}}
+       redfish category=System command=GetBiosBootOrder baseuri={{baseuri}}
        user={{user}} password={{password}}
     register: result
     ignore_errors: yes
@@ -64,7 +65,7 @@
   # ------------------------------------------------------------------------
   - name: Set one-time boot device to {{bootdevice}}
     local_action: >
-       redfish category=Bios command=SetOneTimeBoot baseuri={{baseuri}}
+       redfish category=System command=SetOneTimeBoot baseuri={{baseuri}}
        user={{user}} password={{password}} bootdevice={{bootdevice}}
     ignore_errors: yes
     tags: setonetimebootdevice
@@ -72,7 +73,7 @@
   # ------------------------------------------------------------------------
   - name: Set default settings
     local_action: >
-       redfish category=Bios command=SetDefaultSettings baseuri={{baseuri}}
+       redfish category=System command=SetBiosDefaultSettings baseuri={{baseuri}}
        user={{user}} password={{password}}
     ignore_errors: yes
     tags: setdefaultsettings
@@ -80,7 +81,7 @@
   # ------------------------------------------------------------------------
   - name: Set BootMode to UEFI
     local_action: >
-       redfish category=Bios command=SetAttributes bios_attributes={'BootMode':'Uefi'}
+       redfish category=System command=SetBiosAttributes bios_attributes={'BootMode':'Uefi'}
        user={{user}} password={{password}} baseuri={{baseuri}}
     tags: bootmodeuefi
     ignore_errors: yes
@@ -88,7 +89,7 @@
   # ------------------------------------------------------------------------
   - name: Set BootMode to Legacy BIOS
     local_action: >
-       redfish category=Bios command=SetAttributes bios_attributes={'BootMode':'Bios'}
+       redfish category=System command=SetBiosAttributes bios_attributes={'BootMode':'Bios'}
        user={{user}} password={{password}} baseuri={{baseuri}}
     tags: bootmodelegacybios
     ignore_errors: yes
@@ -96,7 +97,7 @@
   # ------------------------------------------------------------------------
   - name: Create config job - reboot
     local_action: >
-      redfish category=Bios command=CreateConfigJob baseuri={{baseuri}}
+      redfish category=System command=CreateBiosConfigJob baseuri={{baseuri}}
       user={{user}} password={{password}}
-    tags: createconfigjob
+    tags: createbiosconfigjob
     ignore_errors: yes
