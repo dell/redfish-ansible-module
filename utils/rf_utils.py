@@ -100,16 +100,6 @@ class RedfishUtils(object):
             self.accounts_uri = accounts
             return { 'ret': True }
 
-    def _find_storage_service(self, uri):
-        response = self.send_get_request(self.root_uri + uri)
-        data = response.json()
-        if 'SimpleStorage' not in data:
-            return { 'ret': False, 'msg': "Storage Service does not exist" }
-        else:
-            storage_service = data["SimpleStorage"]["@odata.id"]
-            self.storage_uri = storage_service
-            return { 'ret': True }
-
     def _find_systems_service(self, uri):
         response = self.send_get_request(self.root_uri + uri)
         data = response.json()
@@ -165,31 +155,22 @@ class RedfishUtils(object):
             self.manager_uri = manager_service
             return { 'ret': True }
 
-    def _find_log_service(self, uri):
-        # First, get manager ID
-        response = self.send_get_request(self.root_uri + uri)
-        data = response.json()
-        for member in data[u'Members']:
-            manager_id_uri = member[u'@odata.id']
-
-        # Once we have the manager ID, search for LogServices
-        response = self.send_get_request(self.root_uri + manager_id_uri)
-        data = response.json()
-
-        if 'LogServices' not in data:
-            return { 'ret': False, 'msg': "LogServices does not exist" }
-        else:
-            log_service = data["LogServices"]["@odata.id"]
-            self.logs_uri = log_service
-            return { 'ret': True }
-
     def get_logs(self):
         log_svcs_uri_list = []
         list_of_logs = []
         result = {}
 
+        # Find LogService
+        response = self.send_get_request(self.root_uri + self.manager_uri)
+        data = response.json()
+
+        if 'LogServices' not in data:
+            return { 'ret': False, 'msg': "LogServices does not exist" }
+        else:
+            logs_uri = data["LogServices"]["@odata.id"]
+
         # Find all entries in LogServices
-        response = self.send_get_request(self.root_uri + self.logs_uri)
+        response = self.send_get_request(self.root_uri + logs_uri)
         # I should really be checking for response.status_code
         data = response.json()
         for log_svcs_entry in data[u'Members']:
@@ -222,8 +203,17 @@ class RedfishUtils(object):
     def clear_logs(self):
         result = {}
 
+        # Find LogService
+        response = self.send_get_request(self.root_uri + self.manager_uri)
+        data = response.json()
+
+        if 'LogServices' not in data:
+            return { 'ret': False, 'msg': "LogServices does not exist" }
+        else:
+            logs_uri = data["LogServices"]["@odata.id"]
+
         # Find all entries in LogServices
-        response = self.send_get_request(self.root_uri + self.logs_uri)
+        response = self.send_get_request(self.root_uri + logs_uri)
         # I should really be checking for response.status_code
         data = response.json()
         for log_svcs_entry in data[u'Members']:
@@ -300,10 +290,18 @@ class RedfishUtils(object):
     def get_storage_controller_info(self):
         result = {}
         controllers_details = []
-    
-        # Get a list of all storage controllers and build respective URIs
         controller_list = []
-        response = self.send_get_request(self.root_uri + self.storage_uri)
+    
+        # Find Storage service
+        response = self.send_get_request(self.root_uri + self.systems_uri)
+        data = response.json()
+        if 'SimpleStorage' not in data:
+            return { 'ret': False, 'msg': "Storage Service does not exist" }
+        else:
+            storage_uri = data["SimpleStorage"]["@odata.id"]
+
+        # Get a list of all storage controllers and build respective URIs
+        response = self.send_get_request(self.root_uri + storage_uri)
         if response.status_code == 200:             # success
             result['ret'] = True
             data = response.json()
@@ -333,10 +331,18 @@ class RedfishUtils(object):
     def get_disk_info(self):
         result = {}
         disks_details = []
-    
-        # Get a list of all storage controllers and build respective URIs
         controller_list = []
-        response = self.send_get_request(self.root_uri + self.storage_uri)
+
+        # Find Storage service
+        response = self.send_get_request(self.root_uri + self.systems_uri)
+        data = response.json()
+        if 'SimpleStorage' not in data:
+            return { 'ret': False, 'msg': "Storage Service does not exist" }
+        else:
+            storage_uri = data["SimpleStorage"]["@odata.id"]
+
+        # Get a list of all storage controllers and build respective URIs
+        response = self.send_get_request(self.root_uri + storage_uri)
         if response.status_code == 200:             # success
             result['ret'] = True
             data = response.json()

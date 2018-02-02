@@ -228,8 +228,8 @@ def main():
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Storage":
-        # execute only if we find a Storage service
-        result = rf_utils._find_storage_service(rf_uri + "/Systems/System.Embedded.1")
+        # execute only if we find a Systems service
+        result = rf_utils._find_systems_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "GetControllerInventory":
@@ -312,8 +312,8 @@ def main():
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Logs":
-        # execute only if we find a Log service
-        result = rf_utils._find_log_service(rf_uri + "/Managers")
+        # execute only if we find a Manager service
+        result = rf_utils._find_manager(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "GetLogs":
