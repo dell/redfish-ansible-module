@@ -44,43 +44,43 @@ class RedfishUtils(object):
         headers = {}
         if 'token' in self.creds:
             headers = {"X-Auth-Token": self.creds['token']}
-        response = requests.get(uri, headers, verify=False, auth=(self.creds['user'], self.creds['pswd']))
-        if response.status_code < 300:
-            return response
-        else:
-            raise Exception(response.text)
+        try:
+            response = requests.get(uri, headers, verify=False, auth=(self.creds['user'], self.creds['pswd']))
+        except:
+            raise
+        return response
     
     def send_post_request(self, uri, pyld, hdrs, fileName=None):
         headers = {}
         if 'token' in self.creds:
             headers = {"X-Auth-Token": self.creds['token']}
-        response = requests.post(uri, data=json.dumps(pyld), headers=hdrs, files=fileName,
+        try:
+            response = requests.post(uri, data=json.dumps(pyld), headers=hdrs, files=fileName,
                                verify=False, auth=(self.creds['user'], self.creds['pswd']))
-        if response.status_code < 300:
-            return response
-        else:
-            raise Exception(response.text)
+        except:
+            raise
+        return response
     
     def send_patch_request(self, uri, pyld, hdrs):
         headers = {}
         if 'token' in self.creds:
             headers = {"X-Auth-Token": self.creds['token']}
-        response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,
+        try:
+            response = requests.patch(uri, data=json.dumps(pyld), headers=hdrs,
                                verify=False, auth=(self.creds['user'], self.creds['pswd']))
-        if response.status_code < 300:
-            return response
-        else:
-            raise Exception(response.text)
+        except:
+            raise
+        return response
     
     def send_delete_request(self, uri, pyld, hdrs):
         headers = {}
         if 'token' in self.creds:
             headers = {"X-Auth-Token": self.creds['token']}
-        response = requests.delete(uri, verify=False, auth=(self.creds['user'], self.creds['pswd']))
-        if response.status_code < 300:
-            return response
-        else:
-            raise Exception(response.text)
+        try:
+            response = requests.delete(uri, verify=False, auth=(self.creds['user'], self.creds['pswd']))
+        except:
+            raise
+        return response
 
     def _init_session(self):
         pass
@@ -237,7 +237,7 @@ class RedfishUtils(object):
         result['ret'] = True		# assume we're successful
         return result
 
-    def import_scp(self, share, scpfile, uri):
+    def import_dellemc_scp(self, share, scpfile, uri):
         result = {}
         payload = { "ShutdownType" : "Forced",
                     "ShareParameters" : { "Target" : "ALL",
@@ -266,7 +266,7 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
         return result
     
-    def export_scp(self, share, hostname, uri):
+    def export_dellemc_scp(self, share, hostname, uri):
         result = {}
         # timestamp to add to SCP XML file name
         ts = str(datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S"))
@@ -640,9 +640,9 @@ class RedfishUtils(object):
     
         return result
     
-    def get_bios_attributes(self, root_uri):
+    def get_bios_attributes(self, uri):
         result = {}
-        response = self.send_get_request(root_uri + "/Bios")
+        response = self.send_get_request(self.root_uri + self.systems_uri + uri)
         if response.status_code == 200:		# success
             data = response.json()
             for attribute in data[u'Attributes'].items():
@@ -656,15 +656,15 @@ class RedfishUtils(object):
     
         return result
     
-    def get_bios_boot_order(self, root_uri):
+    def get_bios_boot_order(self, uri1, uri2):
         # Get boot mode first as it will determine what attribute to read
         result = {}
-        response = self.send_get_request(root_uri + "/Bios")
+        response = self.send_get_request(self.root_uri + self.systems_uri + uri1)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
             boot_mode = data[u'Attributes']["BootMode"]
-            response = self.send_get_request(root_uri + "/BootSources")
+            response = self.send_get_request(self.root_uri + self.systems_uri + uri2)
             if response.status_code == 200:		# success
                 data = response.json()
                 if boot_mode == "Uefi":
@@ -707,10 +707,10 @@ class RedfishUtils(object):
     
         return result
     
-    def set_bios_default_settings(self, root_uri):
+    def set_bios_default_settings(self, uri):
         result = {}
         payload = {}
-        response = self.send_post_request(root_uri, payload, HEADERS)
+        response = self.send_post_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result = { 'ret': True, 'msg': 'SetBiosDefaultSettings completed'}
         elif response.status_code == 405:
@@ -719,10 +719,10 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def set_one_time_boot_device(self, bootdevice, root_uri):
+    def set_one_time_boot_device(self, bootdevice):
         result = {}
         payload = {"Boot": {"BootSourceOverrideTarget": bootdevice}}
-        response = self.send_patch_request(root_uri, payload, HEADERS)
+        response = self.send_patch_request(self.root_uri + self.systems_uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result = { 'ret': True, 'msg': 'SetOneTimeBoot completed'}
         else:
@@ -755,11 +755,11 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
         return result
     
-    def set_bios_attributes(self, root_uri, bios_attributes):
+    def set_bios_attributes(self, uri, bios_attributes):
         result = {}
         bios_attributes=bios_attributes.replace("'","\"")
         payload = {"Attributes": json.loads(bios_attributes) }
-        response = self.send_patch_request(root_uri, payload, HEADERS)
+        response = self.send_patch_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
         if response.status_code == 200:
             result = { 'ret': True, 'msg': 'BIOS Attributes set as pending values'}
         elif response.status_code == 400:

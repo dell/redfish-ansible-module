@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: Import Server Configuration Profile (SCP)
+  name: Import Dell EMC Server Configuration Profile (SCP)
   gather_facts: False
 
   # Examples:
@@ -20,7 +20,7 @@
 
   - name: Import SCP file
     local_action: >
-       redfish category=SCP command=ImportSCP baseuri={{baseuri}}
+       redfish category=DellEMC_SCP command=ImportSCP baseuri={{baseuri}}
        user={{user}} password={{password}}
        sharehost={{sharehost}} sharename={{sharename}}
        shareuser={{shareuser}} sharepswd={{sharepswd}}

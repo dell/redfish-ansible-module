@@ -201,12 +201,13 @@ def main():
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
+    rf_uri = "/redfish/v1"
     rf_utils = RedfishUtils(creds, root_uri)
 
     # Organize by Categories / Commands
     if category == "UserManagement":
         # execute only if we find an Account service
-        result = rf_utils._find_account_service("/redfish/v1")
+        result = rf_utils._find_account_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "ListUsers":
@@ -228,7 +229,7 @@ def main():
 
     elif category == "Storage":
         # execute only if we find a Storage service
-        result = rf_utils._find_storage_service("/redfish/v1/Systems/System.Embedded.1")
+        result = rf_utils._find_storage_service(rf_uri + "/Systems/System.Embedded.1")
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "GetControllerInventory":
@@ -240,7 +241,7 @@ def main():
 
     elif category == "Inventory":
         # execute only if we find a Systems service
-        result = rf_utils._find_systems_service("/redfish/v1")
+        result = rf_utils._find_systems_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "GetSystemInventory":
@@ -256,7 +257,7 @@ def main():
 
     elif category == "Chassis":
         # execute only if we find a Chassis service
-        result = rf_utils._find_chassis_service("/redfish/v1")
+        result = rf_utils._find_chassis_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "GetFanInventory":
@@ -266,7 +267,7 @@ def main():
 
     elif category == "UpdateService":
         # execute only if we find an Update service
-        result = rf_utils._find_update_service("/redfish/v1")
+        result = rf_utils._find_update_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "GetInventory":
@@ -282,31 +283,37 @@ def main():
 
     elif category == "Power":
         # execute only if we find a Systems service
-        result = rf_utils._find_systems_service("/redfish/v1")
+        result = rf_utils._find_systems_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         result = rf_utils.manage_system_power(command, "/Actions/ComputerSystem.Reset")
 
     elif category == "Bios":
-        rf_uri = "/redfish/v1/Systems/System.Embedded.1"
+        # execute only if we find a Systems service
+        result = rf_utils._find_systems_service(rf_uri)
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "GetAttributes":
-            result = rf_utils.get_bios_attributes(root_uri + rf_uri)
+            result = rf_utils.get_bios_attributes("/Bios")
         elif command == "GetBootOrder":
-            result = rf_utils.get_bios_boot_order(root_uri + rf_uri)
+            result = rf_utils.get_bios_boot_order("/Bios", "/BootSources")
         elif command == "SetOneTimeBoot":
-            result = rf_utils.set_one_time_boot_device(bootdevice, root_uri + rf_uri)
+            result = rf_utils.set_one_time_boot_device(bootdevice)
         elif command == "SetDefaultSettings":
-            result = rf_utils.set_bios_default_settings(root_uri + rf_uri + "/Bios/Actions/Bios.ResetBios")
+            result = rf_utils.set_bios_default_settings("/Bios/Actions/Bios.ResetBios")
         elif command == "SetAttributes":
-	    result = rf_utils.set_bios_attributes(root_uri + rf_uri + "/Bios/Settings",
-                                                   module.params['bios_attributes'])
+	    result = rf_utils.set_bios_attributes("/Bios/Settings", module.params['bios_attributes'])
+        elif command == "CreateConfigJob":
+            # execute only if we find a Manager service
+            result = rf_utils._find_manager(rf_uri)
+            if result['ret'] == False: module.fail_json(msg=result['msg'])
+            result = rf_utils.create_bios_config_job("/Jobs")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Logs":
         # execute only if we find a Log service
-        result = rf_utils._find_log_service("/redfish/v1/Managers")
+        result = rf_utils._find_log_service(rf_uri + "/Managers")
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "GetLogs":
@@ -316,10 +323,10 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    # Using Dell extension
+    # Specific to Dell
     elif category == "Idrac":
         # execute only if we find a Manager service
-        result = rf_utils._find_manager("/redfish/v1")
+        result = rf_utils._find_manager(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "SetDefaultSettings":
@@ -330,21 +337,19 @@ def main():
             result = rf_utils.get_idrac_attributes("/Attributes")
         elif command == "SetAttributes":
             result = rf_utils.set_idrac_attributes("/Attributes", module.params['idrac_attributes'])
-        elif command == "ConfigJob":
-            result = rf_utils.create_bios_config_job("/Jobs")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    # Using Dell extension
-    elif category == "SCP":
+    # Specific to Dell
+    elif category == "DellEMC_SCP":
         # execute only if we find a Manager service
-        result = rf_utils._find_manager("/redfish/v1")
+        result = rf_utils._find_manager(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "ExportSCP":
-            result = rf_utils.export_scp(share, hostname, "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration")
+            result = rf_utils.export_dellemc_scp(share, hostname, "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration")
         elif command == "ImportSCP":
-            result = rf_utils.import_scp(share, scpfile, "/Actions/Oem/EID_674_Manager.ImportSystemConfiguration")
+            result = rf_utils.import_dellemc_scp(share, scpfile, "/Actions/Oem/EID_674_Manager.ImportSystemConfiguration")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

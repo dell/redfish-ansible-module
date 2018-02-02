@@ -8,12 +8,12 @@
   # Carefully review all tasks and select what you need by using tags.
   # Running *ALL* tasks will have unintended consequences!
   #
-  # Updating BIOS settings requires a reboot to implement, so be sure
-  # to pass the 'reboot' tag accordingly.
+  # Updating BIOS settings requires creating a configuration job to implement
+  # (which then reboots the system), so pass the 'createconfigjob' tag accordingly.
   #
   # Examples:
   # ansible-playbook manage_bios.yml --tags getattributes
-  # ansible-playbook manage_bios.yml --tags "bootmodeuefi,reboot"
+  # ansible-playbook manage_bios.yml --tags "bootmodeuefi,createconfigjob"
 
   # Commands available:
   #   GetAttributes 		Get BIOS attributes
@@ -21,7 +21,7 @@
   #   SetOneTimeBoot 		Set one-time boot device
   #   SetDefaultSettings 	Set BIOS default settings 
   #   SetAttributes		Set BIOS attributes
-  #   ConfigJob			Implement new settings
+  #   CreateConfigJob		Implement new settings
 
   tasks:
 
@@ -94,9 +94,9 @@
     ignore_errors: yes
     
   # ------------------------------------------------------------------------
-  - name: Schedule Config Job - REBOOT
+  - name: Create config job - reboot
     local_action: >
-      redfish category=Idrac command=ConfigJob baseuri={{baseuri}}
+      redfish category=Bios command=CreateConfigJob baseuri={{baseuri}}
       user={{user}} password={{password}}
-    tags: reboot
+    tags: createconfigjob
     ignore_errors: yes

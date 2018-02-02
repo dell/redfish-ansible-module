@@ -1,10 +1,10 @@
 ---
 - hosts: myhosts
-  name: Export Server Configuration Profile (SCP)
+  name: Export Dell EMC Server Configuration Profile (SCP)
   gather_facts: False
 
   # Examples:
-  # ansible-playbook export_scp.yml
+  # ansible-playbook export_dellemc_scp.yml
   #
   # Please note that once an Export or Import job is running, you must
   # wait until it's complete before sending another request, else it will
@@ -20,7 +20,7 @@
 
   - name: Export SCP file
     local_action: >
-       redfish category=SCP command=ExportSCP baseuri={{baseuri}}
+       redfish category=DellEMC_SCP command=ExportSCP baseuri={{baseuri}}
        user={{user}} password={{password}}
        sharehost={{sharehost}} sharename={{sharename}}
        shareuser={{shareuser}} sharepswd={{sharepswd}}
