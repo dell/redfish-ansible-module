@@ -4,7 +4,7 @@
 # require custom values place these variables in /etc/ansible/hosts to override
 # for each individual host
 
-# Default credentials
+# Credentials
 user: root
 password: calvin
 

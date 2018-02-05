@@ -548,11 +548,11 @@ class RedfishUtils(object):
     
     # This function compares the firmware levels in the system vs. the firmware levels
     # available in the Catalog.gz file that it downloaded from ftp.dell.com
-    def compare_firmware_inventory(self, root_uri, rf_uri, catalog_file, model):
+    def compare_firmware_inventory(self, catalog_file, model):
         fw = []
         fw_list = {'ret':True, 'Firmwares':[]}
     
-        response = self.send_get_request(root_uri + rf_uri)
+        response = self.send_get_request(self.root_uri + self.update_uri)
         if response.status_code == 400:
             return { 'ret': False, 'msg': 'Not supported on this platform'}
     
@@ -585,32 +585,32 @@ class RedfishUtils(object):
             fw_list['ret'] = False
         return fw_list
     
-    def upload_firmware(self, root_uri, rf_uri, FWPath):
+    def upload_firmware(self, FWPath):
         result = {}
-        response = self.send_get_request(root_uri + rf_uri)
+        response = self.send_get_request(self.root_uri + self.update_uri)
     
         if response.status_code == 400:
             return { 'ret': False, 'msg': 'Not supported on this platform'}
         elif response.status_code == 200:
             ETag = response.headers['ETag']
         else:
-            result = { 'ret': False, 'msg': 'Failed to get update service etag %s' % str(root_uri)}
+            result = { 'ret': False, 'msg': 'Failed to get update service etag %s' % str(self.root_uri)}
             return result
     
         files = {'file': (os.path.basename(FWPath), open(FWPath, 'rb'), 'multipart/form-data')}
         headers = {"if-match": ETag}
     
         # Calling POST directly rather than use send_post_request() - look into it?
-        response = requests.post(root_uri + rf_uri, files=files, auth=(self.creds['user'], self.creds['pswd']), headers=headers, verify=False)
+        response = requests.post(self.root_uri + self.update_uri, files=files, auth=(self.creds['user'], self.creds['pswd']), headers=headers, verify=False)
         if response.status_code == 201:
             result = { 'ret': True, 'msg': 'Firmare uploaded successfully', 'Version': '%s' % str(response.json()['Version']), 'Location':'%s' % response.headers['Location']}
         else:
             result = { 'ret': False, 'msg': 'Error uploading firmware; status_code=%s' % response.status_code }
         return result
     
-    def schedule_firmware_update(self, root_uri, rf_uri, InstallOption):
+    def schedule_firmware_update(self, InstallOption):
         fw = []
-        response = self.send_get_request(root_uri + rf_uri)
+        response = self.send_get_request(self.root_uri + self.update_uri)
     
         if response.status_code == 200:
             data = response.json()
@@ -620,7 +620,7 @@ class RedfishUtils(object):
         else:
             return { 'ret': False, 'msg': 'Error getting firmware inventory; status_code=%s' % response.status_code }
     
-        url = root_uri + '/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install'
+        url = self.root_uri + '/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install'
         payload = {'SoftwareIdentityURIs': fw, 'InstallUpon': InstallOption}
         response = self.send_post_request(url, payload, HEADERS)
     

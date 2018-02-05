@@ -12,6 +12,9 @@
   # Examples:
   # ansible-playbook manage_users.yml --tags listusers
   # ansible-playbook manage_users.yml --tags adduser
+  # ansible-playbook manage_users.yml --tags updaterole
+  # ansible-playbook manage_users.yml --tags updatepassword
+  # ansible-playbook manage_users.yml --tags deleteuser
   #
   # User to add, modify or delete is defined in file group_vars/myhosts
 

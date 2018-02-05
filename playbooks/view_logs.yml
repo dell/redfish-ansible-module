@@ -11,7 +11,7 @@
   - name: Define output file
     include_tasks: set_output_file.yml type=Logs
 
-  - name: Get Logs
+  - name: View Logs
     local_action: >
        redfish category=Manager command=ViewLogs baseuri={{ baseuri }}
             user={{ user }} password={{ password }}
