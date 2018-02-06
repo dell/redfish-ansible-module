@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: Firmware Update 
+  name: Firmware Update
   gather_facts: False
 
   tasks:
@@ -14,7 +14,7 @@
     delegate_to: 127.0.0.1
     run_once: true
 
-  - name: extract gz file 
+  - name: extract gz file
     shell: gzip -d /tmp/Catalog.gz -f
     delegate_to: 127.0.0.1
     run_once: true
@@ -40,7 +40,7 @@
     delegate_to: 127.0.0.1
     run_once: true
 
-  - name: download firmware images 
+  - name: download firmware images
     get_url:
         url: http://downloads.dell.com/{{ item.path }}
         dest: /tmp/firmware/{{ item.path | basename}}
@@ -72,8 +72,7 @@
 
   - name: install firmware image
     local_action: >
-        redfish category=Update command=ScheduleUpdate baseuri={{baseuri}} 
+        redfish category=Update command=ScheduleUpdate baseuri={{baseuri}}
         user={{user}} password={{password}}
         InstallOption=NowAndReboot
-    when: schedule_fw_update_job is defined 
-
+    when: schedule_fw_update_job is defined
