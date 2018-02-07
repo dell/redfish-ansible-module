@@ -226,7 +226,7 @@ def main():
 
     # Organize by Categories / Commands
     if category == "Inventory":
-        # execute only if we find a Systems service
+        # execute only if we find a System service
         result = rf_utils._find_systems_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
@@ -280,8 +280,8 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    elif category == "Systems":
-        # execute only if we find a Systems service
+    elif category == "System":
+        # execute only if we find a System service
         result = rf_utils._find_systems_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 

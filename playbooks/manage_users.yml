@@ -31,7 +31,7 @@
 
   # ------------------------------------------------------------------------
   - name: Set output file
-    include_tasks: set_output_file.yml type=Users
+    include_tasks: create_output_file.yml type=Users
     tags: listusers
 
   - name: List all users

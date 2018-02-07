@@ -21,7 +21,7 @@
   # ------------------------------------------------------------------------
   - name: Enable PXE Boot for NIC1
     local_action: >
-       redfish category=Systems command=SetBiosAttributes
+       redfish category=System command=SetBiosAttributes
        user={{user}} password={{password}} baseuri={{baseuri}}
        bios_attr_name=PxeDev1EnDis bios_attr_value=Enabled
     tags: enablepxenic1
@@ -29,7 +29,7 @@
     
   - name: Disable PXE Boot for NIC1
     local_action: >
-       redfish category=Systems command=SetBiosAttributes
+       redfish category=System command=SetBiosAttributes
        user={{user}} password={{password}} baseuri={{baseuri}}
        bios_attr_name=PxeDev1EnDis bios_attr_value=Disabled
     tags: disablepxenic1
@@ -38,7 +38,7 @@
   # ------------------------------------------------------------------------
   - name: Enable PXE Boot for NIC2
     local_action: >
-       redfish category=Systems command=SetBiosAttributes
+       redfish category=System command=SetBiosAttributes
        user={{user}} password={{password}} baseuri={{baseuri}}
        bios_attr_name=PxeDev2EnDis bios_attr_value=Enabled
     tags: enablepxenic2
@@ -46,7 +46,7 @@
     
   - name: Disable PXE Boot for NIC2
     local_action: >
-       redfish category=Systems command=SetBiosAttributes
+       redfish category=System command=SetBiosAttributes
        user={{user}} password={{password}} baseuri={{baseuri}}
        bios_attr_name=PxeDev2EnDis bios_attr_value=Disabled
     tags: disablepxenic2

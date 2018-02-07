@@ -9,7 +9,7 @@
   tasks:
 
   - name: Set output file
-    include_tasks: set_output_file.yml type=FanInventory
+    include_tasks: create_output_file.yml type=FanInventory
 
   - name: Get fans statistics
     local_action: >

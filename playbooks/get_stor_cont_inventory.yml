@@ -6,7 +6,7 @@
   tasks:
 
   - name: Define output file
-    include_tasks: set_output_file.yml type=StorageControllerInventory
+    include_tasks: create_output_file.yml type=StorageControllerInventory
 
   - name: Get storage controller inventory
     local_action: >

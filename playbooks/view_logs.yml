@@ -9,7 +9,7 @@
   tasks:
 
   - name: Define output file
-    include_tasks: set_output_file.yml type=Logs
+    include_tasks: create_output_file.yml type=Logs
 
   - name: View Logs
     local_action: >

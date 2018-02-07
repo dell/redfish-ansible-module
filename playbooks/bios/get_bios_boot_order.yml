@@ -6,7 +6,7 @@
   tasks:
 
   - name: Define output file
-    include_tasks: set_output_file.yml type=BiosBootOrder
+    include_tasks: create_output_file.yml type=BiosBootOrder
     tags: getbootorder
 
   - name: Get device boot order

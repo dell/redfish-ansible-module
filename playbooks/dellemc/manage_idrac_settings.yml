@@ -23,7 +23,7 @@
   # ------------------------------------------------------------------------
   # 14G only
   - name: Set output file
-    include_tasks: set_output_file.yml type=ManagerAttributes
+    include_tasks: create_output_file.yml type=ManagerAttributes
     tags: getattributes
 
   - name: Get manager attributes
