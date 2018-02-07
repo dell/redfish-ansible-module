@@ -14,9 +14,9 @@
   # ansible-playbook manage_idrac_settings.yml --tags enablentp
 
   # Commands available:
-  #   GetManagerAttributes	Get Manager attributes
-  #   SetManagerAttributes	Most settings can be set using this
-  #   SetManagerDefaultSettings	Set Manager default settings
+  #   GetAttributes		Get Manager attributes
+  #   SetAttributes		Most settings can be set using this
+  #   SetDefaultSettings	Set Manager default settings
 
   tasks:
 
@@ -28,7 +28,7 @@
 
   - name: Get manager attributes
     local_action: >
-       redfish category=Manager command=GetManagerAttributes baseuri={{baseuri}}
+       redfish category=Manager command=GetAttributes baseuri={{baseuri}}
        user={{user}} password={{password}}
     register: result
     ignore_errors: yes
@@ -43,9 +43,9 @@
   # 14G only
   - name: Set Timezone
     local_action: >
-       redfish category=Manager command=SetManagerAttributes
-       manager_attributes={'Time.1.Timezone':'US/Central'}
+       redfish category=Manager command=SetAttributes
        user={{user}} password={{password}} baseuri={{baseuri}}
+       mgr_attr_name=Time.1.Timezone mgr_attr_value={{timezone}}
     tags: settimezone
     ignore_errors: yes
 
@@ -53,17 +53,17 @@
   # 14G only
   - name: Enable NTP
     local_action: >
-       redfish category=Manager command=SetManagerAttributes
-       manager_attributes={'NTPConfigGroup.1.NTPEnable':'Enabled'}
+       redfish category=Manager command=SetAttributes
        user={{user}} password={{password}} baseuri={{baseuri}}
+       mgr_attr_name=NTPConfigGroup.1.NTPEnable mgr_attr_value=Enabled
     tags: enablentp
     ignore_errors: yes
 
-  - name: Set NTP server
+  - name: Set NTP server 1
     local_action: >
-       redfish category=Manager command=SetManagerAttributes
-       manager_attributes={'NTPConfigGroup.1.NTP1':'ntp.server.com'}
+       redfish category=Manager command=SetAttributes
        user={{user}} password={{password}} baseuri={{baseuri}}
+       mgr_attr_name=NTPConfigGroup.1.NTP1 mgr_attr_value={{ntpserver1}}
     tags: enablentp
     ignore_errors: yes
 
@@ -74,7 +74,7 @@
   # Resetting to default values will reset everything and reboot the manager
   - name: Set default manager settings
     local_action: >
-       redfish category=Manager command=SetDefaultManagerSettings
+       redfish category=Manager command=SetDefaultSettings
        baseuri={{baseuri}} user={{user}} password={{password}}
     tags: setdefaultsettings
 

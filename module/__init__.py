@@ -1,2 +1,2 @@
 def main():
-    print("ANsible module for Redfish")
+    print("Ansible module for Redfish")

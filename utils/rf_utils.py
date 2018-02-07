@@ -121,10 +121,11 @@ class RedfishUtils(object):
             return { 'ret': False, 'msg': "UpdateService does not exist" }
         else:
             update = data["UpdateService"]["@odata.id"]
+            self.update_uri = update
             response = self.send_get_request(self.root_uri + update)
             data = response.json()
-            update_service = data['FirmwareInventory'][u'@odata.id']
-            self.update_uri = update_service
+            firmware_inventory = data['FirmwareInventory'][u'@odata.id']
+            self.firmware_uri = firmware_inventory
             return { 'ret': True }
 
     def _find_chassis_service(self, uri):
@@ -522,17 +523,16 @@ class RedfishUtils(object):
         result = {}
         devices = []
     
-        # return { 'ret': True, 'msg': self.root_uri + self.update_uri}
-        response = self.send_get_request(self.root_uri + self.update_uri)
+        response = self.send_get_request(self.root_uri + self.firmware_uri)
         if response.status_code == 200:		# success
             result['ret'] = True
             data = response.json()
             for device in data[u'Members']:
                 d = device[u'@odata.id']
-                d = d.replace(self.update_uri, "")	# leave just device name
+                d = d.replace(self.firmware_uri, "")	# leave just device name
                 if "Installed" in d:
                     # Get details for each device that is relevant
-                    uri = self.root_uri + self.update_uri + d
+                    uri = self.root_uri + self.firmware_uri + d
                     response = self.send_get_request(uri)
                     if response.status_code == 200:	# success
                         data = response.json()
@@ -552,7 +552,7 @@ class RedfishUtils(object):
         fw = []
         fw_list = {'ret':True, 'Firmwares':[]}
     
-        response = self.send_get_request(self.root_uri + self.update_uri)
+        response = self.send_get_request(self.root_uri + self.firmware_uri)
         if response.status_code == 400:
             return { 'ret': False, 'msg': 'Not supported on this platform'}
     
@@ -571,13 +571,13 @@ class RedfishUtils(object):
                 version = '0'
                 path = ""
                 for i in root.findall('.//Category/..'):
-                            for m in i.findall('.//SupportedDevices/Device'):
-                                if m.attrib['componentID'] == ver:
-                                    for nx in i.findall('.//SupportedSystems/Brand/Model/Display'):
-                                        if nx.text == model:
-                                            if LooseVersion(i.attrib['vendorVersion']) > LooseVersion(version):
-                                                version = i.attrib['vendorVersion']
-                                                path = i.attrib['path']
+                    for m in i.findall('.//SupportedDevices/Device'):
+                        if m.attrib['componentID'] == ver:
+                            for nx in i.findall('.//SupportedSystems/Brand/Model/Display'):
+                                if nx.text == model:
+                                    if LooseVersion(i.attrib['vendorVersion']) > LooseVersion(version):
+                                        version = i.attrib['vendorVersion']
+                                        path = i.attrib['path']
     
     	    if path != "":
     		fw_list['Firmwares'].append({ 'curr':'%s' % os.path.basename(inv).replace('Installed-%s-'%ver,''), 'latest':'%s' % version, 'path':'%s' % path })
@@ -587,7 +587,7 @@ class RedfishUtils(object):
     
     def upload_firmware(self, FWPath):
         result = {}
-        response = self.send_get_request(self.root_uri + self.update_uri)
+        response = self.send_get_request(self.root_uri + self.firmware_uri)
     
         if response.status_code == 400:
             return { 'ret': False, 'msg': 'Not supported on this platform'}
@@ -601,16 +601,16 @@ class RedfishUtils(object):
         headers = {"if-match": ETag}
     
         # Calling POST directly rather than use send_post_request() - look into it?
-        response = requests.post(self.root_uri + self.update_uri, files=files, auth=(self.creds['user'], self.creds['pswd']), headers=headers, verify=False)
+        response = requests.post(self.root_uri + self.firmware_uri, files=files, auth=(self.creds['user'], self.creds['pswd']), headers=headers, verify=False)
         if response.status_code == 201:
             result = { 'ret': True, 'msg': 'Firmare uploaded successfully', 'Version': '%s' % str(response.json()['Version']), 'Location':'%s' % response.headers['Location']}
         else:
             result = { 'ret': False, 'msg': 'Error uploading firmware; status_code=%s' % response.status_code }
         return result
     
-    def schedule_firmware_update(self, InstallOption):
+    def schedule_firmware_update(self, uri, InstallOption):
         fw = []
-        response = self.send_get_request(self.root_uri + self.update_uri)
+        response = self.send_get_request(self.root_uri + self.firmware_uri)
     
         if response.status_code == 200:
             data = response.json()
@@ -620,7 +620,7 @@ class RedfishUtils(object):
         else:
             return { 'ret': False, 'msg': 'Error getting firmware inventory; status_code=%s' % response.status_code }
     
-        url = self.root_uri + '/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install'
+        url = self.root_uri + self.update_uri + uri
         payload = {'SoftwareIdentityURIs': fw, 'InstallUpon': InstallOption}
         response = self.send_post_request(url, payload, HEADERS)
     
@@ -747,9 +747,10 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def set_manager_attributes(self, uri, manager_attributes):
+    def set_manager_attributes(self, uri, attributes):
         result = {}
-        manager_attributes = manager_attributes.replace("'","\"")
+        # Example: manager_attributes = {\"name\":\"value\"}
+        manager_attributes = "{\"" + attributes['mgr_attr_name'] + "\":\"" + attributes['mgr_attr_value'] + "\"}"
         payload = {"Attributes": json.loads(manager_attributes) }
         response = self.send_patch_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
         if response.status_code == 200:
@@ -776,9 +777,9 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % str(response.status_code) }
         return result
     
-    def create_bios_config_job(self, uri):
-        payload = {"TargetSettingsURI":"/redfish/v1/Systems/System.Embedded.1/Bios/Settings", "RebootJobType":"PowerCycle"}
-        response = self.send_post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
+    def create_bios_config_job(self, uri1, uri2):
+        payload = { "TargetSettingsURI": self.systems_uri + uri1, "RebootJobType": "PowerCycle"}
+        response = self.send_post_request(self.root_uri + self.manager_uri + uri2, payload, HEADERS)
         if response.status_code == 200:
             result = { 'ret': True, 'msg': 'Config job created'}
         elif response.status_code == 400:

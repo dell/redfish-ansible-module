@@ -8,5 +8,5 @@
 
   - name: Manager graceful restart
     local_action: >
-       redfish category=Manager command=ManagerGracefulRestart
+       redfish category=Manager command=GracefulRestart
        baseuri={{baseuri}} user={{user}} password={{password}}

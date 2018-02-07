@@ -16,7 +16,7 @@ host: "{{inventory_hostname}}"
 
 # These variables are not used in playbooks yet. Need to figure out
 # how to include variables inside curly {} brackets.
-ntpserver1: ntp1.srv.com
+ntpserver1: lb.us.dell.com
 ntpserver2: ntp2.srv.com
 ntpserver3: ntp3.srv.com
 timezone: "US/Central"

@@ -164,7 +164,8 @@ def main():
             shareuser  = dict(required=False, type='str', default=None),
             sharepswd  = dict(required=False, type='str', default=None, no_log=True),
             bootdevice = dict(required=False, type='str', default=None),
-            manager_attributes = dict(required=False, type='str', default=None),
+            mgr_attr_name = dict(required=False, type='str', default=None),
+            mgr_attr_value = dict(required=False, type='str', default=None),
             bios_attributes = dict(required=False, type='str', default=None),
 	    FWPath     = dict(required=False, type='str', default=None),
 	    Model      = dict(required=False, type='str', default=None),
@@ -188,15 +189,19 @@ def main():
     }
     # share information for exporting/importing SCP files
     share = { 'host' : module.params['sharehost'],
-                   'name' : module.params['sharename'],
-                   'user' : module.params['shareuser'],
-                   'pswd' : module.params['sharepswd']
+              'name' : module.params['sharename'],
+              'user' : module.params['shareuser'],
+              'pswd' : module.params['sharepswd']
     }
     # user to add/modify/delete
     user = { 'userid'   : module.params['userid'],
              'username' : module.params['username'],
              'userpswd' : module.params['userpswd'],
              'userrole' : module.params['userrole']
+    }
+    # Manager attributes to update
+    mgr_attributes = { 'mgr_attr_name'  : module.params['mgr_attr_name'],
+                       'mgr_attr_value' : module.params['mgr_attr_value']
     }
 
     # Build root URI
@@ -227,6 +232,14 @@ def main():
             result = rf_utils.get_storage_controller_info()
         elif command == "GetDiskInventory":
             result = rf_utils.get_disk_info()
+
+        # Chassis
+        elif command == "GetFanInventory":
+            # execute only if we find a Chassis service
+            result = rf_utils._find_chassis_service(rf_uri)
+            if result['ret'] == False: module.fail_json(msg=result['msg'])
+            result = rf_utils.get_fan_inventory("/Thermal")
+
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
@@ -252,16 +265,6 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    elif category == "Chassis":
-        # execute only if we find a Chassis service
-        result = rf_utils._find_chassis_service(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
-
-        if command == "GetFanInventory":
-            result = rf_utils.get_fan_inventory("/Thermal")
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
     elif category == "Systems":
         # execute only if we find a Systems service
         result = rf_utils._find_systems_service(rf_uri)
@@ -283,13 +286,13 @@ def main():
             # execute only if we find a Manager service
             result = rf_utils._find_manager(rf_uri)
             if result['ret'] == False: module.fail_json(msg=result['msg'])
-            result = rf_utils.create_bios_config_job("/Jobs")
+            result = rf_utils.create_bios_config_job("/Bios/Settings", "/Jobs")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     # Specific to Dell
     elif category == "Update":
-        # execute only if we find an Update service
+        # execute only if we find an Update and Firmware service
         result = rf_utils._find_update_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
@@ -300,7 +303,7 @@ def main():
 	elif command == "UploadFirmware":
             result = rf_utils.upload_firmware(module.params['FWPath'])
         elif command == "ScheduleUpdate":
-            result = rf_utils.schedule_firmware_update(module.params['InstallOption'])
+            result = rf_utils.schedule_firmware_update("/Actions/Oem/DellUpdateService.Install", module.params['InstallOption'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
@@ -310,13 +313,13 @@ def main():
         result = rf_utils._find_manager(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
-        if command == "ManagerGracefulRestart":
+        if command == "GracefulRestart":
             result = rf_utils.restart_manager_gracefully("/Actions/Manager.Reset")
-        elif command == "GetManagerAttributes":
+        elif command == "GetAttributes":
             result = rf_utils.get_manager_attributes("/Attributes")
-        elif command == "SetManagerAttributes":
-            result = rf_utils.set_manager_attributes("/Attributes", module.params['manager_attributes'])
-        elif command == "SetDefaultManagerSettings":
+        elif command == "SetAttributes":
+            result = rf_utils.set_manager_attributes("/Attributes", mgr_attributes)
+        elif command == "SetDefaultSettings":
             result = rf_utils.set_manager_default_settings("/Actions/Oem/DellManager.ResetToDefaults")
 
         # Logs
