@@ -107,16 +107,26 @@ options:
     default: None
     description:
       - bootdevice when setting boot configuration
-  bios_attributes:
+  bios_attr_name
     required: false
     default: None
     description:
-      - dict where we specify BIOS attributes to set
-  manager_attributes:
+      - name of BIOS attribute to update
+  bios_attr_value
     required: false
     default: None
     description:
-      - dict where we specify manager attributes to set
+      - value of BIOS attribute to update to
+  mgr_attr_name
+    required: false
+    default: None
+    description:
+      - name of Manager attribute to update
+  mgr_attr_value
+    required: false
+    default: None
+    description:
+      - value of Manager attribute to update to
   FWPath:
     required: false
     default: None
@@ -126,7 +136,7 @@ options:
     required: false
     default: None
     description:
-      - system model name like R940, R740
+      - system model name
   InstallOption:
     required: false
     choices: [ Now, NowAndReboot, NextReboot ]
@@ -166,7 +176,8 @@ def main():
             bootdevice = dict(required=False, type='str', default=None),
             mgr_attr_name = dict(required=False, type='str', default=None),
             mgr_attr_value = dict(required=False, type='str', default=None),
-            bios_attributes = dict(required=False, type='str', default=None),
+            bios_attr_name = dict(required=False, type='str', default=None),
+            bios_attr_value = dict(required=False, type='str', default=None),
 	    FWPath     = dict(required=False, type='str', default=None),
 	    Model      = dict(required=False, type='str', default=None),
 	    InstallOption = dict(required=False, type='str', default=None, choices=['Now', 'NowAndReboot', 'NextReboot']),
@@ -202,6 +213,10 @@ def main():
     # Manager attributes to update
     mgr_attributes = { 'mgr_attr_name'  : module.params['mgr_attr_name'],
                        'mgr_attr_value' : module.params['mgr_attr_value']
+    }
+    # BIOS attributes to update
+    bios_attributes = { 'bios_attr_name'  : module.params['bios_attr_name'],
+                        'bios_attr_value' : module.params['bios_attr_value']
     }
 
     # Build root URI
@@ -271,7 +286,7 @@ def main():
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "PowerOn" or command == "PowerOff" or command == "GracefulRestart" or command == "GracefulShutdown":
-            result = rf_utils.manage_system_power(command, "/Actions/ComputerSystem.Reset")
+            result = rf_utils.manage_system_power("/Actions/ComputerSystem.Reset", command)
         elif command == "GetBiosAttributes":
             result = rf_utils.get_bios_attributes("/Bios")
         elif command == "GetBiosBootOrder":
@@ -281,7 +296,7 @@ def main():
         elif command == "SetBiosDefaultSettings":
             result = rf_utils.set_bios_default_settings("/Bios/Actions/Bios.ResetBios")
         elif command == "SetBiosAttributes":
-	    result = rf_utils.set_bios_attributes("/Bios/Settings", module.params['bios_attributes'])
+	    result = rf_utils.set_bios_attributes("/Bios/Settings", bios_attributes)
         elif command == "CreateBiosConfigJob":
             # execute only if we find a Manager service
             result = rf_utils._find_manager(rf_uri)

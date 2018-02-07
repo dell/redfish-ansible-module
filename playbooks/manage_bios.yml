@@ -81,16 +81,18 @@
   # ------------------------------------------------------------------------
   - name: Set BootMode to UEFI
     local_action: >
-       redfish category=System command=SetBiosAttributes bios_attributes={'BootMode':'Uefi'}
+       redfish category=System command=SetBiosAttributes
        user={{user}} password={{password}} baseuri={{baseuri}}
+       bios_attr_name=BootMode bios_attr_value=Uefi
     tags: bootmodeuefi
     ignore_errors: yes
     
   # ------------------------------------------------------------------------
   - name: Set BootMode to Legacy BIOS
     local_action: >
-       redfish category=System command=SetBiosAttributes bios_attributes={'BootMode':'Bios'}
+       redfish category=System command=SetBiosAttributes
        user={{user}} password={{password}} baseuri={{baseuri}}
+       bios_attr_name=BootMode bios_attr_value=Bios
     tags: bootmodelegacybios
     ignore_errors: yes
     

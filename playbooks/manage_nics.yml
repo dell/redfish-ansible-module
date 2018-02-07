@@ -22,16 +22,16 @@
   - name: Enable PXE Boot for NIC1
     local_action: >
        redfish category=Systems command=SetBiosAttributes
-       bios_attributes={'PxeDev1EnDis':'Enabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
+       bios_attr_name=PxeDev1EnDis bios_attr_value=Enabled
     tags: enablepxenic1
     ignore_errors: yes
     
   - name: Disable PXE Boot for NIC1
     local_action: >
        redfish category=Systems command=SetBiosAttributes
-       bios_attributes={'PxeDev1EnDis':'Disabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
+       bios_attr_name=PxeDev1EnDis bios_attr_value=Disabled
     tags: disablepxenic1
     ignore_errors: yes
     
@@ -39,53 +39,19 @@
   - name: Enable PXE Boot for NIC2
     local_action: >
        redfish category=Systems command=SetBiosAttributes
-       bios_attributes={'PxeDev2EnDis':'Enabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
+       bios_attr_name=PxeDev2EnDis bios_attr_value=Enabled
     tags: enablepxenic2
     ignore_errors: yes
     
   - name: Disable PXE Boot for NIC2
     local_action: >
        redfish category=Systems command=SetBiosAttributes
-       bios_attributes={'PxeDev2EnDis':'Disabled'}
        user={{user}} password={{password}} baseuri={{baseuri}}
+       bios_attr_name=PxeDev2EnDis bios_attr_value=Disabled
     tags: disablepxenic2
     ignore_errors: yes
     
-  # ------------------------------------------------------------------------
-  - name: Enable PXE Boot for NIC3
-    local_action: >
-       redfish category=Systems command=SetBiosAttributes
-       bios_attributes={'PxeDev3EnDis':'Enabled'}
-       user={{user}} password={{password}} baseuri={{baseuri}}
-    tags: enablepxenic3
-    ignore_errors: yes
-    
-  - name: Disable PXE Boot for NIC3
-    local_action: >
-       redfish category=Systems command=SetBiosAttributes
-       bios_attributes={'PxeDev3EnDis':'Disabled'}
-       user={{user}} password={{password}} baseuri={{baseuri}}
-    tags: disablepxenic3
-    ignore_errors: yes
-    
-  # ------------------------------------------------------------------------
-  - name: Enable PXE Boot for NIC4
-    local_action: >
-       redfish category=Systems command=SetBiosAttributes
-       bios_attributes={'PxeDev4EnDis':'Enabled'}
-       user={{user}} password={{password}} baseuri={{baseuri}}
-    tags: enablepxenic4
-    ignore_errors: yes
-    
-  - name: Disable PXE Boot for NIC4
-    local_action: >
-       redfish category=Systems command=SetBiosAttributes
-       bios_attributes={'PxeDev4EnDis':'Disabled'}
-       user={{user}} password={{password}} baseuri={{baseuri}}
-    tags: disablepxenic4
-    ignore_errors: yes
-
   # ------------------------------------------------------------------------
   - name: Schedule Config Job - reboot
     local_action: >

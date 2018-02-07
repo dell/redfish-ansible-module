@@ -385,7 +385,7 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
     
-    def manage_system_power(self, command, uri):
+    def manage_system_power(self, uri, command):
         result = {}
         if command == "PowerOn":
             payload = {'ResetType': 'On'}
@@ -762,9 +762,10 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % str(pp) }
         return result
     
-    def set_bios_attributes(self, uri, bios_attributes):
+    def set_bios_attributes(self, uri, attributes):
         result = {}
-        bios_attributes=bios_attributes.replace("'","\"")
+        # Example: bios_attributes = {\"name\":\"value\"}
+        bios_attributes = "{\"" + attributes['bios_attr_name'] + "\":\"" + attributes['bios_attr_value'] + "\"}"
         payload = {"Attributes": json.loads(bios_attributes) }
         response = self.send_patch_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
         if response.status_code == 200:
