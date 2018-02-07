@@ -1,0 +1,14 @@
+---
+- hosts: myhosts
+  name: Set one-time BIOS boot device
+  gather_facts: False
+
+  tasks:
+
+  - name: Set one-time boot device to {{bootdevice}}
+    local_action: >
+       redfish category=System command=SetOneTimeBoot baseuri={{baseuri}}
+       user={{user}} password={{password}} bootdevice={{bootdevice}}
+    ignore_errors: yes
+    tags: setonetimebootdevice
+
