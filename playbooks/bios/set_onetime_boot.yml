@@ -3,6 +3,12 @@
   name: Set one-time BIOS boot device
   gather_facts: False
 
+  # Bootdevice options include: None, Pxe, Cd, Floppy, Hdd, BiosSetup,
+  # Utilities, UefiTarget & SDCard
+
+  vars:
+    - bootdevice: Hdd
+
   tasks:
 
   - name: Set one-time boot device to {{bootdevice}}

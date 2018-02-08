@@ -285,7 +285,7 @@ def main():
         result = rf_utils._find_systems_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
-        if command == "PowerOn" or command == "PowerOff" or command == "GracefulRestart" or command == "GracefulShutdown":
+        if command == "PowerOn" or command == "PowerForceOff" or command == "PowerGracefulRestart" or command == "PowerGracefulShutdown":
             result = rf_utils.manage_system_power("/Actions/ComputerSystem.Reset", command)
         elif command == "GetBiosAttributes":
             result = rf_utils.get_bios_attributes("/Bios")

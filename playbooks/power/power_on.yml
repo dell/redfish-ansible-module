@@ -1,0 +1,12 @@
+---
+
+- hosts: myhosts
+  name: Manage System Power - Turn on
+  gather_facts: False
+
+  tasks:
+
+  - name: Turn system power on
+    local_action: >
+       redfish category=System command=PowerOn baseuri={{baseuri}}
+       user={{user}} password={{password}}

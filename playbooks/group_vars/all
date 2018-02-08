@@ -21,10 +21,6 @@ ntpserver2: ntp2.srv.com
 ntpserver3: ntp3.srv.com
 timezone: "US/Central"
 
-# Device to boot from. Options include: None, Pxe, Cd, Floppy, Hdd, BiosSetup,
-# Utilities, UefiTarget & SDCard
-bootdevice: Hdd
-
 # Dell - SCP files
 sharehost: 10.9.165.171
 sharename: share2

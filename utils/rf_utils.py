@@ -391,15 +391,15 @@ class RedfishUtils(object):
             payload = {'ResetType': 'On'}
             response = self.send_post_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
     
-        elif command == "PowerOff":
+        elif command == "PowerForceOff":
             payload = {'ResetType': 'ForceOff'}
             response = self.send_post_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
     
-        elif command == "GracefulRestart":
+        elif command == "PowerGracefulRestart":
             payload = {'ResetType': 'GracefulRestart'}
             response = self.send_post_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
     
-        elif command == "GracefulShutdown":
+        elif command == "PowerGracefulShutdown":
             payload = {'ResetType': 'GracefulShutdown'}
             response = self.send_post_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
     
