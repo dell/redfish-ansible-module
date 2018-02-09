@@ -14,35 +14,30 @@ Redfish is an open industry-standard specification and schema designed for moder
 
 To learn more about Redfish, click [here](https://www.dmtf.org/standards/redfish).
 
-To learn more about the Redfish APIs available in iDRAC, click [here](http://topics-cdn.dell.com/pdf/iDRAC9-lifecycle-controller-v3.00.00.00_API%20Guide_en-us.pdf).
-
 ## Ansible and Redfish together
 
 Together, Ansible and Redfish can be used by system administrators to fully automate at large scale server monitoring, alerting, configuration and firmware update tasks from one central location, significantly reducing complexity and helping improve the productivity and efficiency of IT administrators.
 
 ## How it works
 
-A client talks to Dell EMC servers via its iDRAC by sending Redfish URIs. The Redfish APIs will then either 1) perform an action (ex: upgrade firmware, reboot server) or 2) send information back (ex: system inventory, power consumption). Ansible provides automation so that this process can be scaled up to thousands of servers.
+A Redfish client communicates with a PowerEdge server via its iDRAC by sending Redfish URIs. The Redfish APIs will then either 1) send information back (i.e. system inventory, power consumption) or 2) perform an action (i.e. upgrade firmware, reboot server). Ansible provides automation so this process can be scaled up to thousands of servers.
 
 ![alt text](http://linux.dell.com/images/ansible-redfish-overview.png)
 
 ## Categories
 
-  - Inventory: Collects system inventory
-  - Firmware: Manages system firmware
-  - Bios: Manages BIOS settings
-  - Power: Manages system power
-  - Storage: Manages storage controllers
-  - Users: Manages iDRAC users
-  - SCP: Manages [Server Configuration Profiles](http://en.community.dell.com/techcenter/extras/m/white_papers/20269601).
-  - Logs: Collect System Event (SE) and Lifecycle Controller (LC) logs
-  - Idrac: Manages iDRAC settings
+  - Inventory: Manages system inventory
+  - Update: Manages system firmware
+  - System: Manages power and BIOS settings
+  - Chassis: Manages the system chassis
+  - Manager: Manages iDRAC settings
+  - UserManagement: Manages iDRAC users
 
-For more details on what options are available in each category, refer to this [README](https://github.com/dell/idrac-ansible-module/tree/master/playbooks).
+For more details on what commands are available in each category, refer to this [README](https://github.com/dell/idrac-ansible-module/tree/master/playbooks).
 
 ## Requirements
 
-  - PowerEdge 12G/13G/14G servers (some features only available in 14G)
+  - Dell PowerEdge 12G/13G/14G servers (some features only available in 14G)
   - Minimum iDRAC 7/8/9 FW 2.40.40.40
 
 ## Installation
@@ -53,7 +48,7 @@ $ git clone https://github.com/dell/idrac-ansible-module
 ```
 Install Ansible + required Python libraries (make sure you have the proper repositories available):
 ```
-pip install requirements.txt
+$ pip install requirements.txt
 ```
 Copy module to default system location:
 ```
@@ -73,7 +68,7 @@ dbserver1      baseuri=192.168.0.103
 ...
 ```
 
-The OOB controller (i.e. BMC, iDRAC, iLo) IP is necessary as this is how we communicate with the host. We are not connecting to the host OS via ssh, but to the OOB controller via https, so be sure this information is correct. Please note that *baseuri* can also be a DNS-resolvable name.
+The OOB controller IP is necessary as this is how we communicate with the host. We are not connecting to the host OS via ssh, but to the OOB controller via https, so be sure this information is correct. Please note that *baseuri* can also be a DNS-resolvable name.
 
 The playbook names are self-explanatory, and they are the best source to learn how to use them. Every Redfish API supported by the Ansible module is included in the playbooks. If it's not in a playbook, a Redfish API has not been coded into the module yet.
 
@@ -91,7 +86,7 @@ ok: [dbserver1]
   --- snip ---
 ```
 
-Playbooks that collect system information will place it in files in JSON format in a directory defined by the *rootdir* variable in file *group_vars/myhosts*. The playbook creates a directory for each server and places files there. For example:
+Playbooks that collect system information will place it in files in JSON format in a directory defined by the *rootdir* variable in file *group_vars/all*. The playbook creates a directory for each server and places files there. For example:
 
 ```bash
 $ cd <rootdir>/webserver1

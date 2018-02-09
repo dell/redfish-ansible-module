@@ -3,8 +3,6 @@
   name: Manage NICs
   gather_facts: False
 
-  #         WARNING!             WARNING!             WARNING!
-  #
   # Carefully review all tasks and select what you need by using tags.
   # Running *ALL* tasks will have unintended consequences!
   #

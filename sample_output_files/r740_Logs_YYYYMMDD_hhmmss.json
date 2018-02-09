@@ -1,0 +1,324 @@
+{
+    "changed": false, 
+    "failed": false, 
+    "result": {
+        "list_of_logs": [
+            {
+                "Description": "System Event Logs for this manager", 
+                "entries": [
+                    {
+                        "Created": "2018-01-31T22:26:53-06:00", 
+                        "Message": "Log cleared.", 
+                        "Name": " Log Entry 1", 
+                        "Severity": "Ok"
+                    }
+                ]
+            }, 
+            {
+                "Description": "LC Logs for this manager", 
+                "entries": [
+                    {
+                        "Created": "2018-02-09T16:14:24-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.165.133 and redfish.", 
+                        "Name": " Log Entry 1097", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T18:42:07-06:00", 
+                        "Message": "The Patrol Read operation completed for RAID Controller in Slot 4.", 
+                        "Name": " Log Entry 1096", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T18:42:07-06:00", 
+                        "Message": "The previous log entry was repeated 5 times.", 
+                        "Name": " Log Entry 1095", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T17:36:10-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.160.254 and redfish.", 
+                        "Name": " Log Entry 1094", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T17:25:43-06:00", 
+                        "Message": "Both of the Internal Dual Secure Digital Module (IDSDM) SD card media are missing, or not responding.", 
+                        "Name": " Log Entry 1093", 
+                        "Severity": "Warning"
+                    }, 
+                    {
+                        "Created": "2018-02-08T17:24:52-06:00", 
+                        "Message": "System CPU Resetting.", 
+                        "Name": " Log Entry 1092", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T17:24:39-06:00", 
+                        "Message": "System is turning on.", 
+                        "Name": " Log Entry 1091", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T17:24:37-06:00", 
+                        "Message": "Requested system powerup.", 
+                        "Name": " Log Entry 1090", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T17:24:37-06:00", 
+                        "Message": "The previous log entry was repeated 5 times.", 
+                        "Name": " Log Entry 1089", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T17:17:27-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.165.133 and redfish.", 
+                        "Name": " Log Entry 1088", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T17:15:54-06:00", 
+                        "Message": "System is turning off.", 
+                        "Name": " Log Entry 1087", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T17:15:53-06:00", 
+                        "Message": "System CPU Resetting.", 
+                        "Name": " Log Entry 1086", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T17:15:42-06:00", 
+                        "Message": "Requested system graceful shutdown.", 
+                        "Name": " Log Entry 1085", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T17:15:42-06:00", 
+                        "Message": "The previous log entry was repeated 7 times.", 
+                        "Name": " Log Entry 1084", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:48:11-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.165.133 and redfish.", 
+                        "Name": " Log Entry 1083", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:45:52-06:00", 
+                        "Message": "The (installation or configuration) job JID_181297519196 is successfully completed.", 
+                        "Name": " Log Entry 1082", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:45:25-06:00", 
+                        "Message": "Both of the Internal Dual Secure Digital Module (IDSDM) SD card media are missing, or not responding.", 
+                        "Name": " Log Entry 1081", 
+                        "Severity": "Warning"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:44:34-06:00", 
+                        "Message": "System CPU Resetting.", 
+                        "Name": " Log Entry 1080", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:44:32-06:00", 
+                        "Message": "Configuration changes successfully applied to device: PowerEdge R740(Setup 1-1)", 
+                        "Name": " Log Entry 1079", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:43:54-06:00", 
+                        "Message": "Both of the Internal Dual Secure Digital Module (IDSDM) SD card media are missing, or not responding.", 
+                        "Name": " Log Entry 1078", 
+                        "Severity": "Warning"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:43:54-06:00", 
+                        "Message": "The previous log entry was repeated 2 times.", 
+                        "Name": " Log Entry 1077", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:43:50-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.165.133 and redfish.", 
+                        "Name": " Log Entry 1076", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:43:03-06:00", 
+                        "Message": "System CPU Resetting.", 
+                        "Name": " Log Entry 1075", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:43:03-06:00", 
+                        "Message": "The previous log entry was repeated 3 times.", 
+                        "Name": " Log Entry 1074", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:42:55-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.165.133 and redfish.", 
+                        "Name": " Log Entry 1073", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:42:54-06:00", 
+                        "Message": "Reboot is complete.", 
+                        "Name": " Log Entry 1072", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:42:50-06:00", 
+                        "Message": "System is turning on.", 
+                        "Name": " Log Entry 1071", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:42:40-06:00", 
+                        "Message": "Requested system powercycle.", 
+                        "Name": " Log Entry 1070", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:42:38-06:00", 
+                        "Message": "System is turning off.", 
+                        "Name": " Log Entry 1069", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:42:38-06:00", 
+                        "Message": "System CPU Resetting.", 
+                        "Name": " Log Entry 1068", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:42:31-06:00", 
+                        "Message": "A reboot is pending.", 
+                        "Name": " Log Entry 1067", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:42:31-06:00", 
+                        "Message": "The (installation or configuration) job RID_181297519447 is successfully created on iDRAC.", 
+                        "Name": " Log Entry 1066", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:42:31-06:00", 
+                        "Message": "The (installation or configuration) job JID_181297519196 is successfully created on iDRAC.", 
+                        "Name": " Log Entry 1065", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:42:31-06:00", 
+                        "Message": "The previous log entry was repeated 10 times.", 
+                        "Name": " Log Entry 1064", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:23:55-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.165.133 and redfish.", 
+                        "Name": " Log Entry 1063", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-08T16:23:55-06:00", 
+                        "Message": "The previous log entry was repeated 2 times.", 
+                        "Name": " Log Entry 1062", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-07T17:58:54-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.160.254 and redfish.", 
+                        "Name": " Log Entry 1061", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-07T17:58:54-06:00", 
+                        "Message": "The previous log entry was repeated 2 times.", 
+                        "Name": " Log Entry 1060", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T18:03:37-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.165.133 and redfish.", 
+                        "Name": " Log Entry 1059", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T18:00:37-06:00", 
+                        "Message": "iDRAC time zone has changed.", 
+                        "Name": " Log Entry 1058", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T18:00:37-06:00", 
+                        "Message": "The previous log entry was repeated 38 times.", 
+                        "Name": " Log Entry 1057", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T17:40:52-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.165.133 and redfish.", 
+                        "Name": " Log Entry 1056", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T17:40:21-06:00", 
+                        "Message": "iDRAC time is set using Network Time Protocol.", 
+                        "Name": " Log Entry 1055", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T17:40:21-06:00", 
+                        "Message": "The previous log entry was repeated 38 times.", 
+                        "Name": " Log Entry 1054", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T16:54:44-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.165.133 and redfish.", 
+                        "Name": " Log Entry 1053", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T16:53:59-06:00", 
+                        "Message": "The session for root from 10.9.160.254 using GUI is logged off.", 
+                        "Name": " Log Entry 1052", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T16:53:59-06:00", 
+                        "Message": "The previous log entry was repeated 4 times.", 
+                        "Name": " Log Entry 1051", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T16:24:17-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.165.133 and redfish.", 
+                        "Name": " Log Entry 1050", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T16:24:04-06:00", 
+                        "Message": "iDRAC time is set using Network Time Protocol.", 
+                        "Name": " Log Entry 1049", 
+                        "Severity": "Ok"
+                    }, 
+                    {
+                        "Created": "2018-02-06T17:23:41-06:00", 
+                        "Message": "Successfully logged in using root, from 10.9.160.254 and GUI.", 
+                        "Name": " Log Entry 1048", 
+                        "Severity": "Ok"
+                    }
+                ]
+            }
+        ]
+    }
+}
