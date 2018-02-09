@@ -142,11 +142,11 @@ $ cat webserver1_StorageControllerInventory_20170912_103733.json
 
 These files are in the format *<host>_<timestamp>_<datatype>* and each contains valuable server inventory.
 
-Some Redfish APIs are only available in 14G PowerEdge servers. In addition, availability of Redfish APIs varies in 13G and 12G servers (though we are working to make them uniform across all supported servers). If you run a task for a Redfish API that is not available in a server, you will see an error displayed during playbook execution:
+The implementation of Redfish APIs varies across generations of PowerEdge servers, with the latest generation having the most APIs implemented, though we are working on making them uniform across all supported server generations. If you run a task where a Redfish API is not available, an error message will be displayed:
 
 ```
 TASK [Get Firmware Inventory] *********************************************************************
-fatal: [r630 -> localhost]: FAILED! => {"changed": false, "failed": true, "msg": "14G only"}
+fatal: [r630 -> localhost]: FAILED! => {"changed": false, "failed": true, "msg": "Not supported on this platform"}
 ...ignoring
 ok: [r740-1 -> localhost]
 ```
