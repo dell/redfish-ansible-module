@@ -1,13 +1,14 @@
 #! /usr/bin/python
 # _*_ coding: utf-8 _*_
 
-#
-# Copyright © 2017 Dell Inc. or its subsidiaries. All rights reserved.
+# Copyright © 2017-2018 Dell Inc. or its subsidiaries. All rights reserved.
 # Dell, EMC, and other trademarks are trademarks of Dell Inc. or its
 # subsidiaries. Other trademarks may be trademarks of their respective owners.
 
 import os
 import sys
+green="\033[92m"
+end="\033[0m"
 
 try:
     import ansible
@@ -30,14 +31,14 @@ def copy_files(src, dest):
             dst_file = os.path.join(dest, file_name)
             if os.path.isfile(src_file):
                 shutil.copy(src_file, dst_file)
-                print("- " + src_file + "  ===>  " + dst_file)
+                print("- " + src_file + "  ===>  " + green + dst_file + end)
     return
 
 # Create directory for the main module
 if not os.path.isdir(redfish_path): os.makedirs(redfish_path)
 
 # Copy module to ansible module location
-copy_files(os.getcwd() + '/module', redfish_path)
+copy_files(os.getcwd() + '/library', redfish_path)
 
 # Copy common files to module_util
 copy_files(os.getcwd() + '/utils', module_utils_path)
