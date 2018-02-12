@@ -152,7 +152,7 @@ import requests
 import json
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.rf_utils import RedfishUtils
+from ansible.module_utils.redfish_utils import RedfishUtils
 
 def main():
     result = {}
