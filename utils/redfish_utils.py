@@ -579,8 +579,8 @@ class RedfishUtils(object):
                                         version = i.attrib['vendorVersion']
                                         path = i.attrib['path']
  
-            if path != "":
-    		fw_list['Firmwares'].append({ 'curr':'%s' % os.path.basename(inv).replace('Installed-%s-'%ver,''), 'latest':'%s' % version, 'path':'%s' % path })
+                if path != "":
+                    fw_list['Firmwares'].append({ 'curr':'%s' % os.path.basename(inv).replace('Installed-%s-'%ver,''), 'latest':'%s' % version, 'path':'%s' % path })
         else:
             fw_list['ret'] = False
         return fw_list
