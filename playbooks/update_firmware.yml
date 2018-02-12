@@ -1,6 +1,6 @@
 ---
 - hosts: myhosts
-  name: PowerEdge Firmware Update 
+  name: Firmware Update
   gather_facts: False
 
   tasks:
@@ -14,21 +14,21 @@
     delegate_to: 127.0.0.1
     run_once: true
 
-  - name: extract gz file 
+  - name: extract gz file
     shell: gzip -d /tmp/Catalog.gz -f
     delegate_to: 127.0.0.1
     run_once: true
 
   - name: Getting system inventory
     local_action: >
-        idrac category=Inventory command=GetSystemInventory idracip={{idracip}}
-        idracuser={{idracuser}} idracpswd={{idracpswd}}
+        redfish category=Inventory command=GetSystemInventory baseuri={{baseuri}}
+        user={{user}} password={{password}}
     register: result
 
   - name: compare firmware inventory
     local_action: >
-        idrac category=Firmware command=FirmwareCompare idracip={{idracip}}
-        idracuser={{idracuser}} idracpswd={{idracpswd}}
+        redfish category=Update command=CompareFirmwareInventory baseuri={{baseuri}}
+        user={{user}} password={{password}}
         Model={{result.result.Model|replace('PowerEdge ','')}}
     register: firmware
 
@@ -40,7 +40,7 @@
     delegate_to: 127.0.0.1
     run_once: true
 
-  - name: download firmware images 
+  - name: download firmware images
     get_url:
         url: http://downloads.dell.com/{{ item.path }}
         dest: /tmp/firmware/{{ item.path | basename}}
@@ -54,8 +54,8 @@
 
   - name: upload firmware images
     local_action: >
-        idrac category=Firmware command=UploadFirmware idracip={{idracip}}
-        idracuser={{idracuser}} idracpswd={{idracpswd}}
+        redfish category=Update command=UploadFirmware baseuri={{baseuri}}
+        user={{user}} password={{password}}
         FWPath=/tmp/firmware/{{ item.path | basename}}
     register: fw_available
     when:
@@ -72,8 +72,7 @@
 
   - name: install firmware image
     local_action: >
-        idrac category=Firmware command=InstallFirmware idracip={{idracip}} 
-        idracuser={{idracuser}} idracpswd={{idracpswd}}
+        redfish category=Update command=ScheduleUpdate baseuri={{baseuri}}
+        user={{user}} password={{password}}
         InstallOption=NowAndReboot
-    when: schedule_fw_update_job is defined 
-
+    when: schedule_fw_update_job is defined

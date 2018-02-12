@@ -1,7 +1,7 @@
 ---
 
 - hosts: myhosts
-  name: PowerEdge iDRAC - Manage iDRAC Settings
+  name: Manage manager settings
   gather_facts: False
 
   #         WARNING!             WARNING!             WARNING!
@@ -14,28 +14,27 @@
   # ansible-playbook manage_idrac_settings.yml --tags enablentp
 
   # Commands available:
-  #   GetAttributes		Get iDRAC attributes
-  #   SetDefaultSettings	Set iDRAC default settings
+  #   GetAttributes		Get Manager attributes
   #   SetAttributes		Most settings can be set using this
-  #   ViewJobQueue		View Job Queue (coming soon)
+  #   SetDefaultSettings	Set Manager default settings
 
   tasks:
 
   # ------------------------------------------------------------------------
   # 14G only
   - name: Set output file
-    include: set_output_file.yml type=IdracAttributes
+    include_tasks: create_output_file.yml type=ManagerAttributes
     tags: getattributes
 
-  - name: Get iDRAC attributes
+  - name: Get manager attributes
     local_action: >
-       idrac category=Idrac command=GetAttributes idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Manager command=GetAttributes baseuri={{baseuri}}
+       user={{user}} password={{password}}
     register: result
     ignore_errors: yes
     tags: getattributes
 
-  - name: Copy iDRAC attributes to file
+  - name: Copy manager attributes to file
     local_action: copy content={{ result | to_nice_json }}
        dest={{template}}.json
     tags: getattributes
@@ -44,9 +43,9 @@
   # 14G only
   - name: Set Timezone
     local_action: >
-       idrac category=Idrac command=SetAttributes
-       idrac_attributes={'Time.1.Timezone':'US/Central'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Manager command=SetAttributes
+       user={{user}} password={{password}} baseuri={{baseuri}}
+       mgr_attr_name=Time.1.Timezone mgr_attr_value={{timezone}}
     tags: settimezone
     ignore_errors: yes
 
@@ -54,17 +53,17 @@
   # 14G only
   - name: Enable NTP
     local_action: >
-       idrac category=Idrac command=SetAttributes
-       idrac_attributes={'NTPConfigGroup.1.NTPEnable':'Enabled'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Manager command=SetAttributes
+       user={{user}} password={{password}} baseuri={{baseuri}}
+       mgr_attr_name=NTPConfigGroup.1.NTPEnable mgr_attr_value=Enabled
     tags: enablentp
     ignore_errors: yes
 
-  - name: Set NTP server
+  - name: Set NTP server 1
     local_action: >
-       idrac category=Idrac command=SetAttributes
-       idrac_attributes={'NTPConfigGroup.1.NTP1':'ntp.server.com'}
-       idracuser={{idracuser}} idracpswd={{idracpswd}} idracip={{idracip}}
+       redfish category=Manager command=SetAttributes
+       user={{user}} password={{password}} baseuri={{baseuri}}
+       mgr_attr_name=NTPConfigGroup.1.NTP1 mgr_attr_value={{ntpserver1}}
     tags: enablentp
     ignore_errors: yes
 
@@ -72,10 +71,10 @@
   # To get exact attributes names, run the getattributes task first
 
   # ------------------------------------------------------------------------
-  # Resetting to default values will reset everything and reboot the iDRAC
-  - name: Idrac set default settings
+  # Resetting to default values will reset everything and reboot the manager
+  - name: Set default manager settings
     local_action: >
-       idrac category=Idrac command=SetDefaultSettings
-       idracip={{idracip}} idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Manager command=SetDefaultSettings
+       baseuri={{baseuri}} user={{user}} password={{password}}
     tags: setdefaultsettings
 

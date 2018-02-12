@@ -1,0 +1,22 @@
+---
+- hosts: myhosts
+  name: View System Logs
+  gather_facts: False
+
+  # Example:
+  # ansible-playbook view_logs.yml
+
+  tasks:
+
+  - name: Define output file
+    include_tasks: create_output_file.yml type=Logs
+
+  - name: View Logs
+    local_action: >
+       redfish category=Manager command=ViewLogs baseuri={{ baseuri }}
+            user={{ user }} password={{ password }}
+    register: result
+
+  - name: Copy Logs to output file
+    local_action: copy content={{ result | to_nice_json }}
+             dest={{template}}.json

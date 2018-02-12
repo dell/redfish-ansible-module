@@ -1,0 +1,3 @@
+ansible
+requests
+urllib3

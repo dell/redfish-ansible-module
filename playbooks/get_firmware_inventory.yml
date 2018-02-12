@@ -1,17 +1,17 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC Device Firmware Inventory
+  name: Device Firmware Inventory
   gather_facts: False
 
   tasks:
 
   - name: Set output file
-    include: set_output_file.yml type=FirmwareInventory
+    include_tasks: create_output_file.yml type=FirmwareInventory
 
   - name: Get Firmware Inventory
     local_action: >
-       idrac category=Firmware command=GetInventory idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Update command=GetFirmwareInventory baseuri={{baseuri}}
+       user={{user}} password={{password}}
     register: result
     ignore_errors: yes
 

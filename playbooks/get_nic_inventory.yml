@@ -1,17 +1,17 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC NIC Inventory
+  name: NIC Inventory
   gather_facts: False
 
   tasks:
 
   - name: Define output file
-    include: set_output_file.yml type=NicInventory
+    include_tasks: create_output_file.yml type=NicInventory
 
   - name: Get NIC Information
     local_action: >
-       idrac category=Inventory command=GetNicInventory idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Inventory command=GetNicInventory baseuri={{baseuri}}
+       user={{user}} password={{password}}
     register: result
     ignore_errors: yes
 

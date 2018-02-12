@@ -1,0 +1,21 @@
+---
+
+- hosts: myhosts
+  name: List Users
+  gather_facts: False
+
+  # User to add, modify or delete is defined in file group_vars/myhosts
+
+  tasks:
+
+  - name: Set output file
+    include_tasks: create_output_file.yml type=Users
+
+  - name: List all users
+    local_action: >
+       redfish category=UserManagement command=ListUsers baseuri={{baseuri}}
+       user={{user}} password={{password}} 
+    register: result
+
+  - local_action: copy content={{ result | to_nice_json }}
+       dest={{template}}.json

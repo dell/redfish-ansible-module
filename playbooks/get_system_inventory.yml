@@ -1,17 +1,17 @@
 ---
 - hosts: myhosts
-  name: PowerEdge iDRAC Get System Inventory
+  name: System Inventory
   gather_facts: False
 
   tasks:
 
   - name: Define output file
-    include: set_output_file.yml type=SystemInventory
+    include_tasks: create_output_file.yml type=SystemInventory
 
   - name: Getting system inventory
     local_action: >
-       idrac category=Inventory command=GetSystemInventory idracip={{idracip}}
-       idracuser={{idracuser}} idracpswd={{idracpswd}}
+       redfish category=Inventory command=GetSystemInventory baseuri={{baseuri}}
+       user={{user}} password={{password}}
     register: result
 
   - name: Copy results to output file

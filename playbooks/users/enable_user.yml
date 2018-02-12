@@ -1,0 +1,14 @@
+---
+
+- hosts: myhosts
+  name: Enable User
+  gather_facts: False
+
+  # User to add, modify or delete is defined in file group_vars/myhosts
+
+  tasks:
+
+  - name: Enable user
+    local_action: >
+       redfish category=UserManagement command=EnableUser baseuri={{baseuri}}
+       user={{user}} password={{password}} userid={{userid}}
