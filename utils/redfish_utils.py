@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# (c) 2017-2018, Dell EMC Inc.
+# Copyright © 2017-2018, Dell EMC Inc.
 #
-# This file is part of Ansible
+# This file is part of Ansible.
 #
 # Ansible is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
