@@ -100,7 +100,7 @@ class RedfishUtils(object):
             self.accounts_uri = accounts
             return { 'ret': True }
 
-    def _find_systems_service(self, uri):
+    def _find_systems(self, uri):
         response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         if 'Systems' not in data:
@@ -128,7 +128,7 @@ class RedfishUtils(object):
             self.firmware_uri = firmware_inventory
             return { 'ret': True }
 
-    def _find_chassis_service(self, uri):
+    def _find_chassis(self, uri):
         response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         if 'Chassis' not in data:
@@ -142,7 +142,7 @@ class RedfishUtils(object):
             self.chassis_uri = chassis_service
             return { 'ret': True }
 
-    def _find_manager(self, uri):
+    def _find_managers(self, uri):
         response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         if 'Managers' not in data:

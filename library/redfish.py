@@ -226,8 +226,8 @@ def main():
 
     # Organize by Categories / Commands
     if category == "Inventory":
-        # execute only if we find a System service
-        result = rf_utils._find_systems_service(rf_uri)
+        # execute only if we find System
+        result = rf_utils._find_systems(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         # General
@@ -250,8 +250,8 @@ def main():
 
         # Chassis
         elif command == "GetFanInventory":
-            # execute only if we find a Chassis service
-            result = rf_utils._find_chassis_service(rf_uri)
+            # execute only if we find Chassis
+            result = rf_utils._find_chassis(rf_uri)
             if result['ret'] == False: module.fail_json(msg=result['msg'])
             result = rf_utils.get_fan_inventory("/Thermal")
 
@@ -281,8 +281,8 @@ def main():
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "System":
-        # execute only if we find a System service
-        result = rf_utils._find_systems_service(rf_uri)
+        # execute only if we find System
+        result = rf_utils._find_systems(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "PowerOn" or command == "PowerForceOff" or command == "PowerGracefulRestart" or command == "PowerGracefulShutdown":
@@ -298,8 +298,8 @@ def main():
         elif command == "SetBiosAttributes":
 	    result = rf_utils.set_bios_attributes("/Bios/Settings", bios_attributes)
         elif command == "CreateBiosConfigJob":
-            # execute only if we find a Manager service
-            result = rf_utils._find_manager(rf_uri)
+            # execute only if we find Managers
+            result = rf_utils._find_managers(rf_uri)
             if result['ret'] == False: module.fail_json(msg=result['msg'])
             result = rf_utils.create_bios_config_job("/Bios/Settings", "/Jobs")
         else:
@@ -325,7 +325,7 @@ def main():
     # Specific to Dell
     elif category == "Manager":
         # execute only if we find a Manager service
-        result = rf_utils._find_manager(rf_uri)
+        result = rf_utils._find_managers(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
         if command == "GracefulRestart":
