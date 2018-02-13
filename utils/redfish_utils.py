@@ -618,16 +618,17 @@ class RedfishUtils(object):
                 if 'Available' in i['@odata.id']:
                     fw.append(i['@odata.id'])
         else:
-            return { 'ret': False, 'msg': 'Error getting firmware inventory; status_code=%s' % response.status_code }
+            return { 'ret': False, 'msg': 'Error getting firmware inventory; Error code %s' % response.status_code }
 
-        url = self.root_uri + self.update_uri + uri
         payload = {'SoftwareIdentityURIs': fw, 'InstallUpon': InstallOption}
-        response = self.send_post_request(url, payload, HEADERS)
+        response = self.send_post_request(self.root_uri + self.update_uri + uri, payload, HEADERS)
  
         if response.status_code == 202:
             result = { 'ret': True, 'msg': 'Firmware install job accepted' }
+        elif response.status_code == 400:
+            result = { 'ret': False, 'msg': 'Not supported on this platform'}
         else:
-            result =  { 'ret': False, 'msg': 'Error accepting firmware install; status_code=%s' % response.status_code }
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
 
     def get_manager_attributes(self, uri):
