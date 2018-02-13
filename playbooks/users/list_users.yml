@@ -13,7 +13,7 @@
 
   - name: List all users
     local_action: >
-       redfish category=UserManagement command=ListUsers baseuri={{baseuri}}
+       redfish category=Accounts command=ListUsers baseuri={{baseuri}}
        user={{user}} password={{password}} 
     register: result
 

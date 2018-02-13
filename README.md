@@ -30,8 +30,8 @@ A Redfish client communicates with a PowerEdge server via its iDRAC by sending R
   - Update: Manages system firmware
   - System: Manages power and BIOS settings
   - Chassis: Manages the system chassis
-  - Manager: Manages iDRAC settings
-  - UserManagement: Manages iDRAC users
+  - Manager: Manages OOB controller settings
+  - Accounts: Manages OOB controller users
 
 For more details on what commands are available in each category, refer to this [README](https://github.com/dell/idrac-ansible-module/tree/master/playbooks).
 

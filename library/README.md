@@ -14,7 +14,7 @@
 
 | paramater       | required | default | choices  | comments                  |
 |-----------------|----------|---------|----------|-----------------------------------|
-| category        | yes      |         | <ul><li>Inventory</li><li>Update</li><li>System</li><li>Chassis</li><li>Manager</li><li>UserManagement</li></ul>| Type of action to run |
+| category        | yes      |         | <ul><li>Inventory</li><li>Update</li><li>System</li><li>Chassis</li><li>Manager</li><li>Accounts</li></ul>| Type of action to run |
 | command         | yes      |         |          | Command within each category   |
 | baseuri         | yes      |         |          | Name/IP addr of OOB controller |
 | user            | yes      | root    |          | Login credentials         |

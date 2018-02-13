@@ -10,6 +10,6 @@
 
   - name: Update user role
     local_action: >
-       redfish category=UserManagement command=UpdateUserRole baseuri={{baseuri}}
+       redfish category=Accounts command=UpdateUserRole baseuri={{baseuri}}
        user={{user}} password={{password}} userid={{userid}}
        userrole={{userrole}}

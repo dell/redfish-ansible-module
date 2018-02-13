@@ -10,5 +10,5 @@
 
   - name: Enable user
     local_action: >
-       redfish category=UserManagement command=EnableUser baseuri={{baseuri}}
+       redfish category=Accounts command=EnableUser baseuri={{baseuri}}
        user={{user}} password={{password}} userid={{userid}}

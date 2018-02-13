@@ -258,7 +258,7 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    elif category == "UserManagement":
+    elif category == "Accounts":
         # execute only if we find an Account service
         result = rf_utils._find_account_service(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])

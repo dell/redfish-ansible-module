@@ -24,7 +24,7 @@
 |           | PowerForceOff          | power_force_off.yml        |                    |
 |           | PowerGracefulRestart   | power_graceful_restart.ym  |                    |
 |           | PowerGracefulShutdown  | power_graceful_shutdown.yml |                   |
-| UserManagement | ListUsers         | list_users.yml             | [r740_Users_YYYYMMDD_hhmmss.json](../sample_output_files/r740_Users_YYYYMMDD_hhmmss.json) |
+| Accounts  | ListUsers              | list_users.yml             | [r740_Users_YYYYMMDD_hhmmss.json](../sample_output_files/r740_Users_YYYYMMDD_hhmmss.json) |
 |           | AddUser                | add_user.yml               |                    |
 |           | EnableUser             | enable_user.yml            |                    |
 |           | UpdateUserRole         | update_user_role.yml       |                    |
