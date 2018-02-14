@@ -89,7 +89,7 @@ class RedfishUtils(object):
         response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         if 'AccountService' not in data:
-            return { 'ret': False, 'msg': "AccountService API not found" }
+            return { 'ret': False, 'msg': "AccountService resource not found" }
         else:
             account_service = data["AccountService"]["@odata.id"]
             response = self.send_get_request(self.root_uri + account_service)
@@ -104,7 +104,7 @@ class RedfishUtils(object):
         response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         if 'Systems' not in data:
-            return { 'ret': False, 'msg': "Systems API not found" }
+            return { 'ret': False, 'msg': "Systems resource not found" }
         else:
             systems = data["Systems"]["@odata.id"]
             response = self.send_get_request(self.root_uri + systems)
@@ -118,7 +118,7 @@ class RedfishUtils(object):
         response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         if 'UpdateService' not in data:
-            return { 'ret': False, 'msg': "UpdateService API not found" }
+            return { 'ret': False, 'msg': "UpdateService resource not found" }
         else:
             update = data["UpdateService"]["@odata.id"]
             self.update_uri = update
@@ -132,7 +132,7 @@ class RedfishUtils(object):
         response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         if 'Chassis' not in data:
-            return { 'ret': False, 'msg': "Chassis API not found" }
+            return { 'ret': False, 'msg': "Chassis resource not found" }
         else:
             chassis = data["Chassis"]["@odata.id"]
             response = self.send_get_request(self.root_uri + chassis)
@@ -146,7 +146,7 @@ class RedfishUtils(object):
         response = self.send_get_request(self.root_uri + uri)
         data = response.json()
         if 'Managers' not in data:
-            return { 'ret': False, 'msg': "Manager API not found" }
+            return { 'ret': False, 'msg': "Manager resource not found" }
         else:
             manager = data["Managers"]["@odata.id"]
             response = self.send_get_request(self.root_uri + manager)
@@ -166,7 +166,7 @@ class RedfishUtils(object):
         data = response.json()
 
         if 'LogServices' not in data:
-            return { 'ret': False, 'msg': "LogServices API not found" }
+            return { 'ret': False, 'msg': "LogServices resource not found" }
         else:
             logs_uri = data["LogServices"]["@odata.id"]
 
@@ -209,7 +209,7 @@ class RedfishUtils(object):
         data = response.json()
 
         if 'LogServices' not in data:
-            return { 'ret': False, 'msg': "LogServices API not found" }
+            return { 'ret': False, 'msg': "LogServices resource not found" }
         else:
             logs_uri = data["LogServices"]["@odata.id"]
 
@@ -297,7 +297,7 @@ class RedfishUtils(object):
         response = self.send_get_request(self.root_uri + self.systems_uri)
         data = response.json()
         if 'SimpleStorage' not in data:
-            return { 'ret': False, 'msg': "SimpleStorage API not found" }
+            return { 'ret': False, 'msg': "SimpleStorage resource not found" }
         else:
             storage_uri = data["SimpleStorage"]["@odata.id"]
 
@@ -338,7 +338,7 @@ class RedfishUtils(object):
         response = self.send_get_request(self.root_uri + self.systems_uri)
         data = response.json()
         if 'SimpleStorage' not in data:
-            return { 'ret': False, 'msg': "SimpleStorage API not found" }
+            return { 'ret': False, 'msg': "SimpleStorage resource not found" }
         else:
             storage_uri = data["SimpleStorage"]["@odata.id"]
 

@@ -29,7 +29,7 @@
 |           | EnableUser             | enable_user.yml            |                    |
 |           | UpdateUserRole         | update_user_role.yml       |                    |
 |           | UpdateUserPassword     | update_user_password.yml   |                    |
-|           | DisableUser            | disable_user.yml   i       |                    |
+|           | DisableUser            | disable_user.yml           |                    |
 |           | DeleteUser             | delete_user.yml            |                    |
 | Manager   | ViewLogs               | view_logs.yml              | [r740_Logs_YYYYMMDD_hhmmss.json](../sample_output_files/r740_Logs_YYYYMMDD_hhmmss.json) |
 |           | ClearLogs              | clear_logs.yml             |                    |

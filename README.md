@@ -146,7 +146,7 @@ The implementation of Redfish APIs varies across generations of PowerEdge server
 
 ```
 TASK [Get Firmware Inventory] *********************************************************************
-fatal: [r630 -> localhost]: FAILED! => {"changed": false, "failed": true, "msg": "UpdateService API not found"}
+fatal: [r630 -> localhost]: FAILED! => {"changed": false, "failed": true, "msg": "UpdateService resource not found"}
 ...ignoring
 ok: [r740 -> localhost]
 ```
