@@ -44,7 +44,7 @@ def copy_files(src, dest):
             dst_file = os.path.join(dest, file_name)
             if os.path.isfile(src_file):
                 shutil.copy(src_file, dst_file)
-                print("- " + src_file + "  ===>  " + green + dst_file + end)
+                print("- " + src_file + " ---> " + green + dst_file + end)
     return
 
 # Create directory for the main module
