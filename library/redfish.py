@@ -242,6 +242,16 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
+    elif category == "Update":
+        # execute only if we find UpdateService resources
+        result = rf_utils._find_updateservice_resource(rf_uri)
+        if result['ret'] == False: module.fail_json(msg=result['msg'])
+
+        if command == "GetFirmwareInventory":
+            result = rf_utils.get_firmware_inventory()
+        else:
+            result = { 'ret': False, 'msg': 'Invalid Command'}
+
     elif category == "Manager":
         # execute only if we find a Manager service resource
         result = rf_utils._find_managers_resource(rf_uri)
