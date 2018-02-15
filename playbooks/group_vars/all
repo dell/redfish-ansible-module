@@ -16,18 +16,10 @@ host: "{{inventory_hostname}}"
 
 # These variables are not used in playbooks yet. Need to figure out
 # how to include variables inside curly {} brackets.
-ntpserver1: lb.us.dell.com
+ntpserver1: ntp1.srv.com
 ntpserver2: ntp2.srv.com
 ntpserver3: ntp3.srv.com
 timezone: "US/Central"
-
-# Dell - SCP files
-sharehost: 10.9.165.171
-sharename: share2
-shareuser: dell
-sharepswd: 111111
-# name of SCP file to use for importing - apply to same server models each time
-scpfile: SCP-for-server-model-x.xml
 
 # For managing users - userid 2 is default root user, be mindful!
 userid: 3                  # user id of user to add/delete/modify (1-16)

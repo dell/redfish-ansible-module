@@ -37,5 +37,3 @@
 |           | SetAttributes          | manage_idrac_settings.yml  |                    |
 |           | SetDefaultSettings     | manage_idrac_settings.yml  |                    |
 |           | GracefulRestart        | restart_idrac.yml          |                    |
-|           | ExportSCP              | export_scp.yml             | [r740_SCP_YYYYMMDD_hhmmss.xml](../sample_output_files/r740_SCP_YYYYMMDD_hhmmss.xml) |
-|           | ImportSCP              | import_scp.yml             |                    |

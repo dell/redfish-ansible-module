@@ -23,12 +23,6 @@
 | username        | no       |         |          | For managing users        |
 | userpswd        | no       |         |          | For managing users        |
 | userrole        | no       |         |          | For managing users        |
-| sharehost       | no       |         |          | For managing SCP files    |
-| sharename       | no       |         |          | For managing SCP files    |
-| shareuser       | no       |         |          | For managing SCP files    |
-| sharepswd       | no       |         |          | For managing SCP files    |
-| hostname        | no       |         |          | For managing SCP files    |
-| scpfile         | no       |         |          | For managing SCP files    |
 | bootdevice      | no       |         |          | For setting boot configuration     |
 | bios_attr_name  | no       |         |          | Name of BIOS attributes to set     |
 | bios_attr_value | no       |         |          | Value of BIOS attributes to set    |

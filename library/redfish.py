@@ -261,7 +261,6 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    # Specific to Dell
     elif category == "Update":
         # execute only if we find Update and Firmware service resources
         result = rf_utils._find_updateservice_resource(rf_uri)
@@ -278,7 +277,6 @@ def main():
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    # Specific to Dell
     elif category == "Manager":
         # execute only if we find a Manager service resource
         result = rf_utils._find_managers_resource(rf_uri)
