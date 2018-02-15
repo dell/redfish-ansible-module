@@ -33,7 +33,7 @@
 |           | DeleteUser             | delete_user.yml            |                    |
 | Manager   | ViewLogs               | view_logs.yml              | [r740_Logs_YYYYMMDD_hhmmss.json](../sample_output_files/r740_Logs_YYYYMMDD_hhmmss.json) |
 |           | ClearLogs              | clear_logs.yml             |                    |
-|           | GetAttributes          | manage_idrac_settings.yml  | [r740_ManagerAttributes_YYYMMDD_hhmmss.json](../sample_output_files/r740_ManagerAttributes_YYYMMDD_hhmmss.json) |
-|           | SetAttributes          | manage_idrac_settings.yml  |                    |
-|           | SetDefaultSettings     | manage_idrac_settings.yml  |                    |
-|           | GracefulRestart        | restart_idrac.yml          |                    |
+|           | GetAttributes          | get_manager_attributes.yml | [r740_ManagerAttributes_YYYMMDD_hhmmss.json](../sample_output_files/r740_ManagerAttributes_YYYMMDD_hhmmss.json) |
+|           | SetAttributes          | set_manager_timezone.yml   |                    |
+|           | SetDefaultSettings     | reset_manager_settings.yml |                    |
+|           | GracefulRestart        | restart_manager.yml        |                    |

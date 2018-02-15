@@ -282,6 +282,9 @@ def main():
         result = rf_utils._find_managers_resource(rf_uri)
         if result['ret'] == False: module.fail_json(msg=result['msg'])
 
+        # The URIs being passed are hard-coded but could easily be built dynamically by
+        # looking in resources Links["Oem"] and Actions["Oem"]["target"] under manager_uri.
+        # Leaving here for reference only so it can be adapted for other OEMs.
         if command == "GracefulRestart":
             result = rf_utils.restart_manager_gracefully("/Actions/Manager.Reset")
         elif command == "GetAttributes":

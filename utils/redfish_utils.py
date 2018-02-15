@@ -40,6 +40,7 @@ class RedfishUtils(object):
         self.default_manager_id = None
         return
 
+    # The following functions are to send GET/POST/PATCH/DELETE requests
     def send_get_request(self, uri):
         headers = {}
         if 'token' in self.creds:

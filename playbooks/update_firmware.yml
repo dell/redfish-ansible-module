@@ -74,5 +74,5 @@
     local_action: >
         redfish category=Update command=ScheduleUpdate baseuri={{baseuri}}
         user={{user}} password={{password}}
-        InstallOption=NowAndReboot
+        InstallOption=Now
     when: schedule_fw_update_job is defined
