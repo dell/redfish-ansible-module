@@ -97,22 +97,6 @@ options:
     default: None
     description:
       - value of Manager attribute to update to
-  FWPath:
-    required: false
-    default: None
-    description:
-      - firmware binary path which is used to upload firmware
-  Model:
-    required: false
-    default: None
-    description:
-      - system model name
-  InstallOption:
-    required: false
-    choices: [ Now, NowAndReboot, NextReboot ]
-    default: None
-    description:
-      - firmware installation option like Now or NextReboot
 
 author: "jose.delarosa@dell.com", github: jose-delarosa
 """
@@ -142,9 +126,6 @@ def main():
             mgr_attr_value = dict(required=False, type='str', default=None),
             bios_attr_name = dict(required=False, type='str', default=None),
             bios_attr_value = dict(required=False, type='str', default=None),
-	    FWPath     = dict(required=False, type='str', default=None),
-	    Model      = dict(required=False, type='str', default=None),
-	    InstallOption = dict(required=False, type='str', default=None, choices=['Now', 'NowAndReboot', 'NextReboot']),
         ),
         supports_check_mode=False
     )
@@ -258,22 +239,6 @@ def main():
             result = rf_utils._find_managers_resource(rf_uri)
             if result['ret'] == False: module.fail_json(msg=result['msg'])
             result = rf_utils.create_bios_config_job("/Bios/Settings", "/Jobs")
-        else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
-    elif category == "Update":
-        # execute only if we find Update and Firmware service resources
-        result = rf_utils._find_updateservice_resource(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
-
-        if command == "GetFirmwareInventory":
-            result = rf_utils.get_firmware_inventory()
-	elif command == "CompareFirmwareInventory":
-            result = rf_utils.compare_firmware_inventory("/tmp/Catalog", module.params['Model'])
-	elif command == "UploadFirmware":
-            result = rf_utils.upload_firmware(module.params['FWPath'])
-        elif command == "ScheduleUpdate":
-            result = rf_utils.schedule_firmware_update("/Actions/Oem/DellUpdateService.Install", module.params['InstallOption'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

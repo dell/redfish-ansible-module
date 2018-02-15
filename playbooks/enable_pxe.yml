@@ -15,7 +15,7 @@
        user={{user}} password={{password}} baseuri={{baseuri}}
        bios_attr_name=PxeDev1EnDis bios_attr_value=Enabled
     ignore_errors: yes
-    
+
 # - name: Schedule Config Job - Reboot
 #   local_action: >
 #     redfish category=System command=CreateBiosConfigJob baseuri={{baseuri}}

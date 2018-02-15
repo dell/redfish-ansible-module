@@ -1,3 +1,5 @@
+*Note:* Features specific to PowerEdge servers (like firmware upgrade and SCP management) have been removed from the master branch and are now being tracked in the [fordell](https://github.com/dell/idrac-ansible-module/tree/fordell) development branch. Please use that branch if you want to use those Dell-specific features.
+
 # Ansible module for Dell EMC PowerEdge iDRAC using Redfish APIs
 
 Ansible module and playbooks that use the Redfish API to manage PowerEdge servers via the integrated Dell Remote Access Controller (iDRAC). For more details, see these [slides](https://www.slideshare.net/JoseDeLaRosa7/automated-outofband-management-with-ansible-and-redfish).
