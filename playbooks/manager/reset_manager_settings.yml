@@ -1,0 +1,15 @@
+---
+
+- hosts: myhosts
+  name: Reset Manager default settings
+  gather_facts: False
+
+  tasks:
+
+  # Resetting to default values will reset everything and reboot the Manager
+  - name: Set default manager settings
+    local_action: >
+       redfish category=Manager command=SetDefaultSettings
+       baseuri={{baseuri}} user={{user}} password={{password}}
+    tags: setdefaultsettings
+

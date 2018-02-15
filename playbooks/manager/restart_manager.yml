@@ -1,7 +1,7 @@
 ---
 
 - hosts: myhosts
-  name: Restart iDRAC
+  name: Restart Manager
   gather_facts: False
 
   tasks:
