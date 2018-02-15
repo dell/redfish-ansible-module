@@ -72,36 +72,6 @@ options:
     default: None
     description:
       - role of user to add/delete/modify
-  sharehost:
-    required: false
-    default: None
-    description:
-      - CIFS/SMB share hostname for managing SCP files
-  sharename:
-    required: false
-    default: None
-    description:
-      - CIFS/SMB share name for managing SCP files
-  shareuser:
-    required: false
-    default: None
-    description:
-      - CIFS/SMB share user for managing SCP files
-  sharepswd:
-    required: false
-    default: None
-    description:
-      - CIFS/SMB share user password for managing SCP files
-  hostname:
-    required: false
-    default: None
-    description:
-      - server name to add to filename when exporting SCP file
-  scpfile:
-    required: false
-    default: None
-    description:
-      - SCP file to import
   bootdevice:
     required: false
     default: None
@@ -167,12 +137,6 @@ def main():
             username   = dict(required=False, type='str', default=None),
             userpswd   = dict(required=False, type='str', default=None, no_log=True),
             userrole   = dict(required=False, type='str', default=None),
-            hostname   = dict(required=False, type='str', default=None),
-            scpfile    = dict(required=False, type='str', default=None),
-            sharehost  = dict(required=False, type='str', default=None),
-            sharename  = dict(required=False, type='str', default=None),
-            shareuser  = dict(required=False, type='str', default=None),
-            sharepswd  = dict(required=False, type='str', default=None, no_log=True),
             bootdevice = dict(required=False, type='str', default=None),
             mgr_attr_name = dict(required=False, type='str', default=None),
             mgr_attr_value = dict(required=False, type='str', default=None),
@@ -190,19 +154,11 @@ def main():
 
     category   = module.params['category']
     command    = module.params['command']
-    hostname   = module.params['hostname']
-    scpfile    = module.params['scpfile']
     bootdevice = module.params['bootdevice']
 
     # admin credentials used for authentication
     creds = { 'user': module.params['user'],
               'pswd': module.params['password']
-    }
-    # share information for exporting/importing SCP files
-    share = { 'host' : module.params['sharehost'],
-              'name' : module.params['sharename'],
-              'user' : module.params['shareuser'],
-              'pswd' : module.params['sharepswd']
     }
     # user to add/modify/delete
     user = { 'userid'   : module.params['userid'],
@@ -342,12 +298,6 @@ def main():
             result = rf_utils.view_logs()
         elif command == "ClearLogs":
             result = rf_utils.clear_logs()
-
-        # SCP
-        elif command == "ExportDellSCP":
-            result = rf_utils.export_dell_scp(share, hostname, "/Actions/Oem/EID_674_Manager.ExportSystemConfiguration")
-        elif command == "ImportDellSCP":
-            result = rf_utils.import_dell_scp(share, scpfile, "/Actions/Oem/EID_674_Manager.ImportSystemConfiguration")
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 

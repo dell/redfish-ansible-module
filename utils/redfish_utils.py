@@ -228,66 +228,6 @@ class RedfishUtils(object):
         result['ret'] = True		# assume we're successful
         return result
 
-    def import_dell_scp(self, share, scpfile, uri):
-        result = {}
-        payload = { "ShutdownType" : "Forced",
-                    "ShareParameters" : { "Target" : "ALL",
-                         "ShareType" : "CIFS",
-                         "IPAddress" : share['host'],
-                         "ShareName" : share['name'],
-                         "UserName"  : share['user'],
-                         "Password"  : share['pswd'],
-                         "FileName"  : scpfile }
-                  }
-        response = self.send_post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
-        if response.status_code == 202:		# success
-            result['ret'] = True
-            '''
-            I return the Job ID but not returning success/fail status unless I
-            wait for the task to complete (which can take 45-90 seconds).
-            There isn't a way to know if the task finished successfully other
-            then checking if the configuration settings in the SCP file were
-            applied to the server.
-            '''
-            data_dict = response.__dict__
-            job_id_full = data_dict["headers"]["Location"]
-            job_id = re.search("JID_.+", job_id_full).group()
-            result = { 'ret': True, 'msg': "Job ID %s" % job_id }
-        else:
-            result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
-        return result
-
-    def export_dell_scp(self, share, hostname, uri):
-        result = {}
-        # timestamp to add to SCP XML file name
-        ts = str(datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S"))
-        payload = { "ExportFormat" : "XML",
-                    "ExportUse" : "Default",
-                    "ShareParameters" : { "Target" : "ALL",
-                         "ShareType" : "CIFS",
-                         "IPAddress" : share['host'],
-                         "ShareName" : share['name'],
-                         "UserName"  : share['user'],
-                         "Password"  : share['pswd'],
-                         "FileName"  : hostname + "_SCP_" + ts + ".xml" }
-                  }
-        response = self.send_post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
-        if response.status_code == 202:		# success
-            result['ret'] = True
-            '''
-            I return the Job ID but not returning success/fail status unless I
-            wait for the task to complete (which can take 45-90 seconds).
-            There isn't a way to know if the task finished successfully other
-            than waiting to see if the SCP file is dropped in the SMB share.
-            '''
-            data_dict = response.__dict__
-            job_id_full = data_dict["headers"]["Location"]
-            job_id = re.search("JID_.+", job_id_full).group()
-            result = { 'ret': True, 'msg': "Job ID %s" % job_id }
-        else:
-            result = { 'ret': False, 'msg': "Status code %s" % response.status_code }
-        return result
-
     def get_storage_controller_info(self):
         result = {}
         controllers_details = []
