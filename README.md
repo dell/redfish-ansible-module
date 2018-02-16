@@ -1,4 +1,4 @@
-*Note:* Features specific to PowerEdge servers (like firmware upgrade and SCP management) have been removed from the master branch and are now being tracked in the [fordell](https://github.com/dell/idrac-ansible-module/tree/fordell) development branch. Please use that branch if you want to use those Dell-specific features.
+**Note:** Features specific to PowerEdge servers (like firmware upgrade and SCP management) have been removed from the master branch and are now being tracked in the [fordell](https://github.com/dell/idrac-ansible-module/tree/fordell) development branch. Please use this branch if you want to use these Dell-specific features.
 
 # Ansible module for Dell EMC PowerEdge iDRAC using Redfish APIs
 
@@ -35,7 +35,7 @@ A Redfish client communicates with a PowerEdge server via its iDRAC by sending R
   - Manager: Manages OOB controller settings
   - Accounts: Manages OOB controller users
 
-For more details on what commands are available in each category, refer to this [README](https://github.com/dell/idrac-ansible-module/tree/master/playbooks).
+For more details on what commands are available in each category, refer to this [README](playbooks).
 
 ## Requirements
 

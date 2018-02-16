@@ -28,6 +28,3 @@
 | bios_attr_value | no       |         |          | Value of BIOS attributes to set    |
 | mgr_attr_name   | no       |         |          | Name of Manager attributes to set  |
 | mgr_attr_value  | no       |         |          | Value of Manager attributes to set |
-| FWPath          | no       |         |          | Firmware location (for FW upgrade) |
-| Model           | no       |         |          | Server model (for FW upgrade) |
-| InstallOption   | no       |         | <ul><li>Now</li><li>NowAndReboot</li><li>NextReboot</li></ul>| Action to take after upgrade |
