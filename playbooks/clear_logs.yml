@@ -13,5 +13,5 @@
 
   - name: Clear Logs
     local_action: >
-       redfish category=Logs command=ClearLogs baseuri={{ baseuri }}
+       redfish category=Manager command=ClearLogs baseuri={{ baseuri }}
             user={{ user }} password={{ password }}
