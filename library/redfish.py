@@ -132,11 +132,6 @@ options:
     default: None
     description:
       - firmware binary path which is used to upload firmware
-  Model:
-    required: false
-    default: None
-    description:
-      - system model name
   InstallOption:
     required: false
     choices: [ Now, NowAndReboot, NextReboot ]
@@ -179,7 +174,6 @@ def main():
             bios_attr_name = dict(required=False, type='str', default=None),
             bios_attr_value = dict(required=False, type='str', default=None),
 	    FWPath     = dict(required=False, type='str', default=None),
-	    Model      = dict(required=False, type='str', default=None),
 	    InstallOption = dict(required=False, type='str', default=None, choices=['Now', 'NowAndReboot', 'NextReboot']),
         ),
         supports_check_mode=False
@@ -313,16 +307,24 @@ def main():
 
         if command == "GetFirmwareInventory":
             result = rf_utils.get_firmware_inventory()
-	elif command == "CompareFirmwareInventory":
-            result = rf_utils.compare_firmware_inventory("/tmp/Catalog", module.params['Model'])
-	elif command == "UploadFirmware":
+        elif command == "EvaluateFirmwareUpgrade":
+            result = rf_utils._find_systems_resource(rf_uri)
+            if result['ret'] == False: module.fail_json(msg=result['msg'])
+            # Get server model to determine what firmware to look for
+            model = rf_utils.get_server_model()
+            if model == "Error":
+                result = { 'ret': False, 'msg': 'Error getting server model'}
+            else:
+                # strip first word ("PowerEdge") from model name
+                result = rf_utils.evaluate_firmware_upgrade("/tmp/Catalog", model.split(' ', 1)[1])
+        elif command == "UploadFirmware":
             result = rf_utils.upload_firmware(module.params['FWPath'])
         elif command == "ScheduleUpdate":
             result = rf_utils.schedule_firmware_update("/Actions/Oem/DellUpdateService.Install", module.params['InstallOption'])
         else:
             result = { 'ret': False, 'msg': 'Invalid Command'}
 
-    # Specific to Dell
+    # Specific to Dell?
     elif category == "Manager":
         # execute only if we find a Manager service resource
         result = rf_utils._find_managers_resource(rf_uri)

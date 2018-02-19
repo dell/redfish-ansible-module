@@ -548,7 +548,7 @@ class RedfishUtils(object):
  
     # This function compares the firmware levels in the system vs. the firmware levels
     # available in the Catalog.gz file that it downloaded from ftp.dell.com
-    def compare_firmware_inventory(self, catalog_file, model):
+    def evaluate_firmware_upgrade(self, catalog_file, model):
         fw = []
         fw_list = {'ret':True, 'Firmwares':[]}
  
@@ -966,3 +966,13 @@ class RedfishUtils(object):
         else:
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
+
+    def get_server_model(self):
+        result = {}
+        response = self.send_get_request(self.root_uri + self.systems_uri)
+        if response.status_code == 200:		# success
+            result['ret'] = True
+            data = response.json()
+            return data[u'Model']
+        else:
+            return "Error"

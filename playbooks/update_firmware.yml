@@ -14,25 +14,12 @@
     delegate_to: 127.0.0.1
     run_once: true
 
-  - name: extract gz file
+  - name: extract Catalog file
     shell: gzip -d /tmp/Catalog.gz -f
     delegate_to: 127.0.0.1
     run_once: true
 
-  - name: Getting system inventory
-    local_action: >
-        redfish category=Inventory command=GetSystemInventory baseuri={{baseuri}}
-        user={{user}} password={{password}}
-    register: result
-
-  - name: compare firmware inventory
-    local_action: >
-        redfish category=Update command=CompareFirmwareInventory baseuri={{baseuri}}
-        user={{user}} password={{password}}
-        Model={{result.result.Model|replace('PowerEdge ','')}}
-    register: firmware
-
-  - name: create folder for download firmware binary
+  - name: create folder to download firmware binary
     file:
         path: /tmp/firmware
         state: directory
@@ -40,7 +27,14 @@
     delegate_to: 127.0.0.1
     run_once: true
 
-  - name: download firmware images
+  - name: Evaluate if firmware needs to be updated
+    local_action: >
+        redfish category=Update command=EvaluateFirmwareUpgrade baseuri={{baseuri}}
+        user={{user}} password={{password}}
+    register: firmware
+
+  # Will only download firmware image if an upgrade is available
+  - name: download firmware images to local disk
     get_url:
         url: http://downloads.dell.com/{{ item.path }}
         dest: /tmp/firmware/{{ item.path | basename}}
@@ -52,7 +46,8 @@
         - "{{firmware.result.Firmwares}}"
     delegate_to: 127.0.0.1
 
-  - name: upload firmware images
+  # Will only upload firmware image if an upgrade is available
+  - name: upload firmware images to OOB controller
     local_action: >
         redfish category=Update command=UploadFirmware baseuri={{baseuri}}
         user={{user}} password={{password}}
@@ -70,6 +65,7 @@
     with_items:
       - "{{fw_available.results}}"
 
+  # Will only install firmware image if an upgrade is available
   - name: install firmware image
     local_action: >
         redfish category=Update command=ScheduleUpdate baseuri={{baseuri}}
