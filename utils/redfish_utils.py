@@ -600,7 +600,7 @@ class RedfishUtils(object):
         files = {'file': (os.path.basename(FWPath), open(FWPath, 'rb'), 'multipart/form-data')}
         headers = {"if-match": ETag}
 
-        # Calling POST directly rather than use send_post_request() - look into it?
+        # Calling POST directly
         response = requests.post(self.root_uri + self.firmware_uri, files=files, auth=(self.creds['user'], self.creds['pswd']), headers=headers, verify=False)
         if response.status_code == 201:
             result = { 'ret': True, 'msg': 'Firmare uploaded successfully', 'Version': '%s' % str(response.json()['Version']), 'Location':'%s' % response.headers['Location']}
@@ -614,19 +614,18 @@ class RedfishUtils(object):
  
         if response.status_code == 200:
             data = response.json()
-            for i in data['Members']:
-                if 'Available' in i['@odata.id']:
-                    fw.append(i['@odata.id'])
+            for i in data[u'Members']:
+                if 'Available' in i[u'@odata.id']:
+                    fw.append(i[u'@odata.id'])
         else:
             return { 'ret': False, 'msg': 'Error getting firmware inventory; Error code %s' % response.status_code }
 
-        payload = {'SoftwareIdentityURIs': fw, 'InstallUpon': InstallOption}
+        payload = { "SoftwareIdentityURIs":fw, "InstallUpon":InstallOption }
+        #return { 'ret': False, 'msg': payload }
         response = self.send_post_request(self.root_uri + self.update_uri + uri, payload, HEADERS)
  
         if response.status_code == 202:
             result = { 'ret': True, 'msg': 'Firmware install job accepted' }
-        elif response.status_code == 400:
-            result = { 'ret': False, 'msg': 'Not supported on this platform'}
         else:
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
