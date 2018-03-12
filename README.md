@@ -48,7 +48,7 @@ Clone this repository:
 ```
 $ git clone https://github.com/dell/idrac-ansible-module
 ```
-Install Ansible + required Python libraries (make sure you have the proper repositories available):
+Install Ansible + required Python libraries:
 ```
 $ pip install requirements.txt
 ```
