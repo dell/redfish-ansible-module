@@ -50,7 +50,7 @@ $ git clone https://github.com/dell/idrac-ansible-module
 ```
 Install Ansible + required Python libraries:
 ```
-$ pip install requirements.txt
+$ pip install -r requirements.txt
 ```
 Copy module to default system location:
 ```
