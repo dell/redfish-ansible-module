@@ -650,7 +650,11 @@ class RedfishUtils(object):
         payload = { "TargetSettingsURI": self.systems_uri + uri1, "RebootJobType": "PowerCycle"}
         response = self.send_post_request(self.root_uri + self.manager_uri + uri2, payload, HEADERS)
         if response.status_code == 200:
-            result = { 'ret': True, 'msg': 'Config job created'}
+            convert_to_string=str(response.__dict__)
+            jobid_search=re.search("JID_.+?,",convert_to_string).group()
+            job_id=re.sub("[,']","",jobid_search)
+
+            result = { 'ret': True, 'msg': 'Config job created','job_id': job_id}
         elif response.status_code == 400:
             result = { 'ret': False, 'msg': 'Not supported on this platform'}
         elif response.status_code == 405:
