@@ -584,7 +584,18 @@ class RedfishUtils(object):
  
     def set_one_time_boot_device(self, bootdevice):
         result = {}
-        payload = {"Boot": {"BootSourceOverrideTarget": bootdevice}}
+        response = self.send_get_request(self.root_uri + self.systems_uri + "/Bios")
+        if response.status_code == 200:		# success
+            data = response.json()
+            boot_mode = data[u'Attributes']["BootMode"]
+            if boot_mode == "Uefi":
+                payload = {"Boot":{"BootSourceOverrideTarget": "UefiTarget","UefiTargetBootSourceOverride": bootdevice}}
+            else:
+              payload = {"Boot": {"BootSourceOverrideTarget": bootdevice}}
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+            return result
+
         response = self.send_patch_request(self.root_uri + self.systems_uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result = { 'ret': True, 'msg': 'SetOneTimeBoot completed'}
