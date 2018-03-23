@@ -582,16 +582,16 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
  
-    def set_one_time_boot_device(self, bootdevice):
+    def set_one_time_boot_device(self, bootdevice, uri):
         result = {}
-        response = self.send_get_request(self.root_uri + self.systems_uri + "/Bios")
+        response = self.send_get_request(self.root_uri + self.systems_uri + uri)
         if response.status_code == 200:		# success
             data = response.json()
             boot_mode = data[u'Attributes']["BootMode"]
             if boot_mode == "Uefi":
-                payload = {"Boot":{"BootSourceOverrideTarget": "UefiTarget","UefiTargetBootSourceOverride": bootdevice}}
+                payload = {"Boot": {"BootSourceOverrideTarget": "UefiTarget","UefiTargetBootSourceOverride": bootdevice}}
             else:
-              payload = {"Boot": {"BootSourceOverrideTarget": bootdevice}}
+                payload = {"Boot": {"BootSourceOverrideTarget": bootdevice}}
         else:
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
             return result
@@ -651,7 +651,7 @@ class RedfishUtils(object):
         response = self.send_post_request(self.root_uri + self.manager_uri + uri2, payload, HEADERS)
         if response.status_code == 200:
             convert_to_string=str(response.__dict__)
-            jobid_search=re.search("JID_.+?,",convert_to_string).group()
+            jobid_search=re.search("JID_.+?,", convert_to_string).group()
             job_id=re.sub("[,']","",jobid_search)
 
             result = { 'ret': True, 'msg': 'Config job created','job_id': job_id}
