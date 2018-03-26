@@ -618,7 +618,12 @@ class RedfishUtils(object):
     def set_manager_attributes(self, uri, attributes):
         result = {}
         # Example: manager_attributes = {\"name\":\"value\"}
-        manager_attributes = "{\"" + attributes['mgr_attr_name'] + "\":\"" + attributes['mgr_attr_value'] + "\"}"
+        # Check if value is a number. If so, convert to int.
+        if attributes['mgr_attr_value'].isdigit():
+            manager_attributes = '{{ "{}": {} }}'.format(attributes['mgr_attr_name'], int(attributes['mgr_attr_value']))
+        else:
+            manager_attributes = '{{ "{}": "{}" }}'.format(attributes['mgr_attr_name'], attributes['mgr_attr_value'])
+
         payload = {"Attributes": json.loads(manager_attributes) }
         response = self.send_patch_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
         if response.status_code == 200:
