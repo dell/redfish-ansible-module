@@ -7,7 +7,7 @@
   # Utilities, UefiTarget & SDCard
 
   vars:
-    - bootdevice: Hdd
+    - bootdevice: Pxe
 
   tasks:
 

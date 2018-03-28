@@ -11,17 +11,11 @@ password: calvin
 # Local directory where all results are placed
 rootdir: /root
 
-# shorter name for inventory_hostname. Refers to the hostname, not the OOB controller
+# Shorter name for inventory_hostname.
+# Refers to the OS hostname, not the OOB controller.
 host: "{{inventory_hostname}}"
 
-# These variables are not used in playbooks yet. Need to figure out
-# how to include variables inside curly {} brackets.
-ntpserver1: ntp1.srv.com
-ntpserver2: ntp2.srv.com
-ntpserver3: ntp3.srv.com
-timezone: "US/Central"
-
-# For managing users - userid 2 is default root user, be mindful!
+# For managing users
 userid: 3                  # user id of user to add/delete/modify (1-16)
 username: dauser           # user name to add/delete/modify
 userpswd: pa$$w0rd         # user password to add/delete/modify

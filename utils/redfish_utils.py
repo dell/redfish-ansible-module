@@ -614,9 +614,20 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
  
-    def set_one_time_boot_device(self, bootdevice):
+    def set_one_time_boot_device(self, bootdevice, uri):
         result = {}
-        payload = {"Boot": {"BootSourceOverrideTarget": bootdevice}}
+        response = self.send_get_request(self.root_uri + self.systems_uri + uri)
+        if response.status_code == 200:		# success
+            data = response.json()
+            boot_mode = data[u'Attributes']["BootMode"]
+            if boot_mode == "Uefi":
+                payload = {"Boot": {"BootSourceOverrideTarget": "UefiTarget","UefiTargetBootSourceOverride": bootdevice}}
+            else:
+                payload = {"Boot": {"BootSourceOverrideTarget": bootdevice}}
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+            return result
+
         response = self.send_patch_request(self.root_uri + self.systems_uri, payload, HEADERS)
         if response.status_code == 200:		# success
             result = { 'ret': True, 'msg': 'SetOneTimeBoot completed'}
@@ -639,7 +650,12 @@ class RedfishUtils(object):
     def set_manager_attributes(self, uri, attributes):
         result = {}
         # Example: manager_attributes = {\"name\":\"value\"}
-        manager_attributes = "{\"" + attributes['mgr_attr_name'] + "\":\"" + attributes['mgr_attr_value'] + "\"}"
+        # Check if value is a number. If so, convert to int.
+        if attributes['mgr_attr_value'].isdigit():
+            manager_attributes = '{{ "{}": {} }}'.format(attributes['mgr_attr_name'], int(attributes['mgr_attr_value']))
+        else:
+            manager_attributes = '{{ "{}": "{}" }}'.format(attributes['mgr_attr_name'], attributes['mgr_attr_value'])
+
         payload = {"Attributes": json.loads(manager_attributes) }
         response = self.send_patch_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
         if response.status_code == 200:
@@ -671,7 +687,11 @@ class RedfishUtils(object):
         payload = { "TargetSettingsURI": self.systems_uri + uri1, "RebootJobType": "PowerCycle"}
         response = self.send_post_request(self.root_uri + self.manager_uri + uri2, payload, HEADERS)
         if response.status_code == 200:
-            result = { 'ret': True, 'msg': 'Config job created'}
+            convert_to_string=str(response.__dict__)
+            jobid_search=re.search("JID_.+?,", convert_to_string).group()
+            job_id=re.sub("[,']","",jobid_search)
+
+            result = { 'ret': True, 'msg': 'Config job created','job_id': job_id}
         elif response.status_code == 400:
             result = { 'ret': False, 'msg': 'Not supported on this platform'}
         elif response.status_code == 405:

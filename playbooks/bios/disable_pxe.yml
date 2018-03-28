@@ -16,8 +16,8 @@
        bios_attr_name=PxeDev1EnDis bios_attr_value=Disabled
     ignore_errors: yes
 
-# - name: Schedule Config Job - Reboot
-#   local_action: >
-#     redfish category=System command=CreateBiosConfigJob baseuri={{baseuri}}
-#     user={{user}} password={{password}}
-#   ignore_errors: yes
+  - name: Schedule Config Job - Reboot
+    local_action: >
+      redfish category=System command=CreateBiosConfigJob baseuri={{baseuri}}
+      user={{user}} password={{password}}
+    ignore_errors: yes

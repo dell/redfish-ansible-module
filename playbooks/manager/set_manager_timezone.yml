@@ -4,6 +4,9 @@
   name: Set Mananger timezone
   gather_facts: False
 
+  vars:
+    - timezone: "US/Central" 
+
   tasks:
 
   - name: Set Timezone
