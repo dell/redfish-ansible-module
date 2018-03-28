@@ -191,17 +191,17 @@ def main():
             result = rf_utils._find_chassis_resource(rf_uri)
             if result['ret'] == False: module.fail_json(msg=result['msg'])
             result = rf_utils.get_fan_inventory("/Thermal")
-        
+
         # Power
-        elif command == "GetPowerInventory":
+        elif command == "GetPowerData":
             # execute only if we find Power resource
             result = rf_utils._find_chassis_resource(rf_uri)
             if result['ret'] == False: module.fail_json(msg=result['msg'])
-            result = rf_utils.get_power_inventory("/Power")
+            result = rf_utils.get_power_data("/Power")
 
         else:
             result = { 'ret': False, 'msg': 'Invalid Command at Category Lookup'}
-        
+
     elif category == "Accounts":
         # execute only if we find an Account service resource
         result = rf_utils._find_accountservice_resource(rf_uri)
@@ -282,10 +282,10 @@ def main():
         elif command == "ClearLogs":
             result = rf_utils.clear_logs()
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command at Manager Service Lookup'}
+            result = { 'ret': False, 'msg': 'Invalid Command at Manager Sevice Lookup'}
 
     else:
-        result = { 'ret': False, 'msg': 'Invalid Category'}
+        result = { 'ret': False, 'msg': '6Invalid Category'}
 
     # Return data back or fail with proper message
     if result['ret'] == True:

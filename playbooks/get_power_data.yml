@@ -1,0 +1,24 @@
+---
+- hosts: myhosts
+  name: Power Inventory
+  gather_facts: False
+
+  # Commands available:
+  #   GetPowerData 		Get power Data
+
+  tasks:
+
+  - name: Set output file
+    include_tasks: create_output_file.yml type=PowerData
+
+  - name: Get power inventory
+    local_action: >
+       redfish category=Inventory command=GetPowerData baseuri={{baseuri}}
+       user={{user}} password={{password}}
+    register: result
+    ignore_errors: yes
+
+  - name: Copy power inventory to file
+    local_action: copy content={{ result | to_nice_json }}
+       dest={{template}}.json
+

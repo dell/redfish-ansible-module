@@ -345,7 +345,7 @@ class RedfishUtils(object):
             response = self.send_post_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
  
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
+            result = { 'ret': False, 'msg': 'Invalid Command in redfish_utils'}
 
         if response.status_code == 204:		# success
             result['ret'] = True
@@ -570,27 +570,36 @@ class RedfishUtils(object):
  
         return result
 
-    def get_power_inventory(self, uri):
+# Power Metrics is experimental
+
+    def get_power_data(self, uri):
         result = {}
-        watts_details = []
+        power_details = []
         response = self.send_get_request(self.root_uri + self.chassis_uri + uri)
         if response.status_code == 200:             # success
             result['ret'] = True
             data = response.json()
-
+ 
             for device in data[u'PowerControl']:
-                watts = {}
-                watts['Generated Metrics'] = device[u'PowerMetrics']
-                watts['Watts Requested']   = device[u'PowerRequestedWatts']
-                watts['Watts Consumed']    = device[u'PowerConsumedWatts']
-                watts_details.append(watts)
-            result["entries"] = watts_details
-
+                PwrCntrl = {}
+                PwrCntrl['System Generated Metrics - 60 Minutes'] = device[u'PowerMetrics']
+                power_details.append(PwrCntrl)
+# Power Supplies statistics is experimental
+            for device in data[u'PowerSupplies']:
+                PwrSupplies = {}
+                PwrSupplies['Chassis Slot']       = device[u'MemberId']
+                PwrSupplies['Capacity (watts)']   = device[u'PowerCapacityWatts']
+                PwrSupplies['Voltage type']       = device[u'PowerSupplyType']
+                PwrSupplies['Input Voltage']      = device[u'LineInputVoltage']
+                PwrSupplies['PSU Health']         = device[u'Status'][u'Health']
+                power_details.append(PwrSupplies)
+            result["entries"] = power_details
+            
         elif response.status_code == 400:
             result = { 'ret': False, 'msg': 'Not supported on this platform' }
         else:
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
-
+ 
         return result
 
     def set_bios_default_settings(self, uri):
