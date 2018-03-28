@@ -191,10 +191,17 @@ def main():
             result = rf_utils._find_chassis_resource(rf_uri)
             if result['ret'] == False: module.fail_json(msg=result['msg'])
             result = rf_utils.get_fan_inventory("/Thermal")
+        
+        # Power
+        elif command == "GetPowerInventory":
+            # execute only if we find Power resource
+            result = rf_utils._find_chassis_resource(rf_uri)
+            if result['ret'] == False: module.fail_json(msg=result['msg'])
+            result = rf_utils.get_power_inventory("/Power")
 
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
-
+            result = { 'ret': False, 'msg': 'Invalid Command at Category Lookup'}
+        
     elif category == "Accounts":
         # execute only if we find an Account service resource
         result = rf_utils._find_accountservice_resource(rf_uri)
@@ -215,7 +222,7 @@ def main():
         elif command == "UpdateUserPassword":
             result = rf_utils.update_user_password(user)
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
+            result = { 'ret': False, 'msg': 'Invalid Command at Account Lookup'}
 
     elif category == "System":
         # execute only if we find a System resource
@@ -240,7 +247,7 @@ def main():
             if result['ret'] == False: module.fail_json(msg=result['msg'])
             result = rf_utils.create_bios_config_job("/Bios/Settings", "/Jobs")
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
+            result = { 'ret': False, 'msg': 'Invalid Command at System Resource Lookup'}
 
     elif category == "Update":
         # execute only if we find UpdateService resources
@@ -250,7 +257,7 @@ def main():
         if command == "GetFirmwareInventory":
             result = rf_utils.get_firmware_inventory()
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
+            result = { 'ret': False, 'msg': 'Invalid Command at UpdateService Lookup'}
 
     elif category == "Manager":
         # execute only if we find a Manager service resource
@@ -275,7 +282,7 @@ def main():
         elif command == "ClearLogs":
             result = rf_utils.clear_logs()
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
+            result = { 'ret': False, 'msg': 'Invalid Command at Manager Service Lookup'}
 
     else:
         result = { 'ret': False, 'msg': 'Invalid Category'}

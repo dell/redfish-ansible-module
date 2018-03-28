@@ -569,7 +569,30 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
  
         return result
- 
+
+    def get_power_inventory(self, uri):
+        result = {}
+        watts_details = []
+        response = self.send_get_request(self.root_uri + self.chassis_uri + uri)
+        if response.status_code == 200:             # success
+            result['ret'] = True
+            data = response.json()
+
+            for device in data[u'PowerControl']:
+                watts = {}
+                watts['Generated Metrics'] = device[u'PowerMetrics']
+                watts['Watts Requested']   = device[u'PowerRequestedWatts']
+                watts['Watts Consumed']    = device[u'PowerConsumedWatts']
+                watts_details.append(watts)
+            result["entries"] = watts_details
+
+        elif response.status_code == 400:
+            result = { 'ret': False, 'msg': 'Not supported on this platform' }
+        else:
+            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
+
+        return result
+
     def set_bios_default_settings(self, uri):
         result = {}
         payload = {}
