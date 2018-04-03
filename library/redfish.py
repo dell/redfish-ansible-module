@@ -285,7 +285,7 @@ def main():
             result = { 'ret': False, 'msg': 'Invalid Command at Manager Sevice Lookup'}
 
     else:
-        result = { 'ret': False, 'msg': '6Invalid Category'}
+        result = { 'ret': False, 'msg': 'Invalid Category'}
 
     # Return data back or fail with proper message
     if result['ret'] == True:
