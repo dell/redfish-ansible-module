@@ -233,7 +233,7 @@ def main():
         elif command == "SetBiosDefaultSettings":
             result = rf_utils.set_bios_default_settings("/Bios/Actions/Bios.ResetBios")
         elif command == "SetBiosAttributes":
-	    result = rf_utils.set_bios_attributes("/Bios/Settings", bios_attributes)
+            result = rf_utils.set_bios_attributes("/Bios/Settings", bios_attributes)
         elif command == "CreateBiosConfigJob":
             # execute only if we find a Managers resource
             result = rf_utils._find_managers_resource(rf_uri)
