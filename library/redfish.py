@@ -282,7 +282,7 @@ def main():
         elif command == "ClearLogs":
             result = rf_utils.clear_logs()
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command at Manager Sevice Lookup'}
+            result = { 'ret': False, 'msg': 'Invalid Command at Manager Service Lookup'}
 
     else:
         result = { 'ret': False, 'msg': 'Invalid Category'}
