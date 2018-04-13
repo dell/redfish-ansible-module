@@ -1,8 +1,8 @@
 **Note:** Features specific to PowerEdge servers (like firmware upgrade and SCP management) have been removed from the master branch and are now being tracked in the [fordell](https://github.com/dell/idrac-ansible-module/tree/fordell) development branch. Please use this branch if you want to use these Dell-specific features.
 
-# Ansible module for Dell EMC PowerEdge iDRAC using Redfish APIs
+# Ansible module for Out-Of-Band (OOB) controllers using Redfish APIs
 
-Ansible module and playbooks that use the Redfish API to manage PowerEdge servers via the integrated Dell Remote Access Controller (iDRAC). For more details, see these [slides](https://www.slideshare.net/JoseDeLaRosa7/automated-outofband-management-with-ansible-and-redfish).
+Ansible module and playbooks that use Redfish APIs to manage hardware through OOB controllers. For more details, see these [slides](https://www.slideshare.net/JoseDeLaRosa7/automated-outofband-management-with-ansible-and-redfish).
 
 ## Why Ansible
 
@@ -12,9 +12,7 @@ To learn more about Ansible, click [here](http://docs.ansible.com/).
 
 ## Why Redfish
 
-Redfish is an open industry-standard specification and schema designed for modern and secure management of platform hardware. On PowerEdge servers the Redfish management APIs are available via the iDRAC, which can be used by IT administrators to easily monitor and manage at scale their entire infrastructure using a wide array of clients on devices such as laptops, tablets and smart phones.
-
-To learn more about Redfish, click [here](https://www.dmtf.org/standards/redfish).
+Redfish is an open industry-standard specification and schema designed for modern and secure management of platform hardware. To learn more about Redfish, click [here](https://www.dmtf.org/standards/redfish).
 
 ## Ansible and Redfish together
 
@@ -22,9 +20,9 @@ Together, Ansible and Redfish can be used by system administrators to fully auto
 
 ## How it works
 
-A Redfish client communicates with a PowerEdge server via its iDRAC by sending Redfish URIs. The Redfish APIs will then either 1) send information back (i.e. system inventory, power consumption) or 2) perform an action (i.e. upgrade firmware, reboot server). Ansible provides automation so this process can be scaled up to thousands of servers.
+A Redfish client communicates with hardware through an OOB controller by sending Redfish URIs. The Redfish APIs will then either 1) send information back (i.e. system inventory, power consumption) or 2) perform an action (i.e. upgrade firmware, reboot server). Ansible provides automation so this process can be scaled up to thousands of servers.
 
-![alt text](http://linux.dell.com/images/ansible-redfish-overview.png)
+![redfish-diagram.png](redfish-diagram.png)
 
 ## Categories
 
@@ -39,16 +37,11 @@ For more details on what commands are available in each category, refer to this 
 
 ## Requirements
 
-  - Dell PowerEdge 12G/13G/14G servers (some features only available in 14G)
   - Minimum iDRAC 7/8/9 FW 2.40.40.40
 
 ## Installation
 
-Clone this repository:
-```
-$ git clone https://github.com/dell/idrac-ansible-module
-```
-Install Ansible + required Python libraries:
+Clone this repository. Then, install Ansible + required Python libraries:
 ```
 $ pip install -r requirements.txt
 ```
@@ -101,18 +94,17 @@ $ cat webserver1_SystemInventory_20170912_104953.json
     "result": {
         "AssetTag": "",
         "BiosVersion": "2.4.3",
-        "BootSourceOverrideMode": "14G only.",
         "CpuCount": 2,
         "CpuHealth": "OK",
         "CpuModel": "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz",
-        "HostName": "webserver1.lab.dell.com",
-        "Manufacturer": "Dell Inc.",
+        "HostName": "web483",
+        "Manufacturer": "Contoso",
         "MemoryHealth": "OK",
         "MemoryTotal": 128.0,
-        "Model": "PowerEdge R630",
+        "Model": "3500",
         "PartNumber": "0CNCJWA00",
         "PowerState": "On",
-        "SerialNumber": "CN74YYYYYXXXXX",
+        "SerialNumber": "437XR1138R2",
         "ServiceTag": "XXXYYYY",
         "Status": "OK",
         "SystemType": "Physical"
@@ -124,7 +116,7 @@ $ cat webserver1_StorageControllerInventory_20170912_103733.json
     "result": [
         {
             "Health": "OK",
-            "Name": "PERC H330 Mini"
+            "Name": "Contoso SAS HBA"
         },
         {
             "Health": "OK",
@@ -148,9 +140,9 @@ The implementation of Redfish APIs varies across generations of PowerEdge server
 
 ```
 TASK [Get Firmware Inventory] *********************************************************************
-fatal: [r630 -> localhost]: FAILED! => {"changed": false, "failed": true, "msg": "UpdateService resource not found"}
+fatal: [webserver1 -> localhost]: FAILED! => {"changed": false, "failed": true, "msg": "UpdateService resource not found"}
 ...ignoring
-ok: [r740 -> localhost]
+ok: [webserver2 -> localhost]
 ```
 
 ## Parsing through JSON files
@@ -165,8 +157,8 @@ $ jq .result.BiosVersion webserver1_SystemInventory_20170912_104953.json
 
 $ jq '.result | {Manufacturer: .Manufacturer, Name: .Model}' webserver1_SystemInventory_20170912_104953.json
 {
-  "Manufacturer": "Dell Inc.",
-  "Name": "PowerEdge R630"
+  "Manufacturer": "Contoso",
+  "Name": "3500"
 }
 
 $ jq '.result[] | .Health' webserver1_StorageControllerInventory_20170912_103733.json
@@ -180,7 +172,7 @@ It should be straight-forward to extract the same data from hundreds of files us
 
 ## Support
 
-Please note this code is provided as-is and not supported by Dell EMC.
+Please note this code is provided as-is and comes without support.
 
 ## Report problems or provide feedback
 
