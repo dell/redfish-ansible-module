@@ -6,7 +6,7 @@
 
 # Credentials
 user: root
-password: calvin
+password: password
 
 # Local directory where all results are placed
 rootdir: /root
