@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # _*_ coding: utf-8 _*_
 
 # Copyright © 2017-2018 Jose Delarosa
