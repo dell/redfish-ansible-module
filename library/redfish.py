@@ -22,8 +22,12 @@ ANSIBLE_METADATA = {'status': ['preview'],
 
 DOCUMENTATION = """
 module: redfish
-version_added: "2.3"
+version_added: "2.6"
 short_description: Out-Of-Band management using Redfish APIs
+description:
+  - Builds Redfish URIs locally and sends them to remote OOB controllers to
+    get information back or perform an action.
+  - When receiving information, it is placed in location specified by user.
 options:
   category:
     required: true
@@ -96,6 +100,7 @@ options:
     description:
       - value of Manager attribute to update to
 
+requirements: [ "python-requests", "python-urllib3" ]
 author: "Jose Delarosa (github: jose-delarosa)"
 """
 
