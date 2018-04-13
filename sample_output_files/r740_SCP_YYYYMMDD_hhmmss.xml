@@ -3,7 +3,7 @@
 <!--Exported configuration may contain commented attributes. Attributes may be commented due to dependency, destructive nature, preserving server identity or for security reasons.-->
 <!--Exported configuration does not contain FC-HBA data as the presence of the appropriate cards could not be detected!-->
 <Component FQDD="iDRAC.Embedded.1">
- <Attribute Name="Info.1#Product">Integrated Dell Remote Access Controller</Attribute>
+ <Attribute Name="Info.1#Product">Integrated Remote Access Controller</Attribute>
  <Attribute Name="IPMILan.1#Enable">Enabled</Attribute>
  <Attribute Name="IPMILan.1#PrivLimit">Administrator</Attribute>
  <Attribute Name="IPMILan.1#EncryptionKey">0000000000000000000000000000000000000000</Attribute>
@@ -575,7 +575,7 @@
  <!-- <Attribute Name="ServerTopology.1#RackName"></Attribute> -->
  <!-- <Attribute Name="ServerTopology.1#RackSlot">1</Attribute> -->
  <!-- <Attribute Name="ServerTopology.1#RoomName"></Attribute> -->
- <!-- <Attribute Name="ServerOS.1#HostName">dhcp-164-206.linuxdev.us.dell.com</Attribute> -->
+ <!-- <Attribute Name="ServerOS.1#HostName">dhcp-164-206.linuxdev.us.mfg.com</Attribute> -->
  <!-- <Attribute Name="ServerOS.1#OSName">Red Hat Enterprise Linux Server</Attribute> -->
  <Attribute Name="PCIeSlotLFM.1#CustomLFM">0</Attribute>
  <Attribute Name="PCIeSlotLFM.1#LFMMode">Automatic</Attribute>

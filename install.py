@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # _*_ coding: utf-8 _*_
 
-# Copyright © 2017-2018 Dell Inc.
+# Copyright © 2017-2018 Jose Delarosa
 #
 # This script installs the Ansible modules to their default location.
 #

@@ -18,7 +18,7 @@
 | command         | yes      |         |          | Command within each category   |
 | baseuri         | yes      |         |          | Name/IP addr of OOB controller |
 | user            | yes      | root    |          | Login credentials         |
-| password        | yes      | calvin  |          | Login credentials         |
+| password        | yes      | password |         | Login credentials         |
 | userid          | no       |         |          | For managing users        |
 | username        | no       |         |          | For managing users        |
 | userpswd        | no       |         |          | For managing users        |

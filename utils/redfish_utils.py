@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright © 2017-2018, Dell EMC Inc.
+# Copyright © 2017-2018, Jose Delarosa
 #
 # This file is part of Ansible.
 #

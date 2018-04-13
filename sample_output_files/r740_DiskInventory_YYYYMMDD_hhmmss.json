@@ -4,7 +4,7 @@
     "result": {
         "entries": [
             {
-                "Controller": "PERC H740P Adapter ", 
+                "Controller": "Contoso H740P Adapter ", 
                 "Health": "OK", 
                 "Manufacturer": "HGST", 
                 "Model": "HUC101860CSS200", 
@@ -12,7 +12,7 @@
                 "State": "Enabled"
             }, 
             {
-                "Controller": "PERC H740P Adapter ", 
+                "Controller": "Contoso H740P Adapter ", 
                 "Health": "OK", 
                 "Manufacturer": "HGST", 
                 "Model": "HUC101860CSS200", 
@@ -20,7 +20,7 @@
                 "State": "Enabled"
             }, 
             {
-                "Controller": "PERC H740P Adapter ", 
+                "Controller": "Contoso H740P Adapter ", 
                 "Health": "OK", 
                 "Manufacturer": "HGST", 
                 "Model": "HUC101860CSS200", 
@@ -28,7 +28,7 @@
                 "State": "Enabled"
             }, 
             {
-                "Controller": "PERC H740P Adapter ", 
+                "Controller": "Contoso H740P Adapter ", 
                 "Health": "OK", 
                 "Manufacturer": "HGST", 
                 "Model": "HUC101860CSS200", 
@@ -36,9 +36,9 @@
                 "State": "Enabled"
             }, 
             {
-                "Controller": "PERC H740P Adapter ", 
+                "Controller": "Contoso Adapter ", 
                 "Health": "OK", 
-                "Manufacturer": "DELL", 
+                "Manufacturer": "Contoso", 
                 "Model": "BP14G+ 0:1", 
                 "Name": "Backplane 1 on Connector 0 of RAID Controller in Slot 4", 
                 "State": "Enabled"

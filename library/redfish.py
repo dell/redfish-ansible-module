@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# (c) 2017-2018, Dell EMC Inc.
+# (c) 2017-2018, Jose Delarosa
 #
 # This file is part of Ansible
 #
@@ -49,7 +49,7 @@ options:
       - User for authentication with OOB controller
   password:
     required: false
-    default: calvin
+    default: password
     description:
       - Password for authentication with OOB controller
   userid:
@@ -98,7 +98,7 @@ options:
     description:
       - value of Manager attribute to update to
 
-author: "jose.delarosa@dell.com", github: jose-delarosa
+author: "Jose Delarosa (github: jose-delarosa)"
 """
 
 import os
@@ -116,7 +116,7 @@ def main():
             command    = dict(required=True, type='str', default=None),
             baseuri    = dict(required=True, type='str', default=None),
             user       = dict(required=False, type='str', default='root'),
-            password   = dict(required=False, type='str', default='calvin', no_log=True),
+            password   = dict(required=False, type='str', default='password', no_log=True),
             userid     = dict(required=False, type='str', default=None),
             username   = dict(required=False, type='str', default=None),
             userpswd   = dict(required=False, type='str', default=None, no_log=True),
