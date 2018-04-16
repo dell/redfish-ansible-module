@@ -23,7 +23,6 @@ import re
 import xml.etree.ElementTree as ET
 from distutils.version import LooseVersion
 from datetime import datetime
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 HEADERS = {'content-type': 'application/json'}
 

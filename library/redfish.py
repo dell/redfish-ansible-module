@@ -100,14 +100,13 @@ options:
     description:
       - value of Manager attribute to update to
 
-requirements: [ "python-requests", "python-urllib3" ]
+requirements: [ "python-requests > 2.12", "python-urllib3 > 1.21" ]
 author: "Jose Delarosa (github: jose-delarosa)"
 """
 
 import os
 import requests
 import json
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.redfish_utils import RedfishUtils
 
@@ -132,9 +131,6 @@ def main():
         ),
         supports_check_mode=False
     )
-
-    # Disable insecure-certificate-warning message
-    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
     category   = module.params['category']
     command    = module.params['command']
