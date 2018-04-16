@@ -1,19 +1,19 @@
 ---
 - hosts: myhosts
-  name: View System Logs
+  name: Get System Logs
   gather_facts: False
 
   # Example:
-  # ansible-playbook view_logs.yml
+  # ansible-playbook get_system_logs.yml
 
   tasks:
 
   - name: Define output file
     include_tasks: create_output_file.yml type=Logs
 
-  - name: View Logs
+  - name: Get System Logs
     local_action: >
-       redfish category=Manager command=ViewLogs baseuri={{ baseuri }}
+       redfish category=Manager command=GetLogs baseuri={{ baseuri }}
             user={{ user }} password={{ password }}
     register: result
 

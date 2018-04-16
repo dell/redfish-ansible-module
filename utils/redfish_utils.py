@@ -155,7 +155,7 @@ class RedfishUtils(object):
             self.manager_uri = manager_service
             return { 'ret': True }
 
-    def view_logs(self):
+    def get_logs(self):
         log_svcs_uri_list = []
         list_of_logs = []
         result = {}

@@ -273,8 +273,8 @@ def main():
             result = rf_utils.set_manager_default_settings("/Actions/Oem/DellManager.ResetToDefaults")
 
         # Logs
-        elif command == "ViewLogs":
-            result = rf_utils.view_logs()
+        elif command == "GetLogs":
+            result = rf_utils.get_logs()
         elif command == "ClearLogs":
             result = rf_utils.clear_logs()
         else:
