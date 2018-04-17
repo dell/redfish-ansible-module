@@ -100,7 +100,7 @@ options:
     description:
       - value of Manager attribute to update to
 
-requirements: [ "python-requests > 2.12", "python-urllib3 > 1.21" ]
+requirements: [ "python-requests > 2.12" ]
 author: "Jose Delarosa (github: jose-delarosa)"
 """
 
