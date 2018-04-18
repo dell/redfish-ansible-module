@@ -32,5 +32,4 @@
 |           | ClearLogs              | clear_logs.yml             |                    |
 |           | GetAttributes          | get_manager_attributes.yml | [r740_ManagerAttributes_YYYMMDD_hhmmss.json](../sample_output_files/r740_ManagerAttributes_YYYMMDD_hhmmss.json) |
 |           | SetAttributes          | set_manager_timezone.yml   |                    |
-|           | SetDefaultSettings     | reset_manager_settings.yml |                    |
 |           | GracefulRestart        | restart_manager.yml        |                    |

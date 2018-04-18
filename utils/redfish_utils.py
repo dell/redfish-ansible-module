@@ -600,18 +600,6 @@ class RedfishUtils(object):
             result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
         return result
  
-    def set_manager_default_settings(self, uri):
-        result = {}
-        payload = {"ResetType": "All"}
-        response = self.send_post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
-        if response.status_code == 200:		# success
-            result = { 'ret': True, 'msg': 'SetManagerDefaultSettings completed'}
-        elif response.status_code == 405:
-            result = { 'ret': False, 'msg': "Resource not supported" }
-        else:
-            result = { 'ret': False, 'msg': "Error code %s" % response.status_code }
-        return result
- 
     def set_manager_attributes(self, uri, attributes):
         result = {}
         # Example: manager_attributes = {\"name\":\"value\"}

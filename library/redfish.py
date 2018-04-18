@@ -265,8 +265,6 @@ def main():
             result = rf_utils.get_manager_attributes("/Attributes")
         elif command == "SetAttributes":
             result = rf_utils.set_manager_attributes("/Attributes", mgr_attributes)
-        elif command == "SetDefaultSettings":
-            result = rf_utils.set_manager_default_settings("/Actions/Oem/DellManager.ResetToDefaults")
 
         # Logs
         elif command == "GetLogs":
