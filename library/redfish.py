@@ -96,13 +96,11 @@ EXAMPLES = '''
     local_action: >
        redfish category=Inventory command=GetSystemInventory baseuri={{baseuri}}
        user={{user}} password={{password}}
-    register: result
 
   - name: Get CPU Inventory
     local_action: >
        redfish category=Inventory command=GetCpuInventory baseuri={{baseuri}}
        user={{user}} password={{password}}
-    register: result
 
   - name: Enable PXE Boot for NIC1
     local_action: >
@@ -114,6 +112,27 @@ EXAMPLES = '''
     local_action: >
        redfish category=System command=SetOneTimeBoot baseuri={{baseuri}}
        user={{user}} password={{password}} bootdevice={{bootdevice}}
+
+  - name: Turn system power on
+    local_action: >
+       redfish category=System command=PowerOn baseuri={{baseuri}}
+       user={{user}} password={{password}}
+
+  - name: Add user
+    local_action: >
+       redfish category=Accounts command=AddUser baseuri={{baseuri}}
+       user={{user}} password={{password}} userid={{userid}}
+       username={{username}} userpswd={{userpswd}} userrole={{userrole}}
+
+  - name: Enable user
+    local_action: >
+       redfish category=Accounts command=EnableUser baseuri={{baseuri}}
+       user={{user}} password={{password}} userid={{userid}}
+
+  - name: Get BIOS attributes
+    local_action: >
+       redfish category=System command=GetBiosAttributes baseuri={{baseuri}}
+       user={{user}} password={{password}}
 '''
 
 import os
@@ -126,21 +145,21 @@ from ansible.module_utils.redfish_utils import RedfishUtils
 def main():
     result = {}
     module = AnsibleModule(
-        argument_spec = dict(
-            category = dict(required=True, type='str'),
-            command = dict(required=True, type='str'),
-            baseuri = dict(required=True, type='str'),
-            user = dict(required=True, type='str'),
-            password = dict(required=True, type='str', no_log=True),
-            userid = dict(required=False, type='str'),
-            username = dict(required=False, type='str'),
-            userpswd = dict(required=False, type='str', no_log=True),
-            userrole = dict(required=False, type='str'),
-            bootdevice = dict(required=False, type='str'),
-            mgr_attr_name = dict(required=False, type='str'),
-            mgr_attr_value = dict(required=False, type='str'),
-            bios_attr_name = dict(required=False, type='str'),
-            bios_attr_value = dict(required=False, type='str'),
+        argument_spec=dict(
+            category=dict(required=True, type='str'),
+            command=dict(required=True, type='str'),
+            baseuri=dict(required=True, type='str'),
+            user=dict(required=True, type='str'),
+            password=dict(required=True, type='str', no_log=True),
+            userid=dict(required=False, type='str'),
+            username=dict(required=False, type='str'),
+            userpswd=dict(required=False, type='str', no_log=True),
+            userrole=dict(required=False, type='str'),
+            bootdevice=dict(required=False, type='str'),
+            mgr_attr_name=dict(required=False, type='str'),
+            mgr_attr_value=dict(required=False, type='str'),
+            bios_attr_name=dict(required=False, type='str'),
+            bios_attr_value=dict(required=False, type='str'),
         ),
         supports_check_mode=False
     )
