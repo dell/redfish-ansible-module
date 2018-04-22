@@ -122,19 +122,20 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.redfish_utils import RedfishUtils
 
+
 def main():
     result = {}
     module = AnsibleModule(
         argument_spec = dict(
-            category   = dict(required=True, type='str'),
-            command    = dict(required=True, type='str'),
-            baseuri    = dict(required=True, type='str'),
-            user       = dict(required=True, type='str'),
-            password   = dict(required=True, type='str', no_log=True),
-            userid     = dict(required=False, type='str'),
-            username   = dict(required=False, type='str'),
-            userpswd   = dict(required=False, type='str', no_log=True),
-            userrole   = dict(required=False, type='str'),
+            category = dict(required=True, type='str'),
+            command = dict(required=True, type='str'),
+            baseuri = dict(required=True, type='str'),
+            user = dict(required=True, type='str'),
+            password = dict(required=True, type='str', no_log=True),
+            userid = dict(required=False, type='str'),
+            username = dict(required=False, type='str'),
+            userpswd = dict(required=False, type='str', no_log=True),
+            userrole = dict(required=False, type='str'),
             bootdevice = dict(required=False, type='str'),
             mgr_attr_name = dict(required=False, type='str'),
             mgr_attr_value = dict(required=False, type='str'),
@@ -144,28 +145,26 @@ def main():
         supports_check_mode=False
     )
 
-    category   = module.params['category']
-    command    = module.params['command']
+    category = module.params['category']
+    command = module.params['command']
     bootdevice = module.params['bootdevice']
 
     # admin credentials used for authentication
-    creds = { 'user': module.params['user'],
-              'pswd': module.params['password']
-    }
+    creds = {'user': module.params['user'],
+             'pswd': module.params['password']}
+
     # user to add/modify/delete
-    user = { 'userid'   : module.params['userid'],
-             'username' : module.params['username'],
-             'userpswd' : module.params['userpswd'],
-             'userrole' : module.params['userrole']
-    }
+    user = {'userid': module.params['userid'],
+            'username': module.params['username'],
+            'userpswd': module.params['userpswd'],
+            'userrole': module.params['userrole']}
+
     # Manager attributes to update
-    mgr_attributes = { 'mgr_attr_name'  : module.params['mgr_attr_name'],
-                       'mgr_attr_value' : module.params['mgr_attr_value']
-    }
+    mgr_attributes = {'mgr_attr_name': module.params['mgr_attr_name'],
+                      'mgr_attr_value': module.params['mgr_attr_value']}
     # BIOS attributes to update
-    bios_attributes = { 'bios_attr_name'  : module.params['bios_attr_name'],
-                        'bios_attr_value' : module.params['bios_attr_value']
-    }
+    bios_attributes = {'bios_attr_name': module.params['bios_attr_name'],
+                       'bios_attr_value': module.params['bios_attr_value']}
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
@@ -176,7 +175,8 @@ def main():
     if category == "Inventory":
         # execute only if we find a System resource
         result = rf_utils._find_systems_resource(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
+        if result['ret'] is False:
+            module.fail_json(msg=result['msg'])
 
         # General
         if command == "GetSystemInventory":
@@ -200,16 +200,18 @@ def main():
         elif command == "GetFanInventory":
             # execute only if we find Chassis resource
             result = rf_utils._find_chassis_resource(rf_uri)
-            if result['ret'] == False: module.fail_json(msg=result['msg'])
+            if result['ret'] is False:
+                module.fail_json(msg=result['msg'])
             result = rf_utils.get_fan_inventory("/Thermal")
 
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
+            result = {'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Accounts":
         # execute only if we find an Account service resource
         result = rf_utils._find_accountservice_resource(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
+        if result['ret'] is False:
+            module.fail_json(msg=result['msg'])
 
         if command == "ListUsers":
             result = rf_utils.list_users(user)
@@ -226,12 +228,13 @@ def main():
         elif command == "UpdateUserPassword":
             result = rf_utils.update_user_password(user)
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
+            result = {'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "System":
         # execute only if we find a System resource
         result = rf_utils._find_systems_resource(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
+        if result['ret'] is False:
+            module.fail_json(msg=result['msg'])
 
         if command == "PowerOn" or command == "PowerForceOff" or command == "PowerGracefulRestart" or command == "PowerGracefulShutdown":
             result = rf_utils.manage_system_power("/Actions/ComputerSystem.Reset", command)
@@ -248,29 +251,29 @@ def main():
         elif command == "CreateBiosConfigJob":
             # execute only if we find a Managers resource
             result = rf_utils._find_managers_resource(rf_uri)
-            if result['ret'] == False: module.fail_json(msg=result['msg'])
+            if result['ret'] is False:
+                module.fail_json(msg=result['msg'])
             result = rf_utils.create_bios_config_job("/Bios/Settings", "/Jobs")
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
+            result = {'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Update":
         # execute only if we find UpdateService resources
         result = rf_utils._find_updateservice_resource(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
+        if result['ret'] is False:
+            module.fail_json(msg=result['msg'])
 
         if command == "GetFirmwareInventory":
             result = rf_utils.get_firmware_inventory()
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
+            result = {'ret': False, 'msg': 'Invalid Command'}
 
     elif category == "Manager":
         # execute only if we find a Manager service resource
         result = rf_utils._find_managers_resource(rf_uri)
-        if result['ret'] == False: module.fail_json(msg=result['msg'])
+        if result['ret'] is False:
+            module.fail_json(msg=result['msg'])
 
-        # The URIs being passed are hard-coded but could easily be built dynamically by
-        # looking in resources Links["Oem"] and Actions["Oem"]["target"] under manager_uri.
-        # Leaving here for reference only so it can be adapted for other OEMs.
         if command == "GracefulRestart":
             result = rf_utils.restart_manager_gracefully("/Actions/Manager.Reset")
         elif command == "GetAttributes":
@@ -284,13 +287,13 @@ def main():
         elif command == "ClearLogs":
             result = rf_utils.clear_logs()
         else:
-            result = { 'ret': False, 'msg': 'Invalid Command'}
+            result = {'ret': False, 'msg': 'Invalid Command'}
 
     else:
-        result = { 'ret': False, 'msg': 'Invalid Category'}
+        result = {'ret': False, 'msg': 'Invalid Category'}
 
     # Return data back or fail with proper message
-    if result['ret'] == True:
+    if result['ret'] is True:
         del result['ret']
         module.exit_json(result=result)
     else:
