@@ -7,7 +7,6 @@
 
   - name: Define output file
     include_tasks: create_output_file.yml type=BiosBootOrder
-    tags: getbootorder
 
   - name: Get device boot order
     local_action: >
@@ -15,9 +14,7 @@
        user={{user}} password={{password}}
     register: result
     ignore_errors: yes
-    tags: getbootorder
 
   - name: Copy boot order to output file
     local_action: copy content={{ result | to_nice_json }}
        dest={{template}}.json
-    tags: getbootorder

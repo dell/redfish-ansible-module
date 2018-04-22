@@ -16,5 +16,3 @@
        redfish category=System command=SetOneTimeBoot baseuri={{baseuri}}
        user={{user}} password={{password}} bootdevice={{bootdevice}}
     ignore_errors: yes
-    tags: setonetimebootdevice
-

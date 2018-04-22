@@ -10,5 +10,4 @@
        redfish category=System command=SetBiosDefaultSettings baseuri={{baseuri}}
        user={{user}} password={{password}}
     ignore_errors: yes
-    tags: setdefaultsettings
 
