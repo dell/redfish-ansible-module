@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2017-2018, Jose Delarosa
+# Copyright: (c) 2017-2018, Jose Delarosa <jose.e.delarosa@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@ ANSIBLE_METADATA = {'status': ['preview'],
                     'supported_by': 'community',
                     'metadata_version': '1.1'}
 
-DOCUMENTATION = """
+DOCUMENTATION = '''
+---
 module: redfish
 version_added: "2.6"
 short_description: Out-Of-Band management using Redfish APIs
@@ -31,78 +32,89 @@ description:
 options:
   category:
     required: true
-    default: None
     description:
       - Action category to execute on server
   command:
     required: true
-    default: None
     description:
       - Command to execute on server
   baseuri:
     required: true
-    default: None
     description:
       - Base URI of OOB controller
   user:
-    required: false
-    default: root
+    required: true
     description:
       - User for authentication with OOB controller
   password:
-    required: false
-    default: password
+    required: true
     description:
       - Password for authentication with OOB controller
   userid:
     required: false
-    default: None
     description:
       - ID of user to add/delete/modify
   username:
     required: false
-    default: None
     description:
       - name of user to add/delete/modify
   userpswd:
     required: false
-    default: None
     description:
       - password of user to add/delete/modify
   userrole:
     required: false
-    default: None
     description:
       - role of user to add/delete/modify
   bootdevice:
     required: false
-    default: None
     description:
       - bootdevice when setting boot configuration
-  bios_attr_name
+  bios_attr_name:
     required: false
-    default: None
     description:
       - name of BIOS attribute to update
-  bios_attr_value
+  bios_attr_value:
     required: false
-    default: None
     description:
       - value of BIOS attribute to update to
-  mgr_attr_name
+  mgr_attr_name:
     required: false
-    default: None
     description:
       - name of Manager attribute to update
-  mgr_attr_value
+  mgr_attr_value:
     required: false
-    default: None
     description:
       - value of Manager attribute to update to
 
 requirements: [ "python-requests > 2.12" ]
 author: "Jose Delarosa (github: jose-delarosa)"
-"""
+'''
+
+EXAMPLES = '''
+  - name: Getting system inventory
+    local_action: >
+       redfish category=Inventory command=GetSystemInventory baseuri={{baseuri}}
+       user={{user}} password={{password}}
+    register: result
+
+  - name: Get CPU Inventory
+    local_action: >
+       redfish category=Inventory command=GetCpuInventory baseuri={{baseuri}}
+       user={{user}} password={{password}}
+    register: result
+
+  - name: Enable PXE Boot for NIC1
+    local_action: >
+       redfish category=System command=SetBiosAttributes
+       user={{user}} password={{password}} baseuri={{baseuri}}
+       bios_attr_name=PxeDev1EnDis bios_attr_value=Enabled
+
+  - name: Set one-time boot device to {{bootdevice}}
+    local_action: >
+       redfish category=System command=SetOneTimeBoot baseuri={{baseuri}}
+       user={{user}} password={{password}} bootdevice={{bootdevice}}
+'''
 
 import os
 import requests
@@ -114,20 +126,20 @@ def main():
     result = {}
     module = AnsibleModule(
         argument_spec = dict(
-            category   = dict(required=True, type='str', default=None),
-            command    = dict(required=True, type='str', default=None),
-            baseuri    = dict(required=True, type='str', default=None),
-            user       = dict(required=False, type='str', default='root'),
-            password   = dict(required=False, type='str', default='password', no_log=True),
-            userid     = dict(required=False, type='str', default=None),
-            username   = dict(required=False, type='str', default=None),
-            userpswd   = dict(required=False, type='str', default=None, no_log=True),
-            userrole   = dict(required=False, type='str', default=None),
-            bootdevice = dict(required=False, type='str', default=None),
-            mgr_attr_name = dict(required=False, type='str', default=None),
-            mgr_attr_value = dict(required=False, type='str', default=None),
-            bios_attr_name = dict(required=False, type='str', default=None),
-            bios_attr_value = dict(required=False, type='str', default=None),
+            category   = dict(required=True, type='str'),
+            command    = dict(required=True, type='str'),
+            baseuri    = dict(required=True, type='str'),
+            user       = dict(required=True, type='str'),
+            password   = dict(required=True, type='str', no_log=True),
+            userid     = dict(required=False, type='str'),
+            username   = dict(required=False, type='str'),
+            userpswd   = dict(required=False, type='str', no_log=True),
+            userrole   = dict(required=False, type='str'),
+            bootdevice = dict(required=False, type='str'),
+            mgr_attr_name = dict(required=False, type='str'),
+            mgr_attr_value = dict(required=False, type='str'),
+            bios_attr_name = dict(required=False, type='str'),
+            bios_attr_value = dict(required=False, type='str'),
         ),
         supports_check_mode=False
     )
@@ -232,7 +244,7 @@ def main():
         elif command == "SetBiosDefaultSettings":
             result = rf_utils.set_bios_default_settings("/Bios/Actions/Bios.ResetBios")
         elif command == "SetBiosAttributes":
-	    result = rf_utils.set_bios_attributes("/Bios/Settings", bios_attributes)
+            result = rf_utils.set_bios_attributes("/Bios/Settings", bios_attributes)
         elif command == "CreateBiosConfigJob":
             # execute only if we find a Managers resource
             result = rf_utils._find_managers_resource(rf_uri)
@@ -279,7 +291,7 @@ def main():
 
     # Return data back or fail with proper message
     if result['ret'] == True:
-        del result['ret']		# Don't want to pass this back
+        del result['ret']
         module.exit_json(result=result)
     else:
         module.fail_json(msg=result['msg'])
