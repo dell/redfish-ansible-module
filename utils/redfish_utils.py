@@ -18,8 +18,9 @@ __metaclass__ = type
 
 try:
     import requests
+    HAS_REQUESTS = True
 except ImportError:
-    module.fail_json(msg="Python module requests not found.")
+    HAS_REQUESTS = False
 
 import os
 import json
