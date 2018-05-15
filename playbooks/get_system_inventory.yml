@@ -1,5 +1,6 @@
 ---
 - hosts: myhosts
+  connection: local
   name: System Inventory
   gather_facts: False
 
@@ -9,11 +10,15 @@
     include_tasks: create_output_file.yml type=SystemInventory
 
   - name: Getting system inventory
-    local_action: >
-       redfish category=Inventory command=GetSystemInventory baseuri={{baseuri}}
-       user={{user}} password={{password}}
+    redfish:
+      category: Inventory
+      command: GetSystemInventory
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
     register: result
 
   - name: Copy results to output file
-    local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}.json
+    copy:
+      content: "{{ result | to_nice_json }}"
+      dest: "{{ template }}.json"

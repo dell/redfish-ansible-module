@@ -1,18 +1,28 @@
 ---
-
 - hosts: myhosts
+  connection: local
   name: Delete User
   gather_facts: False
 
   # User to add, modify or delete is defined in file group_vars/myhosts
 
+  tasks:
+
   # Before a user can be deleted, it must first be disabled
   - name: Disable user
-    local_action: >
-       redfish category=Accounts command=DisableUser baseuri={{baseuri}}
-       user={{user}} password={{password}} userid={{userid}}
+    redfish:
+      category: Accounts
+      command: DisableUser
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+      userid: "{{ userid }}"
 
   - name: Delete user
-    local_action: >
-       redfish category=Accounts command=DeleteUser baseuri={{baseuri}}
-       user={{user}} password={{password}} userid={{userid}}
+    redfish:
+      category: Accounts
+      command: DeleteUser
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+      userid: "{{ userid }}"

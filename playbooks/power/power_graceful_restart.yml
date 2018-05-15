@@ -1,12 +1,15 @@
 ---
-
 - hosts: myhosts
+  connection: local
   name: Manage System Power - Greaceful restart
   gather_facts: False
 
   tasks:
 
   - name: Graceful system power restart
-    local_action: >
-       redfish category=System command=PowerGracefulRestart baseuri={{baseuri}}
-       user={{user}} password={{password}}
+    redfish:
+      category: System
+      command: PowerGracefulRestart
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"

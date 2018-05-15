@@ -6,4 +6,6 @@
     set_fact: template={{rootdir}}/{{host}}/{{host}}_{{type}}_{{timestamp}}
 
   - name: Create dropoff directory for host
-    local_action: file path={{rootdir}}/{{host}} state=directory
+    file:
+      path: "{{ rootdir }}/{{ host }}"
+      state: directory

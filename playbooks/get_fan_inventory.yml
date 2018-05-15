@@ -1,10 +1,8 @@
 ---
 - hosts: myhosts
+  connection: local
   name: Fan Inventory
   gather_facts: False
-
-  # Commands available:
-  #   GetFanInventory 		Get fan inventory
 
   tasks:
 
@@ -12,13 +10,16 @@
     include_tasks: create_output_file.yml type=FanInventory
 
   - name: Get fans statistics
-    local_action: >
-       redfish category=Inventory command=GetFanInventory baseuri={{baseuri}}
-       user={{user}} password={{password}}
+    redfish:
+      category: Inventory
+      command: GetFanInventory
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
     register: result
     ignore_errors: yes
 
-  - name: Copy fans statistics to file
-    local_action: copy content={{ result | to_nice_json }}
-       dest={{template}}.json
-
+  - name: Copy results to output file
+    copy:
+      content: "{{ result | to_nice_json }}"
+      dest: "{{ template }}.json"

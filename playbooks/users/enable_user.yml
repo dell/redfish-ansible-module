@@ -1,6 +1,6 @@
 ---
-
 - hosts: myhosts
+  connection: local
   name: Enable User
   gather_facts: False
 
@@ -9,6 +9,10 @@
   tasks:
 
   - name: Enable user
-    local_action: >
-       redfish category=Accounts command=EnableUser baseuri={{baseuri}}
-       user={{user}} password={{password}} userid={{userid}}
+    redfish:
+      category: Accounts
+      command: EnableUser
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+      userid: "{{ userid }}"

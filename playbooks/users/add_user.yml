@@ -1,6 +1,6 @@
 ---
-
 - hosts: myhosts
+  connection: local
   name: Add User
   gather_facts: False
 
@@ -10,13 +10,22 @@
 
   # When adding a user, you must enable it afterwards
   - name: Add user
-    local_action: >
-       redfish category=Accounts command=AddUser baseuri={{baseuri}}
-       user={{user}} password={{password}} userid={{userid}}
-       username={{username}} userpswd={{userpswd}} userrole={{userrole}}
+    redfish:
+      category: Accounts
+      command: AddUser
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+      userid: "{{ userid }}"
+      username: "{{ username }}"
+      userpswd: "{{ userpswd }}"
+      userrole: "{{ userrole }}"
 
   - name: Enable user
-    local_action: >
-       redfish category=Accounts command=EnableUser baseuri={{baseuri}}
-       user={{user}} password={{password}} userid={{userid}}
-
+    redfish:
+      category: Accounts
+      command: EnableUser
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+      userid: "{{ userid }}"
