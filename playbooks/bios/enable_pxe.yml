@@ -1,5 +1,6 @@
 ---
 - hosts: myhosts
+  connection: local
   name: Enable PXE in NICs
   gather_facts: False
 
@@ -10,14 +11,21 @@
   tasks:
 
   - name: Enable PXE Boot for NIC1
-    local_action: >
-       redfish category=System command=SetBiosAttributes
-       user={{user}} password={{password}} baseuri={{baseuri}}
-       bios_attr_name=PxeDev1EnDis bios_attr_value=Enabled
+    redfish:
+      category: System
+      command: SetBiosAttributes
+      bios_attr_name: PxeDev1EnDis
+      bios_attr_value: Enabled
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
     ignore_errors: yes
 
   - name: Schedule Config Job - Reboot
-    local_action: >
-      redfish category=System command=CreateBiosConfigJob baseuri={{baseuri}}
-      user={{user}} password={{password}}
+    redfish:
+      category: System
+      command: CreateBiosConfigJob
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
     ignore_errors: yes

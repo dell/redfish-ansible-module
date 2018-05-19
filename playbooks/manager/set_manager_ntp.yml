@@ -1,6 +1,6 @@
 ---
-
 - hosts: myhosts
+  connection: local
   name: Set Manager NTP settings
   gather_facts: False
 
@@ -10,19 +10,26 @@
   tasks:
 
   - name: Enable NTP
-    local_action: >
-       redfish category=Manager command=SetAttributes
-       user={{user}} password={{password}} baseuri={{baseuri}}
-       mgr_attr_name=NTPConfigGroup.1.NTPEnable mgr_attr_value=Enabled
+    redfish:
+      category: Manager
+      command: SetAttributes
+      mgr_attr_name: NTPConfigGroup.1.NTPEnable
+      mgr_attr_value: Enabled
+      baseuri: "{{ baseuri }}"
+      user: "{{ user}}"
+      password: "{{ password }}"
     ignore_errors: yes
 
-  - name: Set NTP server 1
-    local_action: >
-       redfish category=Manager command=SetAttributes
-       user={{user}} password={{password}} baseuri={{baseuri}}
-       mgr_attr_name=NTPConfigGroup.1.NTP1 mgr_attr_value={{ntpserver1}}
+  - name: Set NTP server 1 to {{ ntpserver1 }}
+    redfish:
+      category: Manager
+      command: SetAttributes
+      mgr_attr_name: NTPConfigGroup.1.NTP1
+      mgr_attr_value: "{{ ntpserver1 }}"
+      baseuri: "{{ baseuri }}"
+      user: "{{ user}}"
+      password: "{{ password }}"
     ignore_errors: yes
 
   # Add more NTP servers as needed
   # To get exact attributes names, run the getattributes task first
-

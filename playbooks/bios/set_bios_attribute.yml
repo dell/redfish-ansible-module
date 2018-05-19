@@ -1,5 +1,6 @@
 ---
 - hosts: myhosts
+  connection: local
   name: Set BIOS attribute - choose one below
   gather_facts: False
 
@@ -21,20 +22,31 @@
 
   # Can set more attributes as needed (or just one), then reboot at the end.
 
-  - name: Set BIOS attribute {{attribute_name1}} to {{attribute_value1}}
-    local_action: >
-       redfish category=System command=SetBiosAttributes
-       user={{user}} password={{password}} baseuri={{baseuri}}
-       bios_attr_name={{attribute_name1}} bios_attr_value={{attribute_value1}}
+  - name: Set BIOS attribute {{ attribute_name1 }} to {{ attribute_value1 }}
+    redfish:
+      category: System
+      command: SetBiosAttributes
+      bios_attr_name: "{{ attribute_name1 }}"
+      bios_attr_value: "{{ attribute_value1 }}"
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
 
-  - name: Set BIOS attribute {{attribute_name2}} to {{attribute_value2}}
-    local_action: >
-       redfish category=System command=SetBiosAttributes
-       user={{user}} password={{password}} baseuri={{baseuri}}
-       bios_attr_name={{attribute_name2}} bios_attr_value={{attribute_value2}}
+  - name: Set BIOS attribute {{ attribute_name2 }} to {{ attribute_value2 }}
+    redfish:
+      category: System
+      command: SetBiosAttributes
+      bios_attr_name: "{{ attribute_name2 }}"
+      bios_attr_value: "{{ attribute_value2 }}"
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
 
-  - name: Create config job - reboot
-    local_action: >
-      redfish category=System command=CreateBiosConfigJob baseuri={{baseuri}}
-      user={{user}} password={{password}}
+  - name: Schedule Config Job - Reboot
+    redfish:
+      category: System
+      command: CreateBiosConfigJob
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
     ignore_errors: yes

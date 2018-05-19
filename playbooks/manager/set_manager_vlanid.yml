@@ -1,6 +1,6 @@
 ---
-
 - hosts: myhosts
+  connection: local
   name: Set Manager VLAN ID settings
   gather_facts: False
 
@@ -10,15 +10,23 @@
   tasks:
 
   - name: Enable VLAN ID
-    local_action: >
-       redfish category=Manager command=SetAttributes
-       user={{user}} password={{password}} baseuri={{baseuri}}
-       mgr_attr_name=NIC.1.VLanEnable mgr_attr_value=Enabled
+    redfish:
+      category: Manager
+      command: SetAttributes
+      mgr_attr_name: NIC.1.VLanEnable
+      mgr_attr_value: Enabled
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
     ignore_errors: yes
 
   - name: Set VLAN ID
-    local_action: >
-       redfish category=Manager command=SetAttributes
-       user={{user}} password={{password}} baseuri={{baseuri}}
-       mgr_attr_name=NIC.1.VLanID mgr_attr_value={{vlanid}}
+    redfish:
+      category: Manager
+      command: SetAttributes
+      mgr_attr_name: NIC.1.VLanID
+      mgr_attr_value: "{{ vlanid }}"
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
     ignore_errors: yes

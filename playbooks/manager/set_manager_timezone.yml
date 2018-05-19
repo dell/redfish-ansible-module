@@ -1,6 +1,6 @@
 ---
-
 - hosts: myhosts
+  connection: local
   name: Set Mananger timezone
   gather_facts: False
 
@@ -9,9 +9,13 @@
 
   tasks:
 
-  - name: Set Timezone
-    local_action: >
-       redfish category=Manager command=SetAttributes
-       user={{user}} password={{password}} baseuri={{baseuri}}
-       mgr_attr_name=Time.1.Timezone mgr_attr_value={{timezone}}
+  - name: Set Manager Timezone to {{ timezone }}
+    redfish:
+      category: Manager
+      command: SetAttributes
+      mgr_attr_name: Time.1.Timezone
+      mgr_attr_value: "{{ timezone }}"
+      baseuri: "{{ baseuri }}"
+      user: "{{ user}}"
+      password: "{{ password }}"
     ignore_errors: yes

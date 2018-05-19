@@ -1,19 +1,27 @@
 ---
 - hosts: myhosts
+  connection: local
   name: Set boot mode to UEFI and reboot
   gather_facts: False
 
   tasks:
 
   - name: Set BootMode to UEFI
-    local_action: >
-       redfish category=System command=SetBiosAttributes
-       user={{user}} password={{password}} baseuri={{baseuri}}
-       bios_attr_name=BootMode bios_attr_value=Uefi
+    redfish:
+      category: System
+      command: SetBiosAttributes
+      bios_attr_name: BootMode
+      bios_attr_value: Uefi
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
     ignore_errors: yes
 
-  - name: Create config job - reboot
-    local_action: >
-      redfish category=System command=CreateBiosConfigJob baseuri={{baseuri}}
-      user={{user}} password={{password}}
+  - name: Schedule Config Job - Reboot
+    redfish:
+      category: System
+      command: CreateBiosConfigJob
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
     ignore_errors: yes
