@@ -217,7 +217,7 @@ class RedfishUtils(object):
         result['ret'] = True		# assume we're successful
         return result
 
-    def get_storage_controller_info(self):
+    def get_storage_controller_inventory(self):
         result = {}
         controllers_details = []
         controller_list = []
@@ -258,7 +258,7 @@ class RedfishUtils(object):
             result = {'ret': False, 'msg': "Error code %s" % response.status_code}
         return result
 
-    def get_disk_info(self):
+    def get_disk_inventory(self):
         result = {}
         disks_details = []
         controller_list = []

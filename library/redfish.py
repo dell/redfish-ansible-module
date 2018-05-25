@@ -228,9 +228,9 @@ def main():
 
         # Storage
         elif command == "GetStorageControllerInventory":
-            result = rf_utils.get_storage_controller_info()
+            result = rf_utils.get_storage_controller_inventory()
         elif command == "GetDiskInventory":
-            result = rf_utils.get_disk_info()
+            result = rf_utils.get_disk_inventory()
 
         # Chassis
         elif command == "GetFanInventory":
