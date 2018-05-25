@@ -21,6 +21,8 @@
   tasks:
 
   # Can set more attributes as needed (or just one), then reboot at the end.
+  # Don't set ignore_errors to yes because if setting an attribute fails, you
+  # want all other actions (including rebooting) to NOT happen.
 
   - name: Set BIOS attribute {{ attribute_name1 }} to {{ attribute_value1 }}
     redfish:

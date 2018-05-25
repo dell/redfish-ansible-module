@@ -1,6 +1,7 @@
 ---
   - name: Define timestamp
     set_fact: timestamp="{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
+    run_once: true
 
   - name: Define file to place results
     set_fact: template={{rootdir}}/{{host}}/{{host}}_{{type}}_{{timestamp}}

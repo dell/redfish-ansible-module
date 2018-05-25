@@ -4,12 +4,12 @@
   name: List Users
   gather_facts: False
 
-  # User to add, modify or delete is defined in file group_vars/myhosts
+  # User to add, modify or delete is defined in file group_vars/all
 
   tasks:
 
   - name: Set output file
-    include_tasks: create_output_file.yml type=Users
+    include_tasks: create_output_file.yml type=UserList
 
   - name: List all users
     redfish:

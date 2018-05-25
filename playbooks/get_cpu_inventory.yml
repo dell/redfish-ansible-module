@@ -11,11 +11,11 @@
 
   - name: Get CPU Inventory
     redfish:
-       category: Inventory
-       command: GetCpuInventory
-       baseuri: "{{ baseuri }}"
-       user: "{{ user}}"
-       password: "{{ password }}"
+      category: Inventory
+      command: GetCpuInventory
+      baseuri: "{{ baseuri }}"
+      user: "{{ user}}"
+      password: "{{ password }}"
     register: result
     ignore_errors: yes
 
