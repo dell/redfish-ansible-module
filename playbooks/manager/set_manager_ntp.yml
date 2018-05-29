@@ -18,7 +18,6 @@
       baseuri: "{{ baseuri }}"
       user: "{{ user}}"
       password: "{{ password }}"
-    ignore_errors: yes
 
   - name: Set NTP server 1 to {{ ntpserver1 }}
     redfish:
@@ -29,7 +28,6 @@
       baseuri: "{{ baseuri }}"
       user: "{{ user}}"
       password: "{{ password }}"
-    ignore_errors: yes
 
   # Add more NTP servers as needed
   # To get exact attributes names, run the getattributes task first

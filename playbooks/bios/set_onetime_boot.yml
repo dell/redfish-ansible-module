@@ -20,4 +20,3 @@
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
-    ignore_errors: yes

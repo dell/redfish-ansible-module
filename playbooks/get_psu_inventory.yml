@@ -19,7 +19,6 @@
       user: "{{ user }}"
       password: "{{ password }}"
     register: result
-    ignore_errors: yes
 
   - name: Copy results to output file
     copy:

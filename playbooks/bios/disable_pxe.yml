@@ -19,7 +19,6 @@
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
-    ignore_errors: yes
 
   - name: Schedule Config Job - Reboot
     redfish:
@@ -28,4 +27,3 @@
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
-    ignore_errors: yes

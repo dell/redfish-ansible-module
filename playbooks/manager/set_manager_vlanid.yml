@@ -18,7 +18,6 @@
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
-    ignore_errors: yes
 
   - name: Set VLAN ID
     redfish:
@@ -29,4 +28,3 @@
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
-    ignore_errors: yes
