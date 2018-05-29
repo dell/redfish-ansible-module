@@ -78,7 +78,6 @@ options:
     description:
       - value of Manager attribute to update to
 
-requirements: [ "python-requests > 2.12" ]
 author: "Jose Delarosa (github: jose-delarosa)"
 '''
 
@@ -144,12 +143,6 @@ result:
     sample: BIOS Attributes set as pending values
 '''
 
-try:
-    import requests
-    HAS_REQUESTS = True
-except ImportError:
-    HAS_REQUESTS = False
-
 import os
 import json
 from ansible.module_utils.basic import AnsibleModule
@@ -177,9 +170,6 @@ def main():
         ),
         supports_check_mode=False
     )
-
-    if not HAS_REQUESTS:
-        module.fail_json(msg="Module requests not found.")
 
     category = module.params['category']
     command = module.params['command']

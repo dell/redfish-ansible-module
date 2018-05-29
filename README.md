@@ -41,11 +41,8 @@ For more details on what commands are available in each category, refer to this 
 
 ## Installation
 
-Clone this repository. Then, install Ansible + required Python libraries:
-```
-$ pip install -r requirements.txt
-```
-Copy module to default system location:
+Clone this repository and copy module files to default system location:
+
 ```
 $ python install.py
 ```
