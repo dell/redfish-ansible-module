@@ -212,9 +212,9 @@ def main():
         elif command == "GetPsuInventory":
             result = rf_utils.get_psu_inventory()
         elif command == "GetCpuInventory":
-            result = rf_utils.get_cpu_inventory("/Processors")
+            result = rf_utils.get_cpu_inventory()
         elif command == "GetNicInventory":
-            result = rf_utils.get_nic_inventory("/EthernetInterfaces")
+            result = rf_utils.get_nic_inventory()
 
         # Storage
         elif command == "GetStorageControllerInventory":
@@ -228,7 +228,7 @@ def main():
             result = rf_utils._find_chassis_resource(rf_uri)
             if result['ret'] is False:
                 module.fail_json(msg=result['msg'])
-            result = rf_utils.get_fan_inventory("/Thermal")
+            result = rf_utils.get_fan_inventory()
 
         else:
             result = {'ret': False, 'msg': 'Invalid Command'}
@@ -265,11 +265,11 @@ def main():
         if command == "PowerOn" or command == "PowerForceOff" or command == "PowerGracefulRestart" or command == "PowerGracefulShutdown":
             result = rf_utils.manage_system_power("/Actions/ComputerSystem.Reset", command)
         elif command == "GetBiosAttributes":
-            result = rf_utils.get_bios_attributes("/Bios")
+            result = rf_utils.get_bios_attributes()
         elif command == "GetBiosBootOrder":
             result = rf_utils.get_bios_boot_order("/Bios", "/BootSources")
         elif command == "SetOneTimeBoot":
-            result = rf_utils.set_one_time_boot_device(bootdevice, "/Bios")
+            result = rf_utils.set_one_time_boot_device(bootdevice)
         elif command == "SetBiosDefaultSettings":
             result = rf_utils.set_bios_default_settings("/Bios/Actions/Bios.ResetBios")
         elif command == "SetBiosAttributes":

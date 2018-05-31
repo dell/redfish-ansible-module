@@ -34,14 +34,15 @@ class RedfishUtils(object):
         try:
             resp = open_url(uri, method="GET",
                 url_username=self.creds['user'], url_password=self.creds['pswd'],
-                force_basic_auth=True, validate_certs=False, use_proxy=False)
+                force_basic_auth=True, validate_certs=False,
+                timeout=10, use_proxy=False)
             data = json.loads(resp.read())
         except HTTPError as e:
             return {'ret': False, 'msg': "HTTP Error: %s" % e.code}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error: %s" % e.reason}
-        except:
-            return {'ret': False, 'msg': "Other error"}
+        except Exception as e:
+            return {'ret': False, 'msg': "Other error: %s" % e.message}
         return {'ret': True, 'data': data}
 
     def post_request(self, uri, pyld, hdrs):
@@ -56,8 +57,8 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': "HTTP Error: %s" % e.code}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error: %s" % e.reason}
-        except:
-            return {'ret': False, 'msg': "Other error"}
+        except Exception as e:
+            return {'ret': False, 'msg': "Other error: %s" % e.message}
         return {'ret': True, 'resp': resp}
 
     def patch_request(self, uri, pyld, hdrs):
@@ -72,8 +73,8 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': "HTTP Error: %s" % e.code}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error: %s" % e.reason}
-        except:
-            return {'ret': False, 'msg': "Other error"}
+        except Exception as e:
+            return {'ret': False, 'msg': "Other error: %s" % e.message}
         return {'ret': True, 'resp': resp}
 
     def delete_request(self, uri, pyld, hdrs):
@@ -88,8 +89,8 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': "HTTP Error: %s" % e.code}
         except URLError as e:
             return {'ret': False, 'msg': "URL Error: %s" % e.reason}
-        except:
-            return {'ret': False, 'msg': "Other error"}
+        except Exception as e:
+            return {'ret': False, 'msg': "Other error: %s" % e.message}
         return {'ret': True, 'resp': resp}
 
     def _init_session(self):
@@ -151,6 +152,7 @@ class RedfishUtils(object):
             return {'ret': True}
 
     def _find_chassis_resource(self, uri):
+        chassis_service = []
         response = self.get_request(self.root_uri + uri)
         if response['ret'] is False:
             return response
@@ -164,8 +166,8 @@ class RedfishUtils(object):
                 return response
             data = response['data']
             for member in data[u'Members']:
-                chassis_service = member[u'@odata.id']
-            self.chassis_uri = chassis_service
+                chassis_service.append(member[u'@odata.id'])
+            self.chassis_uri_list = chassis_service
             return {'ret': True}
 
     def _find_managers_resource(self, uri):
@@ -499,9 +501,19 @@ class RedfishUtils(object):
             result[attribute[0]] = attribute[1]
         return result
 
-    def get_bios_attributes(self, uri):
+    def get_bios_attributes(self):
         result = {}
-        response = self.get_request(self.root_uri + self.systems_uri + uri)
+        key = "Bios"
+
+        # Search for 'key' entry and extract URI from it
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+
+        bios_uri = data[key]["@odata.id"]
+        response = self.get_request(self.root_uri + bios_uri)
         if response['ret'] is False:
             return response
         result['ret'] = True
@@ -534,27 +546,6 @@ class RedfishUtils(object):
             result["device%s" % b[u'Index']] = b[u'Name']
         return result
 
-    def get_fan_inventory(self, uri):
-        result = {}
-        fan_details = []
-
-        response = self.get_request(self.root_uri + self.chassis_uri + uri)
-        if response['ret'] is False:
-            return response
-        result['ret'] = True
-        data = response['data']
-
-        for device in data[u'Fans']:
-            fan = {}
-            # There is more information available but this is most important
-            fan['Name'] = device[u'FanName']
-            fan['RPMs'] = device[u'Reading']
-            fan['State'] = device[u'Status'][u'State']
-            fan['Health'] = device[u'Status'][u'Health']
-            fan_details.append(fan)
-        result["entries"] = fan_details
-        return result
-
     def set_bios_default_settings(self, uri):
         result = {}
         response = self.post_request(self.root_uri + self.systems_uri + uri, {}, HEADERS)
@@ -562,9 +553,19 @@ class RedfishUtils(object):
             return response
         return {'ret': True}
 
-    def set_one_time_boot_device(self, bootdevice, uri):
+    def set_one_time_boot_device(self, bootdevice):
         result = {}
-        response = self.get_request(self.root_uri + self.systems_uri + uri)
+        key = "Bios"
+
+        # Search for 'key' entry and extract URI from it
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+
+        bios_uri = data[key]["@odata.id"]
+        response = self.get_request(self.root_uri + bios_uri)
         if response['ret'] is False:
             return response
         data = response['data']
@@ -616,13 +617,55 @@ class RedfishUtils(object):
         job_id = re.search("JID_.+", job_id).group()
         return {'ret': True, 'msg': 'Config job created', 'job_id': job_id}
 
-    def get_cpu_inventory(self, uri):
+    def get_fan_inventory(self):
+        result = {}
+        fan_details = []
+        key = "Thermal"
+
+        # Go through list
+        for chassis_uri in self.chassis_uri_list:
+            response = self.get_request(self.root_uri + chassis_uri)
+            if response['ret'] is False:
+                return response
+            result['ret'] = True
+            data = response['data']
+            if key in data:
+                # match: found an entry for "Thermal" information = fans
+                thermal_uri = data[key]["@odata.id"]
+                response = self.get_request(self.root_uri + thermal_uri)
+                if response['ret'] is False:
+                    return response
+                result['ret'] = True
+                data = response['data']
+
+                for device in data[u'Fans']:
+                    fan = {}
+                    # There is more information available but this is most important
+                    fan['Name'] = device[u'FanName']
+                    fan['RPMs'] = device[u'Reading']
+                    fan['State'] = device[u'Status'][u'State']
+                    fan['Health'] = device[u'Status'][u'Health']
+                    fan_details.append(fan)
+                result["entries"] = fan_details
+        return result
+
+    def get_cpu_inventory(self):
         result = {}
         cpu_details = []
         cpu_list = []
+        key = "Processors"
+
+        # Search for 'key' entry and extract URI from it
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+
+        processors_uri = data[key]["@odata.id"]
 
         # Get a list of all CPUs and build respective URIs
-        response = self.get_request(self.root_uri + self.systems_uri + uri)
+        response = self.get_request(self.root_uri + processors_uri)
         if response['ret'] is False:
             return response
         result['ret'] = True
@@ -650,13 +693,23 @@ class RedfishUtils(object):
         result["entries"] = cpu_details
         return result
 
-    def get_nic_inventory(self, uri):
+    def get_nic_inventory(self):
         result = {}
         nic_details = []
         nic_list = []
+        key = "EthernetInterfaces"
+
+        # Search for 'key' entry and extract URI from it
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+
+        ethernetinterfaces_uri = data[key]["@odata.id"]
 
         # Get a list of all network controllers and build respective URIs
-        response = self.get_request(self.root_uri + self.systems_uri + uri)
+        response = self.get_request(self.root_uri + ethernetinterfaces_uri)
         if response['ret'] is False:
             return response
         result['ret'] = True
