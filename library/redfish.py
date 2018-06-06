@@ -301,7 +301,7 @@ def main():
             module.fail_json(msg=result['msg'])
 
         if command == "GracefulRestart":
-            result = rf_utils.restart_manager_gracefully("/Actions/Manager.Reset")
+            result = rf_utils.restart_manager_gracefully()
         elif command == "GetAttributes":
             result = rf_utils.get_manager_attributes("/Attributes")
         elif command == "SetAttributes":

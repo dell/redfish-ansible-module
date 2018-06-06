@@ -353,10 +353,20 @@ class RedfishUtils(object):
         result["entries"] = disks_details
         return result
 
-    def restart_manager_gracefully(self, uri):
+    def restart_manager_gracefully(self):
         result = {}
+        key = "Actions"
+
+        # Search for 'key' entry and extract URI from it
+        response = self.get_request(self.root_uri + self.manager_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        action_uri = data[key]["#Manager.Reset"]["target"]
+
         payload = {'ResetType': 'GracefulRestart'}
-        response = self.post_request(self.root_uri + self.manager_uri + uri, payload, HEADERS)
+        response = self.post_request(self.root_uri + action_uri, payload, HEADERS)
         if response['ret'] is False:
             return response
         return {'ret': True}
