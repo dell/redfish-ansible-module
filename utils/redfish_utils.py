@@ -511,8 +511,8 @@ class RedfishUtils(object):
             return response
         result['ret'] = True
         data = response['data']
-
         bios_uri = data[key]["@odata.id"]
+
         response = self.get_request(self.root_uri + bios_uri)
         if response['ret'] is False:
             return response
@@ -522,28 +522,45 @@ class RedfishUtils(object):
             result[attribute[0]] = attribute[1]
         return result
 
-    def get_bios_boot_order(self, uri1, uri2):
-        # Get boot mode first as it will determine what attribute to read
+    def get_bios_boot_order(self, uri):
         result = {}
-        response = self.get_request(self.root_uri + self.systems_uri + uri1)
+        boot_device_list = []
+        boot_device_details = []
+        key = "Bios"
+
+        # Search for 'key' entry and extract URI from it
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        bios_uri = data[key]["@odata.id"]
+
+        # Get boot mode first as it will determine what attribute to read
+        response = self.get_request(self.root_uri + bios_uri)
         if response['ret'] is False:
             return response
         data = response['data']
-
         boot_mode = data[u'Attributes']["BootMode"]
-        response = self.get_request(self.root_uri + self.systems_uri + uri2)
+        if boot_mode == "Uefi":
+            boot_seq = "UefiBootSeq"
+        else:
+            boot_seq = "BootSeq"
+
+        response = self.get_request(self.root_uri + self.systems_uri + uri)
         if response['ret'] is False:
             return response
         result['ret'] = True
         data = response['data']
 
-        if boot_mode == "Uefi":
-            boot_seq = "UefiBootSeq"
-        else:
-            boot_seq = "BootSeq"
-        boot_devices = data[u'Attributes'][boot_seq]
-        for b in boot_devices:
-            result["device%s" % b[u'Index']] = b[u'Name']
+        boot_device_list = data[u'Attributes'][boot_seq]
+        for b in boot_device_list:
+            boot_device = {}
+            boot_device["Index"] = b[u'Index']
+            boot_device["Name"] = b[u'Name']
+            boot_device["Enabled"] = b[u'Enabled']
+            boot_device_details.append(boot_device)
+        result["entries"] = boot_device_details
         return result
 
     def set_bios_default_settings(self, uri):

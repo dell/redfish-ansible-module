@@ -267,7 +267,7 @@ def main():
         elif command == "GetBiosAttributes":
             result = rf_utils.get_bios_attributes()
         elif command == "GetBiosBootOrder":
-            result = rf_utils.get_bios_boot_order("/Bios", "/BootSources")
+            result = rf_utils.get_bios_boot_order("/BootSources")
         elif command == "SetOneTimeBoot":
             result = rf_utils.set_one_time_boot_device(bootdevice)
         elif command == "SetBiosDefaultSettings":
