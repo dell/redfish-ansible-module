@@ -263,7 +263,7 @@ def main():
             module.fail_json(msg=result['msg'])
 
         if command == "PowerOn" or command == "PowerForceOff" or command == "PowerGracefulRestart" or command == "PowerGracefulShutdown":
-            result = rf_utils.manage_system_power("/Actions/ComputerSystem.Reset", command)
+            result = rf_utils.manage_system_power(command)
         elif command == "GetBiosAttributes":
             result = rf_utils.get_bios_attributes()
         elif command == "GetBiosBootOrder":

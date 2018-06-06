@@ -361,8 +361,19 @@ class RedfishUtils(object):
             return response
         return {'ret': True}
 
-    def manage_system_power(self, uri, command):
+    def manage_system_power(self, command):
         result = {}
+        key = "Actions"
+
+        # Search for 'key' entry and extract URI from it
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        action_uri = data[key]["#ComputerSystem.Reset"]["target"]
+
+        # Define payload accordingly
         if command == "PowerOn":
             payload = {'ResetType': 'On'}
         elif command == "PowerForceOff":
@@ -374,7 +385,7 @@ class RedfishUtils(object):
         else:
             return {'ret': False, 'msg': 'Invalid Command'}
 
-        response = self.post_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
+        response = self.post_request(self.root_uri + action_uri, payload, HEADERS)
         if response['ret'] is False:
             return response
         result['ret'] = True
