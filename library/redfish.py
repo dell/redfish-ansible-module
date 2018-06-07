@@ -274,13 +274,13 @@ def main():
         elif command == "SetBiosDefaultSettings":
             result = rf_utils.set_bios_default_settings()
         elif command == "SetBiosAttributes":
-            result = rf_utils.set_bios_attributes("/Bios/Settings", bios_attributes)
+            result = rf_utils.set_bios_attributes(bios_attributes)
         elif command == "CreateBiosConfigJob":
             # execute only if we find a Managers resource
             result = rf_utils._find_managers_resource(rf_uri)
             if result['ret'] is False:
                 module.fail_json(msg=result['msg'])
-            result = rf_utils.create_bios_config_job("/Bios/Settings", "/Jobs")
+            result = rf_utils.create_bios_config_job()
         else:
             result = {'ret': False, 'msg': 'Invalid Command'}
 

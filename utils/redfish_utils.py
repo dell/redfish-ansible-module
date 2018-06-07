@@ -652,19 +652,57 @@ class RedfishUtils(object):
             return response
         return {'ret': True}
 
-    def set_bios_attributes(self, uri, attr):
+    def set_bios_attributes(self, attr):
         result = {}
+        key = "Bios"
+
+        # Search for 'key' entry and extract URI from it
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        bios_uri = data[key]["@odata.id"]
+
+        # Extract proper URI
+        response = self.get_request(self.root_uri + bios_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        set_bios_attr_uri = data["@Redfish.Settings"]["SettingsObject"]["@odata.id"]
+
         # Example: bios_attr = {\"name\":\"value\"}
         bios_attr = "{\"" + attr['bios_attr_name'] + "\":\"" + attr['bios_attr_value'] + "\"}"
         payload = {"Attributes": json.loads(bios_attr)}
-        response = self.patch_request(self.root_uri + self.systems_uri + uri, payload, HEADERS)
+        response = self.patch_request(self.root_uri + set_bios_attr_uri, payload, HEADERS)
         if response['ret'] is False:
             return response
         return {'ret': True}
 
-    def create_bios_config_job(self, uri1, uri2):
-        payload = {"TargetSettingsURI": self.systems_uri + uri1, "RebootJobType": "PowerCycle"}
-        response = self.post_request(self.root_uri + self.manager_uri + uri2, payload, HEADERS)
+    def create_bios_config_job(self):
+        result = {}
+        key = "Bios"
+        jobs = "Jobs"
+
+        # Search for 'key' entry and extract URI from it
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        bios_uri = data[key]["@odata.id"]
+
+        # Extract proper URI
+        response = self.get_request(self.root_uri + bios_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        set_bios_attr_uri = data["@Redfish.Settings"]["SettingsObject"]["@odata.id"]
+
+        payload = {"TargetSettingsURI": set_bios_attr_uri, "RebootJobType": "PowerCycle"}
+        response = self.post_request(self.root_uri + self.manager_uri + "/" + jobs, payload, HEADERS)
         if response['ret'] is False:
             return response
 
