@@ -304,9 +304,9 @@ def main():
         if command == "GracefulRestart":
             result = rf_utils.restart_manager_gracefully()
         elif command == "GetAttributes":
-            result = rf_utils.get_manager_attributes("/Attributes")
+            result = rf_utils.get_manager_attributes()
         elif command == "SetAttributes":
-            result = rf_utils.set_manager_attributes("/Attributes", mgr_attributes)
+            result = rf_utils.set_manager_attributes(mgr_attributes)
 
         # Logs
         elif command == "GetLogs":
