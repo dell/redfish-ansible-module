@@ -4,7 +4,7 @@
     run_once: true
 
   - name: Define file to place results
-    set_fact: template={{rootdir}}/{{host}}/{{host}}_{{type}}_{{timestamp}}
+    set_fact: template={{rootdir}}/{{host}}/{{host}}_{{category}}_{{timestamp}}
 
   - name: Create dropoff directory for host
     file:

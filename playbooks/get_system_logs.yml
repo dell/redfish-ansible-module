@@ -4,10 +4,13 @@
   name: Get System Logs
   gather_facts: False
 
+  vars:
+    category: Logs
+
   tasks:
 
   - name: Define output file
-    include_tasks: create_output_file.yml type=Logs
+    include_tasks: create_output_file.yml
 
   - name: Get System Logs
     redfish:

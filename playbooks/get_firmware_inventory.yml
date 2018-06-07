@@ -4,10 +4,13 @@
   name: Device Firmware Inventory
   gather_facts: False
 
+  vars:
+    category: FirmwareInventory
+
   tasks:
 
   - name: Set output file
-    include_tasks: create_output_file.yml type=FirmwareInventory
+    include_tasks: create_output_file.yml
 
   - name: Get Firmware Inventory
     redfish:

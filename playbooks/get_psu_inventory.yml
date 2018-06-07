@@ -4,12 +4,15 @@
   name: Power Supply (PSU) Inventory
   gather_facts: False
 
+  vars:
+    category: PsuInventory
+
   tasks:
 
   # Not supported in 12G servers
 
   - name: Define output file
-    include_tasks: create_output_file.yml type=PsuInventory
+    include_tasks: create_output_file.yml
 
   - name: Get PSU Inventory
     redfish:

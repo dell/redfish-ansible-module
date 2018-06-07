@@ -4,10 +4,13 @@
   name: NIC Inventory
   gather_facts: False
 
+  vars:
+    category: NicInventory
+
   tasks:
 
   - name: Define output file
-    include_tasks: create_output_file.yml type=NicInventory
+    include_tasks: create_output_file.yml
 
   - name: Get NIC Information
     redfish:

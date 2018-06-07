@@ -4,10 +4,13 @@
   name: Fan Inventory
   gather_facts: False
 
+  vars:
+    category: FanInventory
+
   tasks:
 
   - name: Set output file
-    include_tasks: create_output_file.yml type=FanInventory
+    include_tasks: create_output_file.yml
 
   - name: Get fans statistics
     redfish:

@@ -4,10 +4,13 @@
   name: Get BIOS boot order
   gather_facts: False
 
+  vars:
+    category: BiosBootOrder
+
   tasks:
 
   - name: Define output file
-    include_tasks: create_output_file.yml type=BiosBootOrder
+    include_tasks: create_output_file.yml
 
   - name: Get device boot order
     redfish:
