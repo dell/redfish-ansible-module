@@ -543,11 +543,12 @@ class RedfishUtils(object):
             result[attribute[0]] = attribute[1]
         return result
 
-    def get_bios_boot_order(self, uri):
+    def get_bios_boot_order(self):
         result = {}
         boot_device_list = []
         boot_device_details = []
         key = "Bios"
+        bootsources = "BootSources"
 
         # Search for 'key' entry and extract URI from it
         response = self.get_request(self.root_uri + self.systems_uri)
@@ -568,7 +569,7 @@ class RedfishUtils(object):
         else:
             boot_seq = "BootSeq"
 
-        response = self.get_request(self.root_uri + self.systems_uri + uri)
+        response = self.get_request(self.root_uri + self.systems_uri + "/" + bootsources)
         if response['ret'] is False:
             return response
         result['ret'] = True
