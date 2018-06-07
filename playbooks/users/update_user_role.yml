@@ -4,7 +4,7 @@
   name: Update user role
   gather_facts: False
 
-  # User to add, modify or delete is defined in file group_vars/myhosts
+  # User to add, modify or delete is defined in file group_vars/all
 
   tasks:
 
