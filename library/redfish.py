@@ -262,7 +262,8 @@ def main():
         if result['ret'] is False:
             module.fail_json(msg=result['msg'])
 
-        if command == "PowerOn" or command == "PowerForceOff" or command == "PowerGracefulRestart" or command == "PowerGracefulShutdown":
+        if command == "PowerOn" or command == "PowerForceOff" \
+            or command == "PowerGracefulRestart" or command == "PowerGracefulShutdown":
             result = rf_utils.manage_system_power(command)
         elif command == "GetBiosAttributes":
             result = rf_utils.get_bios_attributes()
@@ -271,7 +272,7 @@ def main():
         elif command == "SetOneTimeBoot":
             result = rf_utils.set_one_time_boot_device(bootdevice)
         elif command == "SetBiosDefaultSettings":
-            result = rf_utils.set_bios_default_settings("/Bios/Actions/Bios.ResetBios")
+            result = rf_utils.set_bios_default_settings()
         elif command == "SetBiosAttributes":
             result = rf_utils.set_bios_attributes("/Bios/Settings", bios_attributes)
         elif command == "CreateBiosConfigJob":

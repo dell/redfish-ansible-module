@@ -584,9 +584,27 @@ class RedfishUtils(object):
         result["entries"] = boot_device_details
         return result
 
-    def set_bios_default_settings(self, uri):
+    def set_bios_default_settings(self):
         result = {}
-        response = self.post_request(self.root_uri + self.systems_uri + uri, {}, HEADERS)
+        key = "Bios"
+
+        # Search for 'key' entry and extract URI from it
+        response = self.get_request(self.root_uri + self.systems_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        bios_uri = data[key]["@odata.id"]
+
+        # Extract proper URI
+        response = self.get_request(self.root_uri + bios_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        reset_bios_settings_uri = data["Actions"]["#Bios.ResetBios"]["target"]
+
+        response = self.post_request(self.root_uri + reset_bios_settings_uri, {}, HEADERS)
         if response['ret'] is False:
             return response
         return {'ret': True}
@@ -601,8 +619,8 @@ class RedfishUtils(object):
             return response
         result['ret'] = True
         data = response['data']
-
         bios_uri = data[key]["@odata.id"]
+
         response = self.get_request(self.root_uri + bios_uri)
         if response['ret'] is False:
             return response
