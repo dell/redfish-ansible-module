@@ -1,58 +1,52 @@
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-# Script to get inventory from server
-
-import rfutils
 import json
 import sys
-rf = rfutils.rfutils()
+from ansible.module_utils.urls import open_url
+from urllib2 import URLError, HTTPError
 
-def get_inventory(idrac, base_uri, rf_uri):
-    response = rf.send_get_request(idrac, base_uri + rf_uri)
-    rf.print_bold("status_code: %s" % response.status_code)
-    if not response.status_code == 200:
-        rf.print_red("Something went wrong.")
+def usage(me):
+    print("Usage: %s <ip> <user> <password>" % (me))
+    exit(1)
+
+def get_inventory(argv, redfish_uri):
+    uri = "https://" + argv[1] + redfish_uri
+    r = None
+    data = {}
+    try:
+        r = open_url(uri, method="GET",
+            url_username=argv[2], url_password=argv[3],
+            force_basic_auth=True, validate_certs=False, use_proxy=False)
+        data = json.loads(r.read())
+    except HTTPError as e:
+        print("HTTP [%s]" % e)
+        print("HTTP [%s]" % e.code)
+        exit(1)
+    except URLError as e:
+        print("URL [%s]" % e)
+        print("URL [%s]" % e.reason)
+        exit(1)
+    except:
+        print("Other Error")
         exit(1)
 
-    data = response.json()
-    # print(json.dumps(data, separators=(',', ':')))
+    print("Hostname:    %s" % data[u'HostName'])
     print("Model:       %s" % data[u'Model'])
     print("Mfg:         %s" % data[u'Manufacturer'])
     print("Part Number: %s" % data[u'PartNumber'])
     print("System Type: %s" % data[u'SystemType'])
-    print("Asset tag:   %s" % data[u'AssetTag'])
     print("Service tag: %s" % data[u'SKU'])
     print("Serial No.:  %s" % data[u'SerialNumber'])
     print("BIOS:        %s" % data[u'BiosVersion'])
-    print("Hostname:    %s" % data[u'HostName'])
     print("Power state: %s" % data[u'PowerState'])
     print("Memory:      %s" % data[u'MemorySummary'][u'TotalSystemMemoryGiB'])
-    print("CPU count:   %s" % data[u'ProcessorSummary'][u'Count'])
-    print("CPU model:   %s" % data[u'ProcessorSummary'][u'Model'])
-    print("CPU health   %s" % data[u'ProcessorSummary'][u'Status'][u'Health'])
     print("Status:      %s" % data[u'Status'][u'Health'])
-
     return
 
 def main():
-    # Initialize iDRAC arguments
-    idrac = rf.check_args(sys)
-    base_uri = "https://" + idrac['ip']
-    rf_uri = "/redfish/v1/Systems/System.Embedded.1"
+    if len(sys.argv) < 4:
+        usage(sys.argv[0])
 
-    # Get system inventory
-    get_inventory(idrac, base_uri, rf_uri)
+    rf_uri = "/redfish/v1/Systems/System.Embedded.1"
+    get_inventory(sys.argv, rf_uri)
 
 if __name__ == '__main__':
     main()

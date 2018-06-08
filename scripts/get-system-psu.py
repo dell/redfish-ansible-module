@@ -1,49 +1,65 @@
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import rfutils
 import json
 import sys
-rf = rfutils.rfutils()
+from ansible.module_utils.urls import open_url
+from urllib2 import URLError, HTTPError
 
-def get_list_of_psus(idrac, base_uri, rf_uri):
+def usage(me):
+    print("Usage: %s <ip> <user> <password>" % (me))
+    exit(1)
+
+def get_list_of_psus(argv, redfish_uri):
+    uri = "https://" + argv[1] + redfish_uri
     count = 0
     psus = []
-    response = rf.send_get_request(idrac, base_uri + rf_uri)
-    rf.print_bold("status_code: %s" % response.status_code)
-    if not response.status_code == 200:
-        rf.print_red("Something went wrong.")
+    data = {}
+    r = None
+    try:
+        r = open_url(uri, method="GET",
+            url_username=argv[2], url_password=argv[3],
+            force_basic_auth=True, validate_certs=False, use_proxy=False)
+        data = json.loads(r.read())
+    except HTTPError as e:
+        print("HTTP [%s]" % e)
+        print("HTTP [%s]" % e.code)
         exit(1)
-    data = response.json()
+    except URLError as e:
+        print("URL [%s]" % e)
+        print("URL [%s]" % e.reason)
+        exit(1)
+    except:
+        print("Other Error")
+        exit(1)
 
     for psu in data[u'Links'][u'PoweredBy']:
         c = psu[u'@odata.id']
         psus.append(c)
     return psus
 
-def get_psu_details(idrac, base_uri, psus):
+def get_psu_details(argv, psus):
     for i in psus:
-        uri = base_uri + i
-        response = rf.send_get_request(idrac, uri)
-        if not response.status_code == 200:
-            rf.print_red("Something went wrong.")
+        uri = "https://" + argv[1] + i
+        print(uri)
+        try:
+            r = open_url(uri, method="GET",
+                url_username=argv[2], url_password=argv[3],
+                force_basic_auth=True, validate_certs=False, use_proxy=False)
+            data = json.loads(r.read())
+        except HTTPError as e:
+            print("HTTP [%s]" % e)
+            print("HTTP [%s]" % e.code)
             exit(1)
-        data = response.json()
-        rf.print_bold("Name: %s" % data[u'MemberId'])
+        except URLError as e:
+            print("URL [%s]" % e)
+            print("URL [%s]" % e.reason)
+            exit(1)
+        except:
+            print("Other Error")
+            exit(1)
+
+        print(" Name: %s" % data[u'MemberId'])
         print(" Model: %s" % data[u'Model'])
         print(" Serial Number: %s" % data[u'SerialNumber'])
         print(" Part Number: %s" % data[u'PartNumber'])
-        print(" Manufacturer: %s" % data[u'Manufacturer'])
         print(" Firmware Version: %s" % data[u'FirmwareVersion'])
         print(" Power Capacity: %s Watts" % data[u'PowerCapacityWatts'])
         print(" Power Supply Type: %s" % data[u'PowerSupplyType'])
@@ -52,16 +68,13 @@ def get_psu_details(idrac, base_uri, psus):
     return
 
 def main():
-    # Initialize iDRAC arguments
-    idrac = rf.check_args(sys)
-    base_uri = "https://" + idrac['ip']
-    rf_uri = "/redfish/v1/Systems/System.Embedded.1/"
+    if len(sys.argv) < 4:
+        usage(sys.argv[0])
 
-    # Get all power supplies
-    psus = get_list_of_psus(idrac, base_uri, rf_uri)
-
-    # Go through list of devices and get detailed information for each one
-    get_psu_details(idrac, base_uri, psus)
+    rf_uri = "/redfish/v1/Systems/System.Embedded.1"
+    psus = get_list_of_psus(sys.argv, rf_uri)
+    print(psus)
+    get_psu_details(sys.argv, psus)
 
 if __name__ == '__main__':
     main()
