@@ -165,7 +165,7 @@ null
 null
 ```
 
-It should be straight-forward to extract the same data from hundreds of files using shell scripts and organize it accordingly. In the near future scripts will be made available to facilitate data orgnization. For additional help with qt, refer to this [manual](https://shapeshed.com/jq-json/).
+It should be straight-forward to extract the same data from hundreds of files using shell scripts and organize it accordingly. In the near future scripts will be made available to facilitate data orgnization. For additional help with jq, refer to this [manual](https://shapeshed.com/jq-json/).
 
 ## Support
 
