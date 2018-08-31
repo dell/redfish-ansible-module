@@ -38,6 +38,7 @@ For more details on what commands are available in each category, refer to this 
 ## Requirements
 
   - Minimum iDRAC 7/8/9 FW 2.40.40.40
+  - Minimal ansible-playbook version 2.6.3
 
 ## Installation
 
