@@ -1,0 +1,15 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Set default BIOS settings
+  gather_facts: False
+
+  tasks:
+
+  - name: Set BIOS default settings
+    redfish_config:
+      category: Systems
+      command: SetBiosDefaultSettings
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"

@@ -1,0 +1,18 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Enable User
+  gather_facts: False
+
+  # User to add, modify or delete is defined in file group_vars/all
+
+  tasks:
+
+  - name: Enable user
+    redfish_command:
+      category: Accounts
+      command: EnableUser
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+      userid: "{{ userid }}"

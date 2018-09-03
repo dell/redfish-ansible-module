@@ -1,0 +1,15 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Restart Manager
+  gather_facts: False
+
+  tasks:
+
+  - name: Restart Manager gracefully
+    redfish_command:
+      category: Manager
+      command: GracefulRestart
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"

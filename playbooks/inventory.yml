@@ -1,0 +1,33 @@
+# This is the default ansible 'hosts' file.
+#
+# It should live in /etc/ansible/hosts
+#
+#   - Comments begin with the '#' character
+#   - Blank lines are ignored
+#   - Groups of hosts are delimited by [header] elements
+#   - You can enter hostnames or ip addresses
+#   - A hostname/ip can be a member of multiple groups
+
+[myhosts]
+#red1       baseuri=idrac-3m4hhl2   password=linuxdev
+#red2       baseuri=idrac-3m3mhl2   password=linuxdev
+#red3       baseuri=idrac-c12jxk2   password=linuxdev
+red4       baseuri=idrac-7ffg0m2   password=linuxdev
+
+#r630       baseuri=idrac-r630      password=linuxdev
+#r730       baseuri=idrac-r730      password=linuxdev
+#storm1     baseuri=idrac-storm1    password=linuxdev
+storm2     baseuri=idrac-storm2    password=linuxdev
+#storm3     baseuri=idrac-storm3    password=linuxdev
+
+#vrtx       baseuri=100.71.102.12   password=linuxdev
+#vrtx1      baseuri=100.71.102.13   password=linuxdev
+#vrtx2      baseuri=100.71.102.14   password=linuxdev
+#vrtx3      baseuri=100.71.102.15   password=linuxdev
+#vrtx4      baseuri=100.71.102.16   password=linuxdev
+#r820       baseuri=100.71.102.17   password=linuxdev
+#r620       baseuri=100.71.102.18   password=linuxdev
+#t620       baseuri=100.71.102.19   password=linuxdev
+#r320       baseuri=100.71.102.20   password=linuxdev
+orca1      baseuri=100.71.102.21   password=linuxdev
+#orca2      baseuri=100.71.102.22   password=linuxdev

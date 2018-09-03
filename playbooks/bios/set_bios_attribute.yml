@@ -1,0 +1,51 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Set BIOS attribute - choose one below
+  gather_facts: False
+
+  # BIOS attributes that have been tested
+  #
+  # Name			Value
+  # --------------------------------------------------
+  # OsWatchdogTimer		Disabled / Enabled
+  # ProcVirtualization		Disabled / Enabled
+  # MemTest			Disabled / Enabled
+
+  vars:
+  - attribute_name1: PxeDev2EnDis
+  - attribute_value1: Disabled
+  - attribute_name2: ProcVirtualization
+  - attribute_value2: Enabled
+
+  tasks:
+
+  # Can set more attributes as needed (or just one), then reboot at the end.
+
+  - name: Set BIOS attribute {{ attribute_name1 }} to {{ attribute_value1 }}
+    redfish_config:
+      category: Systems
+      command: SetBiosAttributes
+      bios_attr_name: "{{ attribute_name1 }}"
+      bios_attr_value: "{{ attribute_value1 }}"
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+
+  - name: Set BIOS attribute {{ attribute_name2 }} to {{ attribute_value2 }}
+    redfish_config:
+      category: Systems
+      command: SetBiosAttributes
+      bios_attr_name: "{{ attribute_name2 }}"
+      bios_attr_value: "{{ attribute_value2 }}"
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+
+  - name: Schedule Config Job - Reboot
+    redfish_command:
+      category: Systems
+      command: CreateBiosConfigJob
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"

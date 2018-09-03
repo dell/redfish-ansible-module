@@ -1,0 +1,15 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Manage System Power - Turn on
+  gather_facts: False
+
+  tasks:
+
+  - name: Turn system power on
+    redfish_command:
+      category: Systems
+      command: PowerOn
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"

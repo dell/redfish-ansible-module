@@ -12,6 +12,10 @@ To use them, clone the Ansible repository and follow the examples:
 $ git clone https://github.com/ansible/ansible.git
 ```
 
+## Sample playbooks
+
+These [playbooks](playbooks) should give you a very good idea of how to create your own playbooks for your own needs.
+
 ## Old development work
 
 I left 2 development branches in this repository. They are no longer maintained and are for reference ONLY:
@@ -19,10 +23,6 @@ I left 2 development branches in this repository. They are no longer maintained 
 - [fordell](https://github.com/dell/idrac-ansible-module/tree/fordell) - Original module specific to Dell servers. I have not updated this branch in quite some time and the code base is quite old.
 
 - [old_master](https://github.com/dell/idrac-ansible-module/tree/old_master) - Module was updated to be vendor agnostic. Code here is also quite outdated.
-
-## Sample playbooks coming soon
-
-Though there should be enough documentation available upstream to create your own playbooks, I will dump here as many sample playbooks as possible to get you started quickly.
 
 ## Report problems or provide feedback
 

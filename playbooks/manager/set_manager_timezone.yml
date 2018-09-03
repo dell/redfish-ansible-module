@@ -1,0 +1,20 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Set Mananger timezone
+  gather_facts: False
+
+  vars:
+    - timezone: "US/Central" 
+
+  tasks:
+
+  - name: Set Manager Timezone to {{ timezone }}
+    redfish_config:
+      category: Manager
+      command: SetManagerAttributes
+      mgr_attr_name: Time.1.Timezone
+      mgr_attr_value: "{{ timezone }}"
+      baseuri: "{{ baseuri }}"
+      user: "{{ user}}"
+      password: "{{ password }}"

@@ -1,0 +1,15 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Manage System Power - Force Off
+  gather_facts: False
+
+  tasks:
+
+  - name: Turn system power off
+    redfish_command:
+      category: Systems
+      command: PowerForceOff
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"

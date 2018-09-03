@@ -1,0 +1,27 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Get BIOS attributes
+  gather_facts: False
+
+  vars:
+    datatype: BiosAttributes
+
+  tasks:
+
+  - name: Define output file
+    include_tasks: create_output_file.yml
+
+  - name: Get BIOS attributes
+    redfish_facts:
+      category: Systems
+      command: GetBiosAttributes
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+    register: result
+
+  - name: Copy results to output file
+    copy:
+      content: "{{ result | to_nice_json }}"
+      dest: "{{ template }}.json"
