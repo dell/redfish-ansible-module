@@ -17,6 +17,6 @@ host: "{{inventory_hostname}}"
 
 # For managing users
 userid: 3                   # user id of user to add/delete/modify (1-16)
-username: jose              # user name to add/delete/modify
-userpswd: linuxdev          # user password to add/delete/modify
+username: user1             # user name to add/delete/modify
+userpswd: pa$$word          # user password to add/delete/modify
 userrole: Operator          # user role to add/delete/modify
