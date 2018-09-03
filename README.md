@@ -12,9 +12,11 @@ To use them, clone the Ansible repository and follow the examples:
 $ git clone https://github.com/ansible/ansible.git
 ```
 
-## Sample playbooks
+## Sample playbooks and inventory file
 
 These [playbooks](playbooks) should give you a very good idea of how to create your own playbooks for your own needs.
+
+Here is a sample [inventory](inventory.yml) file.
 
 ## Old development work
 

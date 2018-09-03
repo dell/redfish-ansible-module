@@ -1,0 +1,32 @@
+# Sample inventory file for Redfish Ansible modules
+#
+# For baseuri, if specifying names instead of IP addresses, make sure
+# that name is fully DNS resolvable.
+
+[master]
+master1    baseuri=idrac-master1   password=p@$$word
+master2    baseuri=idrac-master2   password=p@$$word
+master3    baseuri=idrac-master3   password=p@$$word
+
+[db]
+db1        baseuri=idrac-db1      password=p@$$word
+db2        baseuri=idrac-db2      password=p@$$word
+db3        baseuri=idrac-db3      password=p@$$word
+
+[web]
+web1       baseuri=192.168.2.10   password=PaSSw0rd
+web2       baseuri=192.168.2.12   password=PaSSw0rd
+web3       baseuri=192.168.2.13   password=PaSSw0rd
+web4       baseuri=192.168.2.14   password=PaSSw0rd
+web5       baseuri=192.168.2.15   password=PaSSw0rd
+
+[app]
+app1       baseuri=192.168.3.10   password=p@$$word
+app2       baseuri=192.168.3.11   password=p@$$word
+app3       baseuri=192.168.3.12   password=p@$$word
+
+[myhosts:children]
+master
+db
+web
+app
