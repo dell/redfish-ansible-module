@@ -1,9 +1,0 @@
-{
-    "changed": false, 
-    "failed": false, 
-    "result": {
-        "device0": "AHCI.Slot.1-1", 
-        "device1": "NIC.PxeDevice.1-1", 
-        "device2": "Unknown.Unknown.3-1"
-    }
-}
