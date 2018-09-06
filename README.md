@@ -1,10 +1,10 @@
 # Ansible module for Out-Of-Band (OOB) controllers using Redfish APIs
 
-This project is now part of the upstream Ansible repository:
+This module is now part of the upstream Ansible repository:
 
-- [ansible_facts](https://docs.ansible.com/ansible/devel/modules/redfish_facts_module)
-- [ansible_command](https://docs.ansible.com/ansible/devel/modules/redfish_command_module)
-- [ansible_config](https://docs.ansible.com/ansible/devel/modules/redfish_config_module)
+- [redfish_facts](https://docs.ansible.com/ansible/devel/modules/redfish_facts_module)
+- [redfish_command](https://docs.ansible.com/ansible/devel/modules/redfish_command_module)
+- [redfish_config](https://docs.ansible.com/ansible/devel/modules/redfish_config_module)
 
 To use them, clone the Ansible repository and follow the examples:
 
