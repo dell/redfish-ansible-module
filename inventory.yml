@@ -4,29 +4,44 @@
 # that name is fully DNS resolvable.
 
 [master]
-master1    baseuri=idrac-master1   password=p@$$word
-master2    baseuri=idrac-master2   password=p@$$word
-master3    baseuri=idrac-master3   password=p@$$word
+master1    baseuri=idrac-master1
+master2    baseuri=idrac-master2
 
 [db]
-db1        baseuri=idrac-db1      password=p@$$word
-db2        baseuri=idrac-db2      password=p@$$word
-db3        baseuri=idrac-db3      password=p@$$word
+db1        baseuri=idrac-db1      password=overrideP@$$word
+db2        baseuri=idrac-db2
+db3        baseuri=idrac-db3
 
 [web]
-web1       baseuri=192.168.2.10   password=PaSSw0rd
-web2       baseuri=192.168.2.12   password=PaSSw0rd
-web3       baseuri=192.168.2.13   password=PaSSw0rd
-web4       baseuri=192.168.2.14   password=PaSSw0rd
-web5       baseuri=192.168.2.15   password=PaSSw0rd
+web1       baseuri=192.168.2.11
+web2       baseuri=192.168.2.12
+web3       baseuri=192.168.2.13
 
 [app]
-app1       baseuri=192.168.3.10   password=p@$$word
-app2       baseuri=192.168.3.11   password=p@$$word
-app3       baseuri=192.168.3.12   password=p@$$word
+app1       baseuri=192.168.3.10
+app2       baseuri=192.168.3.11
+app3       baseuri=192.168.3.12
 
 [myhosts:children]
 master
 db
 web
 app
+
+[myhosts:vars]
+# Credentials for OOB controller
+user=root
+password=P@$$word
+
+# Local directory where all results are placed
+rootdir=~/inventory_files
+
+# Shorter name for inventory_hostname.
+# Refers to the OS hostname, not the OOB controller.
+host="{{inventory_hostname}}"
+
+# For managing users
+userid=3
+username=user3
+userpswd=B1g$3cr3t
+userrole=Operator
