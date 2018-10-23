@@ -4,17 +4,25 @@
   name: Set boot mode to UEFI and reboot
   gather_facts: False
 
+  # Updating BIOS settings requires creating a configuration job to implement,
+  # which then reboots the system if the BIOS attribute was updated. 
+
+  vars:
+  - attribute_name: BootMode
+  - attribute_value: Uefi
+
   tasks:
 
-  - name: Set BootMode to UEFI
+  - name: Set {{ attribute_name }} to {{ attribute_value }}
     redfish_config:
       category: Systems
       command: SetBiosAttributes
-      bios_attr_name: BootMode
-      bios_attr_value: Uefi
+      bios_attr_name: "{{ attribute_name }}"
+      bios_attr_value: "{{ attribute_value }}"
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
+    register: bios_attribute
 
   - name: Schedule Config Job - Reboot
     redfish_command:
@@ -23,3 +31,4 @@
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
+    when: bios_attribute.changed

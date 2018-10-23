@@ -5,20 +5,24 @@
   gather_facts: False
 
   # Updating BIOS settings requires creating a configuration job to implement,
-  # which then reboots the system. You can choose to reboot here or at a later 
-  # time. To reboot immediately, uncomment the last task.
+  # which then reboots the system if the BIOS attribute was updated.
+
+  vars:
+  - attribute_name: PxeDev2EnDis
+  - attribute_value: Disabled
 
   tasks:
 
-  - name: Disable PXE Boot for NIC1
+  - name: Set {{ attribute_name }} to {{ attribute_value }}
     redfish_config:
       category: Systems
       command: SetBiosAttributes
-      bios_attr_name: PxeDev1EnDis
-      bios_attr_value: Disabled
+      bios_attr_name: "{{ attribute_name }}"
+      bios_attr_value: "{{ attribute_value }}"
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
+    register: bios_attribute
 
   - name: Schedule Config Job - Reboot
     redfish_command:
@@ -27,3 +31,4 @@
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
+    when: bios_attribute.changed

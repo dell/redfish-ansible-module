@@ -1,8 +1,11 @@
 ---
 - hosts: myhosts
   connection: local
-  name: Set BIOS attribute - choose one below
+  name: Set BIOS attribute - choose below
   gather_facts: False
+
+  # Updating BIOS settings requires creating a configuration job to implement,
+  # which then reboots the system.
 
   # BIOS attributes that have been tested
   #
@@ -11,16 +14,15 @@
   # OsWatchdogTimer		Disabled / Enabled
   # ProcVirtualization		Disabled / Enabled
   # MemTest			Disabled / Enabled
+  # SriovGlobalEnable		Disabled / Enabled
 
   vars:
-  - attribute_name1: PxeDev2EnDis
+  - attribute_name1: SriovGlobalEnable
   - attribute_value1: Disabled
   - attribute_name2: ProcVirtualization
   - attribute_value2: Enabled
 
   tasks:
-
-  # Can set more attributes as needed (or just one), then reboot at the end.
 
   - name: Set BIOS attribute {{ attribute_name1 }} to {{ attribute_value1 }}
     redfish_config:
