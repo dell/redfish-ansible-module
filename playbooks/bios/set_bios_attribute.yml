@@ -17,37 +17,36 @@
   # SriovGlobalEnable		Disabled / Enabled
 
   vars:
-  - attribute_name1: SriovGlobalEnable
-  - attribute_value1: Disabled
-  - attribute_name2: ProcVirtualization
-  - attribute_value2: Enabled
+  - attribute_name: SriovGlobalEnable
+  - attribute_value: Enabled
 
   tasks:
 
-  - name: Set BIOS attribute {{ attribute_name1 }} to {{ attribute_value1 }}
+  - name: Set BIOS attribute {{ attribute_name }} to {{ attribute_value }}
     redfish_config:
       category: Systems
       command: SetBiosAttributes
-      bios_attr_name: "{{ attribute_name1 }}"
-      bios_attr_value: "{{ attribute_value1 }}"
+      bios_attr_name: "{{ attribute_name }}"
+      bios_attr_value: "{{ attribute_value }}"
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
+    register: bios_attribute
 
-  - name: Set BIOS attribute {{ attribute_name2 }} to {{ attribute_value2 }}
-    redfish_config:
-      category: Systems
-      command: SetBiosAttributes
-      bios_attr_name: "{{ attribute_name2 }}"
-      bios_attr_value: "{{ attribute_value2 }}"
-      baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-
-  - name: Schedule Config Job - Reboot
+  - name: Create BIOS configuration job (schedule BIOS setting update)
     redfish_command:
       category: Systems
       command: CreateBiosConfigJob
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
+    when: bios_attribute.changed
+
+  - name: Reboot system to apply new BIOS settings
+    redfish_command:
+      category: Systems
+      command: PowerGracefulRestart
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+    when: bios_attribute.changed

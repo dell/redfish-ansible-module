@@ -24,10 +24,19 @@
       password: "{{ password }}"
     register: bios_attribute
 
-  - name: Schedule Config Job - Reboot
+  - name: Create BIOS configuration job (schedule BIOS setting update)
     redfish_command:
       category: Systems
       command: CreateBiosConfigJob
+      baseuri: "{{ baseuri }}"
+      user: "{{ user }}"
+      password: "{{ password }}"
+    when: bios_attribute.changed
+
+  - name: Reboot system to apply new BIOS settings
+    redfish_command:
+      category: Systems
+      command: PowerGracefulRestart
       baseuri: "{{ baseuri }}"
       user: "{{ user }}"
       password: "{{ password }}"
