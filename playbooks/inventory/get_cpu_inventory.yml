@@ -17,7 +17,7 @@
       category: Systems
       command: GetCpuInventory
       baseuri: "{{ baseuri }}"
-      user: "{{ user}}"
+      username: "{{ username}}"
       password: "{{ password }}"
     register: result
 

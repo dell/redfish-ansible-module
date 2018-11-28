@@ -4,19 +4,17 @@
   name: Add User
   gather_facts: False
 
-  # User to add, modify or delete is defined in file group_vars/all
-
   tasks:
 
-  # When adding a user, you must enable it afterwards
+  # When adding a user, it must be enabled afterwards
   - name: Add user
     redfish_command:
       category: Accounts
       command: AddUser
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
-      password: "{{ password }}"
-      userid: "{{ userid }}"
       username: "{{ username }}"
-      userpswd: "{{ userpswd }}"
-      userrole: "{{ userrole }}"
+      password: "{{ password }}"
+      id: "{{ id }}"
+      new_username: "{{ new_username }}"
+      new_password: "{{ new_password }}"
+      roleid: "{{ roleid }}"

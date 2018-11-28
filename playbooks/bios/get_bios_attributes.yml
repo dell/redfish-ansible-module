@@ -17,7 +17,7 @@
       category: Systems
       command: GetBiosAttributes
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"
     register: result
 

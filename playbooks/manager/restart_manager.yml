@@ -11,5 +11,5 @@
       category: Manager
       command: GracefulRestart
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"

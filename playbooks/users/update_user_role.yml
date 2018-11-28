@@ -4,8 +4,6 @@
   name: Update user role
   gather_facts: False
 
-  # User to add, modify or delete is defined in file group_vars/all
-
   tasks:
 
   - name: Update user role
@@ -13,7 +11,7 @@
       category: Accounts
       command: UpdateUserRole
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"
-      userid: "{{ userid }}"
-      userrole: "{{ userrole }}"
+      id: "{{ id }}"
+      roleid: "{{ roleid }}"

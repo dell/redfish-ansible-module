@@ -4,8 +4,6 @@
   name: Enable User
   gather_facts: False
 
-  # User to add, modify or delete is defined in file group_vars/all
-
   tasks:
 
   - name: Enable user
@@ -13,6 +11,6 @@
       category: Accounts
       command: EnableUser
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"
-      userid: "{{ userid }}"
+      id: "{{ id }}"

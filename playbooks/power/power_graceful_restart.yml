@@ -11,5 +11,5 @@
       category: Systems
       command: PowerGracefulRestart
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"

@@ -13,8 +13,8 @@
     redfish_config:
       category: Manager
       command: SetManagerAttributes
-      mgr_attr_name: Time.1.Timezone
-      mgr_attr_value: "{{ timezone }}"
+      manager_attribute_name: Time.1.Timezone
+      manager_attribute_value: "{{ timezone }}"
       baseuri: "{{ baseuri }}"
-      user: "{{ user}}"
+      username: "{{ username}}"
       password: "{{ password }}"

@@ -26,10 +26,10 @@
     redfish_config:
       category: Systems
       command: SetBiosAttributes
-      bios_attr_name: "{{ attribute_name }}"
-      bios_attr_value: "{{ attribute_value }}"
+      bios_attribute_name: "{{ attribute_name }}"
+      bios_attribute_value: "{{ attribute_value }}"
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"
     register: bios_attribute
 
@@ -38,7 +38,7 @@
       category: Systems
       command: CreateBiosConfigJob
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"
     when: bios_attribute.changed
 
@@ -47,6 +47,6 @@
       category: Systems
       command: PowerGracefulRestart
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"
     when: bios_attribute.changed

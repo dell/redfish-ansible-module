@@ -11,5 +11,5 @@
       category: Systems
       command: SetBiosDefaultSettings
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"

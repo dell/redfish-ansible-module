@@ -11,5 +11,5 @@
       category: Systems
       command: PowerOn
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"

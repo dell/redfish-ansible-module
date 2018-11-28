@@ -15,9 +15,9 @@
   - name: List all users
     redfish_facts:
       category: Accounts
-      # command: ListUsers
+      command: ListUsers
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"
     register: result
 

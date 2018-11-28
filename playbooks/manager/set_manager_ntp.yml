@@ -13,20 +13,20 @@
     redfish_config:
       category: Manager
       command: SetManagerAttributes
-      mgr_attr_name: NTPConfigGroup.1.NTPEnable
-      mgr_attr_value: Enabled
+      manager_attribute_name: NTPConfigGroup.1.NTPEnable
+      manager_attribute_value: Enabled
       baseuri: "{{ baseuri }}"
-      user: "{{ user}}"
+      username: "{{ username}}"
       password: "{{ password }}"
 
   - name: Set NTP server 1 to {{ ntpserver1 }}
     redfish_config:
       category: Manager
       command: SetManagerAttributes
-      mgr_attr_name: NTPConfigGroup.1.NTP1
-      mgr_attr_value: "{{ ntpserver1 }}"
+      manager_attribute_name: NTPConfigGroup.1.NTP1
+      manager_attribute_value: "{{ ntpserver1 }}"
       baseuri: "{{ baseuri }}"
-      user: "{{ user}}"
+      username: "{{ username}}"
       password: "{{ password }}"
 
   # Add more NTP servers as needed

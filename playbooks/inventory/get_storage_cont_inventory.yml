@@ -17,7 +17,7 @@
       category: Systems
       command: GetStorageControllerInventory
       baseuri: "{{ baseuri }}"
-      user: "{{ user }}"
+      username: "{{ username }}"
       password: "{{ password }}"
     register: result
 
