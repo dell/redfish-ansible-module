@@ -30,7 +30,7 @@ app
 
 [myhosts:vars]
 # Credentials for OOB controller
-user=root
+username=root
 password=P@$$word
 
 # Local directory where all results are placed
@@ -41,7 +41,7 @@ rootdir=~/inventory_files
 host="{{inventory_hostname}}"
 
 # For managing users
-userid=3
-username=user3
-userpswd=B1g$3cr3t
-userrole=Operator
+id=3
+new_username=user3
+new_password=B1g$3cr3t
+role_id=Operator
