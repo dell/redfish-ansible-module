@@ -5,7 +5,7 @@
   gather_facts: False
 
   # Bootdevice options include: None, Pxe, Cd, Floppy, Hdd, BiosSetup,
-  # Utilities, UefiTarget & SDCard. Only work in Legacy BIOS mode
+  # Utilities, UefiTarget & SDCard. Only works in Legacy BIOS mode.
 
   vars:
     - bootdevice: Pxe
@@ -20,3 +20,13 @@
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+    register: bios_onetimeboot
+
+  - name: Reboot system
+    redfish_command:
+      category: Systems
+      command: PowerGracefulRestart
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    when: bios_onetimeboot.changed

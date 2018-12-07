@@ -13,3 +13,13 @@
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+    register: bios_default
+
+  - name: Reboot system to apply new BIOS settings
+    redfish_command:
+      category: Systems
+      command: PowerGracefulRestart
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    when: bios_default.changed

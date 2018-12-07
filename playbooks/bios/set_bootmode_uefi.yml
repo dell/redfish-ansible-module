@@ -4,9 +4,6 @@
   name: Set boot mode to UEFI and reboot
   gather_facts: False
 
-  # Updating BIOS settings requires creating a configuration job to implement,
-  # which then reboots the system if the BIOS attribute was updated. 
-
   vars:
   - attribute_name: BootMode
   - attribute_value: Uefi
@@ -24,14 +21,17 @@
       password: "{{ password }}"
     register: bios_attribute
 
-  - name: Create BIOS configuration job (schedule BIOS setting update)
-    redfish_command:
-      category: Systems
-      command: CreateBiosConfigJob
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-    when: bios_attribute.changed
+  # DELL ONLY: Updating BIOS settings requires creating a configuration
+  # job to schedule the BIOS update, so uncomment below on Dell systems.
+
+# - name: Create BIOS configuration job (schedule BIOS setting update)
+#   idrac_redfish_command:
+#     category: Systems
+#     command: CreateBiosConfigJob
+#     baseuri: "{{ baseuri }}"
+#     username: "{{ username }}"
+#     password: "{{ password }}"
+#   when: bios_attribute.changed
 
   - name: Reboot system to apply new BIOS settings
     redfish_command:
