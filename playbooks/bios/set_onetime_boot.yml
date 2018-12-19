@@ -4,8 +4,11 @@
   name: Set one-time BIOS boot device
   gather_facts: False
 
+  # ONLY WORKS IN LEGACY BIOS MODE!
+  #
   # Bootdevice options include: None, Pxe, Cd, Floppy, Hdd, BiosSetup,
-  # Utilities, UefiTarget & SDCard. Only works in Legacy BIOS mode.
+  # Utilities, UefiTarget & SDCard.
+
 
   vars:
     - bootdevice: Pxe
