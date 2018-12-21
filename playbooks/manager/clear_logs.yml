@@ -11,5 +11,5 @@
       category: Manager
       command: ClearLogs
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"

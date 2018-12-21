@@ -16,7 +16,7 @@
       manager_attribute_name: NTPConfigGroup.1.NTPEnable
       manager_attribute_value: Enabled
       baseuri: "{{ baseuri }}"
-      username: "{{ username}}"
+      user: "{{ username}}"
       password: "{{ password }}"
 
   - name: Set NTP server 1 to {{ ntpserver1 }}
@@ -26,7 +26,7 @@
       manager_attribute_name: NTPConfigGroup.1.NTP1
       manager_attribute_value: "{{ ntpserver1 }}"
       baseuri: "{{ baseuri }}"
-      username: "{{ username}}"
+      user: "{{ username}}"
       password: "{{ password }}"
 
   # Add more NTP servers as needed

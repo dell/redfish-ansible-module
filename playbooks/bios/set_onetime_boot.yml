@@ -21,7 +21,7 @@
       command: SetOneTimeBoot
       bootdevice: "{{ bootdevice }}"
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"
     register: bios_onetimeboot
 
@@ -30,6 +30,6 @@
       category: Systems
       command: PowerGracefulRestart
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"
     when: bios_onetimeboot.changed

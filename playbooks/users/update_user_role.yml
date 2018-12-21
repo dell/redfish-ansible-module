@@ -11,7 +11,7 @@
       category: Accounts
       command: UpdateUserRole
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"
-      id: "{{ id }}"
-      roleid: "{{ roleid }}"
+      userid: "{{ id }}"
+      userrole: "{{ roleid }}"

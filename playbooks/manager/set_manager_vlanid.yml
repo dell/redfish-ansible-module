@@ -16,7 +16,7 @@
       manager_attribute_name: NIC.1.VLanEnable
       manager_attribute_value: Enabled
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"
 
   - name: Set Manager's VLAN ID
@@ -26,5 +26,5 @@
       manager_attribute_name: NIC.1.VLanID
       manager_attribute_value: "{{ vlanid }}"
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"

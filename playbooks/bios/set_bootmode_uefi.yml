@@ -17,7 +17,7 @@
       bios_attribute_name: "{{ attribute_name }}"
       bios_attribute_value: "{{ attribute_value }}"
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"
     register: bios_attribute
 
@@ -29,7 +29,7 @@
 #     category: Systems
 #     command: CreateBiosConfigJob
 #     baseuri: "{{ baseuri }}"
-#     username: "{{ username }}"
+#     user: "{{ username }}"
 #     password: "{{ password }}"
 #   when: bios_attribute.changed
 
@@ -38,7 +38,7 @@
       category: Systems
       command: PowerGracefulRestart
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"
     when: bios_attribute.changed
 

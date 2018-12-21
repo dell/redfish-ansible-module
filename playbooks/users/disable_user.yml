@@ -11,6 +11,6 @@
       category: Accounts
       command: DisableUser
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"
-      id: "{{ id }}"
+      userid: "{{ id }}"

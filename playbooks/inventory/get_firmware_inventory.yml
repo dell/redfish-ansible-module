@@ -17,7 +17,7 @@
       category: Update
       command: GetFirmwareInventory
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"
     register: result
 

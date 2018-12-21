@@ -11,5 +11,5 @@
       category: Systems
       command: PowerForceOff
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"

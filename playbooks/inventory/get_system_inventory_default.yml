@@ -16,7 +16,7 @@
     redfish_facts:
       category: Systems
       baseuri: "{{ baseuri }}"
-      username: "{{ username}}"
+      user: "{{ username}}"
       password: "{{ password }}"
     register: result
 

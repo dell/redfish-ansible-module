@@ -11,7 +11,7 @@
       category: Systems
       command: SetBiosDefaultSettings
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"
     register: bios_default
 
@@ -20,6 +20,6 @@
       category: Systems
       command: PowerGracefulRestart
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"
     when: bios_default.changed

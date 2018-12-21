@@ -17,7 +17,7 @@
       category: Systems
       command: GetSystemInventory
       baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
+      user: "{{ username }}"
       password: "{{ password }}"
     register: result
 
