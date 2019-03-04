@@ -14,7 +14,7 @@
 
   - name: Get PSU Inventory
     redfish_facts:
-      category: Systems
+      category: Chassis
       command: GetPsuInventory
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
