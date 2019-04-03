@@ -1,0 +1,15 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Manage Indicator LED
+  gather_facts: False
+
+  tasks:
+
+  - name: Blink LED
+    redfish_command:
+      category: Chassis
+      command: IndicatorLedBlink
+      baseuri: "{{ baseuri }}"
+      username: "{{ username}}"
+      password: "{{ password }}"

@@ -10,7 +10,7 @@
   tasks:
 
   - name: Enable Manager's VLAN ID
-    redfish_config:
+    idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       manager_attribute_name: NIC.1.VLanEnable
@@ -20,7 +20,7 @@
       password: "{{ password }}"
 
   - name: Set Manager's VLAN ID
-    redfish_config:
+    idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       manager_attribute_name: NIC.1.VLanID

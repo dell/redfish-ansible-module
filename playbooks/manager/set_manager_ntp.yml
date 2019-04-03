@@ -5,12 +5,12 @@
   gather_facts: False
 
   vars:
-    - ntpserver1: ntp.us.dell.com
+    - ntpserver1: ntp1.us.dell.com
 
   tasks:
 
   - name: Enable NTP
-    redfish_config:
+    idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       manager_attribute_name: NTPConfigGroup.1.NTPEnable
@@ -18,9 +18,10 @@
       baseuri: "{{ baseuri }}"
       username: "{{ username}}"
       password: "{{ password }}"
+      timeout: 15
 
   - name: Set NTP server 1 to {{ ntpserver1 }}
-    redfish_config:
+    idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       manager_attribute_name: NTPConfigGroup.1.NTP1
@@ -28,6 +29,7 @@
       baseuri: "{{ baseuri }}"
       username: "{{ username}}"
       password: "{{ password }}"
+      timeout: 15
 
   # Add more NTP servers as needed
   # To get exact attributes names, run the getattributes task first

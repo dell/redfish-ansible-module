@@ -10,7 +10,7 @@
   tasks:
 
   - name: Set Manager Timezone to {{ timezone }}
-    redfish_config:
+    idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       manager_attribute_name: Time.1.Timezone
@@ -18,3 +18,4 @@
       baseuri: "{{ baseuri }}"
       username: "{{ username}}"
       password: "{{ password }}"
+      timeout: 30 

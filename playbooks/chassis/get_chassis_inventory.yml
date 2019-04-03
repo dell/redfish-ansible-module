@@ -1,25 +1,24 @@
 ---
 - hosts: myhosts
   connection: local
-  name: Get Manager attributes
+  name: Chassis Inventory 
   gather_facts: False
 
   vars:
-    datatype: ManagerAttributes
+    datatype: ChassisInventory
 
   tasks:
 
   - name: Set output file
     include_tasks: create_output_file.yml
 
-  - name: Get Manager attributes
-    idrac_redfish_facts:
-      category: Manager
-      command: GetManagerAttributes
+  - name: Get chassis Inventory
+    redfish_facts:
+      category: Chassis
+      command: GetChassisInventory
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
-      timeout: 20
     register: result
 
   - name: Copy results to output file
