@@ -9,7 +9,7 @@
   - name: Restart system power gracefully
     redfish_command:
       category: Systems
-      command: PowerGracefulRestart
+      command: PowerReboot
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"

@@ -21,22 +21,22 @@
       password: "{{ password }}"
     register: bios_attribute
 
-  # DELL ONLY: Updating BIOS settings requires creating a configuration
-  # job to schedule the BIOS update, so uncomment below on Dell systems.
+  # DELL ONLY: Updating BIOS settings requires creating a configuration job
+  # to schedule the BIOS update, so comment out below for non-Dell systems
 
-# - name: Create BIOS configuration job (schedule BIOS setting update)
-#   idrac_redfish_command:
-#     category: Systems
-#     command: CreateBiosConfigJob
-#     baseuri: "{{ baseuri }}"
-#     username: "{{ username }}"
-#     password: "{{ password }}"
-#   when: bios_attribute.changed
+  - name: Create BIOS configuration job (schedule BIOS setting update)
+    idrac_redfish_command:
+      category: Systems
+      command: CreateBiosConfigJob
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    when: bios_attribute.changed
 
   - name: Reboot system to apply new BIOS settings
     redfish_command:
       category: Systems
-      command: PowerGracefulRestart
+      command: PowerReboot
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"

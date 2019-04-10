@@ -18,7 +18,7 @@
   - name: Reboot system to apply new BIOS settings
     redfish_command:
       category: Systems
-      command: PowerGracefulRestart
+      command: PowerReboot
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
