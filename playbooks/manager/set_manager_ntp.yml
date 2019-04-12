@@ -5,7 +5,7 @@
   gather_facts: False
 
   vars:
-    - ntpserver1: ntp1.us.dell.com
+    - ntpserver1: ntp.us.dell.com
 
   tasks:
 

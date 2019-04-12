@@ -1,21 +1,21 @@
 ---
 - hosts: myhosts
   connection: local
-  name: Power Supply (PSU) Inventory
+  name: Device Firmware Inventory
   gather_facts: False
 
   vars:
-    datatype: PsuInventory
+    datatype: FirmwareUpdateCapabilities
 
   tasks:
 
-  - name: Define output file
+  - name: Set output file
     include_tasks: create_output_file.yml
 
-  - name: Get PSU Inventory
+  - name: Get Firmware Inventory
     redfish_facts:
-      category: Systems
-      command: GetPsuInventory
+      category: Update
+      command: GetFirmwareUpdateCapabilities
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
