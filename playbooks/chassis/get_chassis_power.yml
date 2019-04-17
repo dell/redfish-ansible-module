@@ -1,0 +1,27 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Chassis Power 
+  gather_facts: False
+
+  vars:
+    datatype: ChassisPower
+
+  tasks:
+
+  - name: Set output file
+    include_tasks: create_output_file.yml
+
+  - name: Get chassis power
+    redfish_facts:
+      category: Chassis
+      command: GetChassisPower
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    register: result
+
+  - name: Copy results to output file
+    copy:
+      content: "{{ result | to_nice_json }}"
+      dest: "{{ template }}.json"
