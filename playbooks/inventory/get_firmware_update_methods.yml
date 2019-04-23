@@ -1,7 +1,7 @@
 ---
 - hosts: myhosts
   connection: local
-  name: Device Firmware Inventory
+  name: Get Firmware Update Capabilities
   gather_facts: False
 
   vars:
@@ -12,7 +12,7 @@
   - name: Set output file
     include_tasks: create_output_file.yml
 
-  - name: Get Firmware Inventory
+  - name: Get Firmware Update Capabilities
     redfish_facts:
       category: Update
       command: GetFirmwareUpdateCapabilities
