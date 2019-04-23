@@ -16,6 +16,6 @@
       manager_attribute_name: Time.1.Timezone
       manager_attribute_value: "{{ timezone }}"
       baseuri: "{{ baseuri }}"
-      username: "{{ username}}"
+      username: "{{ username }}"
       password: "{{ password }}"
       timeout: 30 

@@ -1,0 +1,30 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Set Manager DNS settings
+  gather_facts: False
+
+  vars:
+    - dnsserver: 192.168.0.10
+    - dnsdomain: mydomain.com
+  tasks:
+
+  - name: Configure Static DNS Settings
+    idrac_redfish_config:
+      category: Manager
+      command: SetManagerAttributes
+      manager_attribute_name: IPv4Static.1.DNS1
+      manager_attribute_value: "{{ dnsserver }}"
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Configure Domain Name
+    idrac_redfish_config:
+      category: Manager
+      command: SetManagerAttributes
+      manager_attribute_name: NICStatic.1.DNSDomainName
+      manager_attribute_value: "{{ dnsdomain }}"
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
