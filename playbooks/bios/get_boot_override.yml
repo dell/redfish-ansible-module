@@ -1,0 +1,27 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Get Boot Override
+  gather_facts: False
+
+  vars:
+    datatype: BootOverride
+
+  tasks:
+
+  - name: Define output file
+    include_tasks: create_output_file.yml
+
+  - name: Get Boot Override information
+    redfish_facts:
+      category: Systems
+      command: GetBootOverride
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    register: result
+
+  - name: Copy results to output file
+    copy:
+      content: "{{ result | to_nice_json }}"
+      dest: "{{ template }}.json"
