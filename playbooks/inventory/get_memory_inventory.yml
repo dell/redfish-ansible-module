@@ -5,7 +5,7 @@
   gather_facts: False
 
   vars:
-    datatype: DiskInventory
+    datatype: MemoryInventory
 
   tasks:
 
