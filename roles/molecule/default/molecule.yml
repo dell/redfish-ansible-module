@@ -1,0 +1,49 @@
+---
+dependency:
+  name: galaxy
+  options:
+    requirements-file: requirements.yml
+driver:
+  name: docker
+platforms:
+  - name: jump-host
+    image: docker.io/pycontribs/centos:8
+    pre_build_image: true
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      jump-host:
+        ansible_user: root
+        idrac_address: ${IDRAC_ADDRESS}
+        idrac_user: ${IDRAC_USER:-root}
+        idrac_user_password: ${IDRAC_USER_PASSWORD:-calvin}
+        idrac_https_port: ${IDRAC_HTTPS_PORT:-443}
+        ca_cert_file: "./test_files/root-ca.pem"
+        certificate_file: "./test_files/signed-certificate.pem"
+        privatekey_file: "./test_files/private-key.pem"
+        certificate_format: "PEM"
+verifier:
+  name: ansible
+scenario:
+  check_sequence:
+    - dependency
+    - destroy
+    - create
+    - prepare
+    - converge
+    - check
+    - destroy
+  test_sequence:
+    - dependency
+    - lint
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - side_effect
+    - verify
+    - cleanup
+    - destroy

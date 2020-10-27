@@ -1,0 +1,43 @@
+---
+
+- name: Cleanup
+  hosts: all
+  gather_facts: no
+  collections:
+    - dellemc.openmanage
+  tasks:
+
+    - name: reset SSL configuration of iDRAC
+      uri:
+        url: "https://{{ idrac_address }}:{{ idrac_https_port }}/redfish/v1/Dell/Managers/iDRAC.Embedded.1/DelliDRACCardService/Actions/DelliDRACCardService.SSLResetCfg"
+        validate_certs: no
+        method: POST
+        user: "{{ idrac_user }}"
+        password: "{{ idrac_user_password }}"
+        headers:
+          Content-Type: "application/json"
+          Accept: '*/*'
+        body: '{}'
+        status_code: 200
+      delegate_to: jump-host
+
+    - name: Reset iDRAC to apply changes
+      dellemc_idrac_reset:
+        idrac_ip: "{{ idrac_address }}"
+        idrac_user: "{{ idrac_user }}"
+        idrac_password: "{{ idrac_user_password }}"
+      delegate_to: jump-host
+
+    - name: wait for idrac to go down (default timeout 300s)
+      wait_for:
+        host: "{{ idrac_address }}"
+        port: "{{ idrac_https_port }}"
+        state: stopped
+      delegate_to: jump-host
+
+    - name: wait for idrac to be reachable again (default timeout 300s)
+      wait_for:
+        host: "{{ idrac_address }}"
+        port: "{{ idrac_https_port }}"
+        state: started
+      delegate_to: jump-host

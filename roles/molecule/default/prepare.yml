@@ -1,0 +1,16 @@
+---
+
+- name: Prepare
+  hosts: all
+  gather_facts: no
+  tasks:
+
+    - name: copy python requirments
+      copy:
+        src: ../../requirements.txt
+        dest: /tmp/requirements.txt
+
+    - name: install python dependencies
+      pip:
+        requirements: /tmp/requirements.txt
+

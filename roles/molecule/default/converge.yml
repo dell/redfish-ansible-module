@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: "Include idrac_manage_ssl_certificate_wsman"
+      include_role:
+        name: "idrac_manage_ssl_certificate_wsman"
