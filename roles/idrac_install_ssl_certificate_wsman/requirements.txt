@@ -8,7 +8,7 @@ ansible==2.9.12           # via -r requirements.in
 certifi==2020.6.20        # via requests
 cffi==1.14.2              # via cryptography
 chardet==3.0.4            # via requests
-cryptography==3.0         # via ansible, pyopenssl
+cryptography==3.2         # via ansible, pyopenssl
 enum34==1.1.10            # via omsdk
 future==0.18.2            # via omsdk
 idna==2.10                # via requests

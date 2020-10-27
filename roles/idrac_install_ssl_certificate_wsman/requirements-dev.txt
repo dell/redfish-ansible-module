@@ -19,7 +19,7 @@ click-help-colors==0.8    # via molecule
 click==7.1.2              # via click-completion, click-help-colors, cookiecutter, molecule, pip-tools, python-gilt
 colorama==0.4.3           # via molecule, python-gilt
 cookiecutter==1.7.2       # via molecule
-cryptography==3.0         # via ansible, paramiko, pyopenssl
+cryptography==3.2         # via ansible, paramiko, pyopenssl
 distlib==0.3.1            # via virtualenv
 distro==1.5.0             # via selinux
 docker==4.3.1             # via -r requirements-dev.in
