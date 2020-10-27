@@ -1,0 +1,12 @@
+---
+# defaults file for idrac_manage_ssl_certificate_wsman
+
+ca_cert_file: None
+certificate_file: None
+certificate_format: PEM
+change_certificate: false
+idrac_https_port: 443
+idrac_user: root
+idrac_user_password: calvin
+pkcs12_password: None
+privatekey_file: None

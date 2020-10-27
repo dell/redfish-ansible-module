@@ -1,0 +1,124 @@
+---
+# tasks file for idrac_manage_ssl_certificate_wsman
+
+- name:  Get target SSL certificate information
+  delegate_to: jump-host
+  get_certificate:
+    host: "{{ idrac_address }}"
+    port: "{{ idrac_https_port }}"
+  register: target_certificate
+
+- name: Create temporary directory for further use
+  delegate_to: localhost
+  tempfile:
+    state: directory
+    suffix: "-certificate"
+  register: tempdir
+  changed_when: False
+
+- name: Save target SSL certificate
+  copy:
+    content: "{{ target_certificate.cert }}"
+    dest: "{{ tempdir.path }}/target-cert.pem"
+  delegate_to: localhost
+  changed_when: False
+
+- name: Parse target SSL certificate info
+  delegate_to: localhost
+  openssl_certificate_info:
+    path: "{{ tempdir.path }}/target-cert.pem"
+  register: target_certificate_info
+
+- name: Unpack PKCS12 certificate to PEM
+  delegate_to: localhost
+  openssl_pkcs12:
+    action: parse
+    src: "{{ certificate_file }}"
+    path: "{{ tempdir.path }}/unpacked-cert.pem"
+    password: "{{ pkcs12_password | or omit }}"
+    state: present
+  register: certificate_pem
+  when: certificate_format == "PKCS12"
+
+- name: Set path for pem certificate file
+  set_fact:
+    certificate_pem: "{{ certificate_file }}"
+  when: certificate_format == "PEM"
+
+- name: Set path for pem certificate file
+  set_fact:
+    certificate_pem: "{{ certificate_pem.filename }}"
+  when: certificate_format == "PKCS12"
+
+- name: Parse local SSL certificate info
+  delegate_to: localhost
+  openssl_certificate_info:
+    path: "{{ certificate_pem }}"
+  register: local_certificate_info
+
+- name: Test if certificate needs to be imported
+  set_fact:
+    change_certificate: true
+  when:
+    - target_certificate_info.public_key != local_certificate_info.public_key
+    - target_certificate_info.issuer != local_certificate_info.issuer
+    - target_certificate_info.subject != local_certificate_info.subject
+    - target_certificate_info.not_after != local_certificate_info.not_after
+    - target_certificate_info.not_before != local_certificate_info.not_before
+
+# when change is detected and only pem files available
+- name: Generate PKCS12 file from PEM
+  delegate_to: localhost
+  openssl_pkcs12:
+    action: export
+    path: "{{ tempdir.path }}/certificate.pfx"
+    privatekey_path: "{{ privatekey_file or omit }}"
+    certificate_path: "{{ certificate_file }}"
+    friendly_name: "pkcs12_certificate"
+    passphrase: "{{ pkcs12_password  or 'Passw0rd.' }}"
+    state: present
+  register: certificate_pkcs12
+  when:
+    - certificate_format == "PEM"
+    - change_certificate
+
+- name: Import certificate on iDRAC
+  delegate_to: jump-host
+  uri:
+    url: "https://{{ idrac_address }}:{{ idrac_https_port }}/wsman"
+    validate_certs: no
+    method: POST
+    user: "{{ idrac_user }}"
+    password: "{{ idrac_user_password }}"
+    headers:
+      Content-Type: "application/xml"
+    body: "{{ lookup('template', 'import_cert_template.j2') }}"
+    status_code: 200
+    return_content: yes
+  register: wsman_envelope
+  failed_when: wsman_envelope is failed or wsman_envelope.content is not search(".*<n1:MessageID>LC018</n1:MessageID>.*")
+  when: change_certificate
+
+- name: Reset iDRAC to apply changes
+  dellemc_idrac_reset:
+    idrac_ip: "{{ idrac_address }}"
+    idrac_user: "{{ idrac_user }}"
+    idrac_password: "{{ idrac_user_password }}"
+  delegate_to: jump-host
+  when: change_certificate
+
+- name: wait for idrac to go down (default timeout 300s)
+  wait_for:
+    host: "{{ idrac_address }}"
+    port: "{{ idrac_https_port }}"
+    state: stopped
+  delegate_to: jump-host
+  when: change_certificate
+
+- name: wait for idrac to be reachable again (default timeout 300s)
+  wait_for:
+    host: "{{ idrac_address }}"
+    port: "{{ idrac_https_port }}"
+    state: started
+  delegate_to: jump-host
+  when: change_certificate
