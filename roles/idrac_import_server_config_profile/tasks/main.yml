@@ -1,0 +1,107 @@
+---
+# tasks file for import server configuration profile
+
+- name: Import SCP payload
+  block:
+    - name: initialize import scp payload
+      ansible.builtin.set_fact:
+        import_scp_payload: "{{ import_scp_payload | default ({}) | combine({ item.key : item.value }, recursive=true) }}"
+      with_dict:
+        HostPowerState: "{{ host_power_state | default(host_power_state_default) }}"
+        ShutdownType: "{{ shutdown_type | default(shutdown_type_default) }}"
+        ShareParameters:
+          IgnoreCertificateWarning: "{{ share_parameters.ignore_certificate_warning | default(share_parameters_default.ignore_certificate_warning) }}"
+          ShareType: "{{ share_parameters.share_type | upper }}"
+          Target: "{{ share_parameters.target | default(share_parameters_default.target) }}"
+
+    - name: add import buffer if share type is local
+      ansible.builtin.set_fact:
+        scp_import_buffer: "{{ lookup('file', share_parameters.share_name + '/' + share_parameters.filename) | replace('\n', '') | replace('\t', '') }}"
+      when: (share_parameters.share_type | upper) == 'LOCAL'
+
+    - name: add import buffer to payload if share type is local
+      ansible.builtin.set_fact:
+        import_scp_payload: "{{ import_scp_payload | combine({ 'ImportBuffer' : scp_import_buffer }) }}"
+      when: (share_parameters.share_type | upper) == 'LOCAL'
+
+    - name: add ipaddress and filename details if share type is not local
+      ansible.builtin.set_fact:
+        import_scp_payload: "{{ import_scp_payload | combine({ item.key : item.value }, recursive=true) }}"
+      with_dict:
+        ShareParameters:
+          IPAddress: "{{ share_parameters.ipaddress }}"
+          ShareName: "{{ share_parameters.share_name }}"
+          FileName: "{{ share_parameters.filename }}"
+      when: (share_parameters.share_type | upper) != 'LOCAL'
+
+    - name: add cifs share username and password
+      ansible.builtin.set_fact:
+        import_scp_payload: "{{ import_scp_payload | combine({ item.key : item.value }, recursive=true) }}"
+      with_dict:
+        ShareParameters:
+          Username: "{{ share_parameters.username }}"
+          Password: "{{ share_parameters.password }}"
+      when:
+        - (share_parameters.share_type | upper) == 'CIFS'
+        - share_parameters.username
+        - share_parameters.password
+
+    - name: add cifs share workgroup
+      ansible.builtin.set_fact:
+        import_scp_payload: "{{ import_scp_payload | combine({ item.key : item.value }, recursive=true) }}"
+      with_dict:
+        ShareParameters:
+          Workgroup: "{{ share_parameters.workgroup }}"
+      when:
+        - share_parameters.share_type == 'CIFS'
+        - share_parameters.workgroup
+
+- name: import scp
+  ansible.builtin.uri:
+    url: "https://{{ idrac_ip }}/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration"
+    user: "{{ idrac_user }}"
+    password: "{{ idrac_password }}"
+    method: POST
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+      OData-Version: "4.0"
+    body: "{{ import_scp_payload }}"
+    body_format: "json"
+    status_code: 202
+    validate_certs: no
+    force_basic_auth: no
+  register: import_scp_response
+
+- name: get the job id
+  ansible.builtin.set_fact:
+    import_scp_job_id: "{{ import_scp_response.location.split('/')[-1] }}"
+  when:
+    - import_scp_response.location
+
+- name: loop over the job until it completes or fails
+  ansible.builtin.uri:
+    url: "https://{{ idrac_ip }}/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/{{ import_scp_job_id }}"
+    user: "{{ idrac_user }}"
+    password: "{{ idrac_password }}"
+    method: GET
+    headers:
+      Accept: "application/json"
+      OData-Version: "4.0"
+    force_basic_auth: no
+    validate_certs: no
+    status_code: 200
+  register: result
+  until: >
+    result.json['JobState'] == 'Completed' or
+    result.json['JobState'] == 'Failed'
+  changed_when: (success_messages | select('in', (result.json['Message']|lower)) | list | length) > 0
+  failed_when: (failure_messages | select('in', (result.json['Message']|lower)) | list | length) > 0
+  retries: 5
+  delay: 10
+  when:
+    - import_scp_response.location
+
+- name: import scp output
+  ansible.builtin.debug:
+    var: result.json

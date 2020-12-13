@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  gather_facts: no
+  remote_user: root
+  roles:
+    - idrac_import_server_config_profile
