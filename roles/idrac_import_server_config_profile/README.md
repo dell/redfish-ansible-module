@@ -30,7 +30,7 @@ None
 Example Playbook
 ----------------
 
-* Import server configuration profile using a file **locally**. In the following example, the server configuration profile is located at ```{{ playbook_dir }}\scp\scp.xml```
+* Import server configuration profile using a file **locally**. In the following example, the server configuration profile is located at ```{{ playbook_dir }}/scp/scp.xml```
 
   ```
        - name: import scp from a local path
