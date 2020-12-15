@@ -46,7 +46,7 @@ Example Playbook
              filename: "scp.xml"
   ```
 
-* Import server configuration profile using a file located on a **HTTPS** share. In the following playbook example, the server configuration profile is located at ```https://192.168.10.10/scp/scp.xml"
+* Import server configuration profile using a file located on a **HTTPS** share. In the following playbook example, the server configuration profile is located at ```https://192.168.10.10/scp/scp.xml```
 
   ```
        - name: import scp from a HTTPS share
