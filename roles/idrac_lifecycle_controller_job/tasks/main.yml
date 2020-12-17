@@ -1,0 +1,118 @@
+---
+# tasks file for idrac_lifecycle_controller_job
+
+- ansible.builtin.assert:
+    that:
+      - (command|lower) in (command_allowable_values|lower)
+    fail_msg: "Invalid value '{{ command }}' for argument 'command'. Valid values are {{ command_allowable_values }}."
+
+- ansible.builtin.assert:
+    that:
+      - job_id
+    fail_msg: "'job_id' is a mandatory argument when 'command' is '{{ command }}'"
+  when: (command|lower) == "info" or (command|lower) == "delete"
+
+- name: get the job info
+  ansible.builtin.uri:
+    url: "https://{{ idrac_ip }}/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/{{ job_id }}"
+    validate_certs: no
+    user: "{{ idrac_user }}"
+    password: "{{ idrac_password }}"
+    method: GET
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+      OData-Version: "4.0"
+    status_code: 200
+    force_basic_auth: no
+  register: job_info_response
+  when:
+    - job_id
+    - (command | lower) == "info"
+
+- name: get the job info
+  ansible.builtin.debug:
+    var: job_info_response.json
+  when:
+    - job_id
+    - (command | lower) == "info"
+
+- name: delete job
+  ansible.builtin.uri:
+    url: "https://{{ idrac_ip }}/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/{{ job_id }}"
+    validate_certs: no
+    user: "{{ idrac_user }}"
+    password: "{{ idrac_password }}"
+    method: DELETE
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+      OData-Version: "4.0"
+    status_code: 200
+    force_basic_auth: no
+  register: delete_job_response
+  changed_when: delete_job_response.status == 200
+  when:
+    - job_id
+    - (command|lower) == "delete"
+
+- name: delete job response
+  ansible.builtin.debug:
+    var: delete_job_response.json
+  when:
+    - job_id
+    - (command|lower) == "delete"
+
+- name: delete job queue
+  ansible.builtin.uri:
+    url: "https://{{ idrac_ip }}/redfish/v1/Dell/Managers/iDRAC.Embedded.1/DellJobService/Actions/DellJobService.DeleteJobQueue"
+    validate_certs: no
+    user: "{{ idrac_user }}"
+    password: "{{ idrac_password }}"
+    method: POST
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+      OData-Version: "4.0"
+    body:
+      "JobID": "JID_CLEARALL"
+    body_format: "json"
+    status_code: 200
+    force_basic_auth: no
+  register: delete_job_queue_response
+  changed_when: delete_job_queue_response.status == 200
+  when:
+    - (command|lower) == "deletejobqueue"
+
+- name: delete job queue response
+  ansible.builtin.debug:
+    var: delete_job_queue_response.json
+  when:
+    - (command|lower) == "deletejobqueue"
+
+- name: delete job queue force
+  ansible.builtin.uri:
+    url: "https://{{ idrac_ip }}/redfish/v1/Dell/Managers/iDRAC.Embedded.1/DellJobService/Actions/DellJobService.DeleteJobQueue"
+    validate_certs: no
+    user: "{{ idrac_user }}"
+    password: "{{ idrac_password }}"
+    method: POST
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+      OData-Version: "4.0"
+    body:
+      "JobID": "JID_CLEARALL_FORCE"
+    body_format: "json"
+    status_code: 200
+    force_basic_auth: no
+  register: delete_job_queue_response
+  changed_when: delete_job_queue_response.status == 200
+  when:
+    - (command|lower) == "deletejobqueueforce"
+
+- name: delete job queue response
+  ansible.builtin.debug:
+    var: delete_job_queue_response.json
+  when:
+    - (command|lower) == "deletejobqueueforce"
