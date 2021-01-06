@@ -18,7 +18,7 @@ Role Variables
 | idrac_user | yes | str | None | "admin" | iDRAC user with privileges to import the server configuration profile |
 | idrac_password | yes | str | None | "Passw0rd" | iDRAC user password |
 | job_id | no | str | None | 'JID_082547249914' | Job ID.<br/>I(job_id) is mandatory if I(command) is either C(Info) or C(Delete). |
-| command | no | str | <ul><li>'Info' *(default)*</li><li>'Delete'</li><li>'DeleteJobQueue'</li><li>'DeleteJobQueueForce'</li></ul> | 'Info' | <ul><li>'Info' - get the lifecycle controller job info for a Job ID</li><li>'Delete' - delete the lifecycle controller job for a job ID</li><li>'DeleteJobQueue' - clear the lifecycle controller job queue</li><li>'DeleteJobQueueForce' - force clear the lifecycle controller job queue</li></ul> |
+| command | no | str | <ul><li>'Info' *(default)*</li><li>'Delete'</li><li>'DeleteJobQueue'</li><li>'DeleteJobQueueForce'</li></ul> | 'Info' | <ul><li>'Info' - get the lifecycle controller job info for a Job ID</li><li>'Delete' - delete the lifecycle controller job for a job ID</li><li>'DeleteJobQueue' - clear the lifecycle controller job queue</li><li>'DeleteJobQueueForce' - force clear the lifecycle controller job queue. This also restarts the Lifecycle Controller services, so please make sure that Lifecycle Controller is in "Ready" state before you run any further tasks on iDRAC. </li></ul> |
 
 Dependencies
 ------------
