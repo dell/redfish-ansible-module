@@ -5,6 +5,7 @@
 idrac_ip: ""
 idrac_user: ""
 idrac_password: ""
+idrac_https_port: "{{ idrac_https_port_default }}"
 
 job_id: ""
 
@@ -12,6 +13,7 @@ command: "{{ command_default }}"
 
 # default - don't modify
 command_default: "Info"
+idrac_https_port_default: "443"
 
 # Allowable values - don't modify
 command_allowable_values: ["Info", "Delete", "DeleteJobQueue", "DeleteJobQueueForce"]
