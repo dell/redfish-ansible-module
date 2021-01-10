@@ -1,0 +1,38 @@
+---
+# defaults file for idrac_lifecycle_controller_status
+
+idrac_ip: ""
+idrac_user: ""
+idrac_password: ""
+idrac_https_port: "{{ idrac_https_port_default }}"
+
+
+# default - don't modify
+idrac_https_port_default: 443
+
+GetRemoteServicesAPIStatus_Code:
+  Status:
+    "0": "Ready"
+    "1": "Not Ready"
+  LCStatus:
+    "0": "Ready"
+    "1": "Not Initialized"
+    "2": "Reloading Data"
+    "3": "Disabled"
+    "4": "In Recovery"
+    "5": "In Use"
+    "U": "Unknown"
+  RTStatus:
+    "0": "Ready"
+    "1": "Not Ready"
+  ServerStatus:
+    "0": "Powered Off"
+    "1": "In POST"
+    "2": "Out of POST"
+    "3": "Collecting System Inventory"
+    "4": "Automated Task Execution"
+    "5": "Lifecycle Controller Unified Server Configurator"
+    "6": "Unknown"
+    "7": "Unknown"
+    "8": "Unknown"
+    "9": "Unknown"
