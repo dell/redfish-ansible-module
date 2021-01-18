@@ -1,0 +1,70 @@
+---
+
+- name: Reset SSL config for iDRAC9
+  ansible.builtin.uri:
+    url: "https://{{ idrac_ip }}/redfish/v1/Dell/Managers/iDRAC.Embedded.1/DelliDRACCardService/Actions/DelliDRACCardService.SSLResetCfg"
+    validate_certs: no
+    method: POST
+    user: "{{ idrac_user }}"
+    password: "{{ idrac_password }}"
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+      OData-Version: "4.0"
+    body: "{}"
+    body_format: "json"
+    status_code: 200
+    return_content: yes
+  register: result
+  when: idrac_firmware_version is version('3.30', '>')
+  delegate_to: localhost
+  tags:
+    - "{{ command }}"
+
+- name: parse the reset SSL config response for iDRAC9
+  ansible.builtin.set_fact:
+    sslresetcfg_response: "{{ result.json }}"
+  when: idrac_firmware_version is version('3.30', '>')
+  tags:
+    - "{{ command }}"
+
+- name: reset SSL config for iDRAC7/8
+  block:
+    - name: reset SSL config for iDRAC7/8
+      ansible.builtin.uri:
+        url: "https://{{ idrac_ip }}:{{ idrac_https_port }}/wsman"
+        validate_certs: no
+        method: POST
+        user: "{{ idrac_user }}"
+        password: "{{ idrac_password }}"
+        headers:
+          Content-Type: "application/xml"
+        body: "{{ lookup('ansible.builtin.template', 'idrac_ssl_reset_cfg_template.j2') }}"
+        status_code: 200
+        return_content: yes
+      register: wsman_envelope
+      delegate_to: localhost
+
+    - name: parse the reset SSL config response for iDRAC7/8
+      ansible.builtin.set_fact:
+        sslresetcfg_response: "{{ sslresetcfg_response | default({}) | combine({ item.key : item.value }, recursive=true) }}"
+      with_dict:
+        Message: "{{ wsman_envelope.content | trim | regex_findall('(?<=<n1:Message>).*(?=<\/n1:Message>)') | first }}"
+        MessageID: "{{ wsman_envelope.content | trim | regex_findall('(?<=<n1:MessageID>).*(?=<\/n1:MessageID>)') | first }}"
+        ReturnValue: "{{ wsman_envelope.content | trim | regex_findall('(?<=<n1:ReturnValue>).*(?=<\/n1:ReturnValue>)') | first }}"
+
+    - name: fail if reset ssl config response is unsuccessful
+      ansible.builtin.fail:
+        msg:
+          - "Reset SSL config request failed!"
+          - "{{ sslresetcfg_response }}"
+      when:
+        - not wsman_envelope.content is search(".*<n1:MessageID>(RAC070|DH010)</n1:MessageID>.*")
+
+  when: idrac_firmware_version is version('3.30', '<')
+  tags:
+    - "{{ command }}"
+
+- name: print the reset ssl config response
+  ansible.builtin.debug:
+    var: sslresetcfg_response

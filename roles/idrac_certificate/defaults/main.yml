@@ -1,0 +1,36 @@
+---
+# defaults file for idrac_certificate
+
+# idrac hostname/IP and credentials
+idrac_ip: ""
+idrac_user: ""
+idrac_password: ""
+
+# variables - common
+command: "{{ idrac_certificate_command_default }}"
+
+# variables - import/export ssl certificate
+ssl_cert_type: "{{ ssl_cert_type_default }}"
+ssl_cert_file: ""
+
+# variable - generate csr
+csr_file: "{{ csr_file_default }}"
+
+# Default - don't modify
+# default - common
+idrac_certificate_command_default: "Info"
+
+# default - import/export ssl certificate
+ssl_cert_type_default: "Server"
+
+# default - generate csr
+csr_file_default: "{{ [idrac_ip, 'csr'] | join('.') }}"
+
+# Allowable values - don't modify
+idrac_certificate_command_allowable_values: ["Info", "GenerateSSLCSR", "ImportSSLCertificate", "ExportSSLCertificate", "SSLResetCfg"]
+
+ssl_cert_type_allowable_values:
+  "Server": 1
+  "CA": 2
+  "CSC": 3
+  "ClientTrustCertificate": 4
