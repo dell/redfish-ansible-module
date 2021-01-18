@@ -1,0 +1,20 @@
+---
+# tasks file for idrac_facts
+
+
+- name: get idrac firmware version
+  ansible.builtin.uri:
+    url: "https://{{ idrac_ip }}/redfish/v1/Managers/iDRAC.Embedded.1"
+    user: "{{ idrac_user }}"
+    password: "{{ idrac_password }}"
+    method: GET
+    headers:
+      accept: "application/json"
+      OData-Version: "4.0"
+    force_basic_auth: no
+    validate_certs: no
+  register: result
+  delegate_to: localhost
+
+- ansible.builtin.set_fact:
+    idrac_firmware_version: "{{ result.json.FirmwareVersion }}"
