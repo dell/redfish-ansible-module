@@ -4,74 +4,196 @@
 #
 #    pip-compile requirements-dev.in
 #
-ansible==2.9.12           # via -r requirements-dev.in, molecule
-appdirs==1.4.4            # via virtualenv
-arrow==0.16.0             # via jinja2-time
-bcrypt==3.2.0             # via paramiko
-binaryornot==0.4.4        # via cookiecutter
-cerberus==1.3.2           # via molecule
-certifi==2020.6.20        # via requests
-cffi==1.14.2              # via bcrypt, cryptography, pynacl
-cfgv==3.2.0               # via pre-commit
-chardet==3.0.4            # via binaryornot, requests
-click-completion==0.5.2   # via molecule
-click-help-colors==0.8    # via molecule
-click==7.1.2              # via click-completion, click-help-colors, cookiecutter, molecule, pip-tools, python-gilt
-colorama==0.4.3           # via molecule, python-gilt
-cookiecutter==1.7.2       # via molecule
-cryptography==3.2         # via ansible, paramiko, pyopenssl
-distlib==0.3.1            # via virtualenv
-distro==1.5.0             # via selinux
-docker==4.3.1             # via -r requirements-dev.in
-enum34==1.1.10            # via omsdk
-fasteners==0.15           # via python-gilt
-filelock==3.0.12          # via virtualenv
-future==0.18.2            # via omsdk
-identify==1.4.28          # via pre-commit
-idna==2.10                # via requests
-ipaddress==1.0.23         # via omsdk
-jinja2-time==0.2.0        # via cookiecutter
-jinja2==2.11.2            # via ansible, click-completion, cookiecutter, jinja2-time, molecule
-markupsafe==1.1.1         # via cookiecutter, jinja2
-molecule==3.0.8           # via -r requirements-dev.in
-monotonic==1.5            # via fasteners
-nodeenv==1.4.0            # via pre-commit
-omsdk==1.2.445            # via -r requirements-dev.in
-paramiko==2.7.1           # via molecule
-pathspec==0.8.0           # via yamllint
-pexpect==4.8.0            # via molecule
-pip-tools==5.3.1          # via -r requirements-dev.in
-pluggy==0.13.1            # via molecule
-ply==3.11                 # via pysmi
-poyo==0.5.0               # via cookiecutter
-pre-commit==2.6.0         # via -r requirements-dev.in
-ptyprocess==0.6.0         # via pexpect
-pyasn1==0.4.8             # via pysnmp
-pycparser==2.20           # via cffi
-pycryptodomex==3.9.8      # via pysnmp
-pynacl==1.4.0             # via paramiko
-pyopenssl==19.1.0         # via -r requirements-dev.in
-pysmi==0.3.4              # via pysnmp
-pysnmp-mibs==0.1.6        # via omsdk
-pysnmp==4.4.12            # via pysnmp-mibs
-python-dateutil==2.8.1    # via arrow
-python-gilt==1.2.3        # via molecule
-python-slugify==4.0.1     # via cookiecutter
-python-version==0.0.2     # via omsdk
-pyyaml==5.3.1             # via ansible, molecule, omsdk, pre-commit, python-gilt, yamllint
-requests==2.24.0          # via cookiecutter, docker, omsdk
-selinux==0.2.1            # via molecule
-sh==1.13.1                # via molecule, python-gilt
-shellingham==1.3.2        # via click-completion
-six==1.15.0               # via bcrypt, click-completion, cookiecutter, cryptography, docker, fasteners, pip-tools, pynacl, pyopenssl, python-dateutil, virtualenv, websocket-client
-tabulate==0.8.7           # via molecule
-text-unidecode==1.3       # via python-slugify
-toml==0.10.1              # via pre-commit
-tree-format==0.1.2        # via molecule
-urllib3==1.25.10          # via requests
-virtualenv==20.0.30       # via pre-commit
-websocket-client==0.57.0  # via docker
-yamllint==1.24.2          # via molecule
+ansible-base==2.10.7
+    # via ansible
+ansible==2.10.0
+    # via
+    #   -r requirements-dev.in
+    #   molecule
+appdirs==1.4.4
+    # via virtualenv
+arrow==0.16.0
+    # via jinja2-time
+bcrypt==3.2.0
+    # via paramiko
+binaryornot==0.4.4
+    # via cookiecutter
+cerberus==1.3.2
+    # via molecule
+certifi==2020.6.20
+    # via requests
+cffi==1.14.2
+    # via
+    #   bcrypt
+    #   cryptography
+    #   pynacl
+cfgv==3.2.0
+    # via pre-commit
+chardet==3.0.4
+    # via
+    #   binaryornot
+    #   requests
+click-completion==0.5.2
+    # via molecule
+click-help-colors==0.8
+    # via molecule
+click==7.1.2
+    # via
+    #   click-completion
+    #   click-help-colors
+    #   cookiecutter
+    #   molecule
+    #   pip-tools
+    #   python-gilt
+colorama==0.4.3
+    # via
+    #   molecule
+    #   python-gilt
+cookiecutter==1.7.2
+    # via molecule
+cryptography==3.2
+    # via
+    #   ansible-base
+    #   paramiko
+    #   pyopenssl
+distlib==0.3.1
+    # via virtualenv
+distro==1.5.0
+    # via selinux
+docker==4.3.1
+    # via -r requirements-dev.in
+enum34==1.1.10
+    # via omsdk
+fasteners==0.15
+    # via python-gilt
+filelock==3.0.12
+    # via virtualenv
+future==0.18.2
+    # via omsdk
+identify==1.4.28
+    # via pre-commit
+idna==2.10
+    # via requests
+ipaddress==1.0.23
+    # via omsdk
+jinja2-time==0.2.0
+    # via cookiecutter
+jinja2==2.11.2
+    # via
+    #   ansible-base
+    #   click-completion
+    #   cookiecutter
+    #   jinja2-time
+    #   molecule
+markupsafe==1.1.1
+    # via
+    #   cookiecutter
+    #   jinja2
+molecule==3.0.8
+    # via -r requirements-dev.in
+monotonic==1.5
+    # via fasteners
+nodeenv==1.4.0
+    # via pre-commit
+omsdk==1.2.445
+    # via -r requirements-dev.in
+packaging==20.9
+    # via ansible-base
+paramiko==2.7.1
+    # via molecule
+pathspec==0.8.0
+    # via yamllint
+pexpect==4.8.0
+    # via molecule
+pip-tools==5.3.1
+    # via -r requirements-dev.in
+pluggy==0.13.1
+    # via molecule
+ply==3.11
+    # via pysmi
+poyo==0.5.0
+    # via cookiecutter
+pre-commit==2.6.0
+    # via -r requirements-dev.in
+ptyprocess==0.6.0
+    # via pexpect
+pyasn1==0.4.8
+    # via pysnmp
+pycparser==2.20
+    # via cffi
+pycryptodomex==3.9.8
+    # via pysnmp
+pynacl==1.4.0
+    # via paramiko
+pyopenssl==19.1.0
+    # via -r requirements-dev.in
+pyparsing==2.4.7
+    # via packaging
+pysmi==0.3.4
+    # via pysnmp
+pysnmp-mibs==0.1.6
+    # via omsdk
+pysnmp==4.4.12
+    # via pysnmp-mibs
+python-dateutil==2.8.1
+    # via arrow
+python-gilt==1.2.3
+    # via molecule
+python-slugify==4.0.1
+    # via cookiecutter
+python-version==0.0.2
+    # via omsdk
+pyyaml==5.3.1
+    # via
+    #   ansible-base
+    #   molecule
+    #   omsdk
+    #   pre-commit
+    #   python-gilt
+    #   yamllint
+requests==2.24.0
+    # via
+    #   cookiecutter
+    #   docker
+    #   omsdk
+selinux==0.2.1
+    # via molecule
+sh==1.13.1
+    # via
+    #   molecule
+    #   python-gilt
+shellingham==1.3.2
+    # via click-completion
+six==1.15.0
+    # via
+    #   bcrypt
+    #   click-completion
+    #   cookiecutter
+    #   cryptography
+    #   docker
+    #   fasteners
+    #   pip-tools
+    #   pynacl
+    #   pyopenssl
+    #   python-dateutil
+    #   virtualenv
+    #   websocket-client
+tabulate==0.8.7
+    # via molecule
+text-unidecode==1.3
+    # via python-slugify
+toml==0.10.1
+    # via pre-commit
+tree-format==0.1.2
+    # via molecule
+urllib3==1.25.10
+    # via requests
+virtualenv==20.0.30
+    # via pre-commit
+websocket-client==0.57.0
+    # via docker
+yamllint==1.24.2
+    # via molecule
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
