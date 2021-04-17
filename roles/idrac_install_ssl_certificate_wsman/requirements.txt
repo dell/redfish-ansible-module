@@ -4,28 +4,65 @@
 #
 #    pip-compile requirements.in
 #
-ansible==2.9.12           # via -r requirements.in
-certifi==2020.6.20        # via requests
-cffi==1.14.2              # via cryptography
-chardet==3.0.4            # via requests
-cryptography==3.2         # via ansible, pyopenssl
-enum34==1.1.10            # via omsdk
-future==0.18.2            # via omsdk
-idna==2.10                # via requests
-ipaddress==1.0.23         # via omsdk
-jinja2==2.11.2            # via ansible
-markupsafe==1.1.1         # via jinja2
-omsdk==1.2.445            # via -r requirements.in
-ply==3.11                 # via pysmi
-pyasn1==0.4.8             # via pysnmp
-pycparser==2.20           # via cffi
-pycryptodomex==3.9.8      # via pysnmp
-pyopenssl==19.1.0         # via -r requirements.in
-pysmi==0.3.4              # via pysnmp
-pysnmp-mibs==0.1.6        # via omsdk
-pysnmp==4.4.12            # via pysnmp-mibs
-python-version==0.0.2     # via omsdk
-pyyaml==5.3.1             # via ansible, omsdk
-requests==2.24.0          # via omsdk
-six==1.15.0               # via cryptography, pyopenssl
-urllib3==1.25.10          # via requests
+ansible-base==2.10.7
+    # via ansible
+ansible==2.10.0
+    # via -r requirements.in
+certifi==2020.6.20
+    # via requests
+cffi==1.14.2
+    # via cryptography
+chardet==3.0.4
+    # via requests
+cryptography==3.2
+    # via
+    #   ansible-base
+    #   pyopenssl
+enum34==1.1.10
+    # via omsdk
+future==0.18.2
+    # via omsdk
+idna==2.10
+    # via requests
+ipaddress==1.0.23
+    # via omsdk
+jinja2==2.11.2
+    # via ansible-base
+markupsafe==1.1.1
+    # via jinja2
+omsdk==1.2.445
+    # via -r requirements.in
+packaging==20.9
+    # via ansible-base
+ply==3.11
+    # via pysmi
+pyasn1==0.4.8
+    # via pysnmp
+pycparser==2.20
+    # via cffi
+pycryptodomex==3.9.8
+    # via pysnmp
+pyopenssl==19.1.0
+    # via -r requirements.in
+pyparsing==2.4.7
+    # via packaging
+pysmi==0.3.4
+    # via pysnmp
+pysnmp-mibs==0.1.6
+    # via omsdk
+pysnmp==4.4.12
+    # via pysnmp-mibs
+python-version==0.0.2
+    # via omsdk
+pyyaml==5.3.1
+    # via
+    #   ansible-base
+    #   omsdk
+requests==2.24.0
+    # via omsdk
+six==1.15.0
+    # via
+    #   cryptography
+    #   pyopenssl
+urllib3==1.25.10
+    # via requests
