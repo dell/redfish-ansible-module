@@ -1,7 +1,9 @@
 idrac_import_server_config_profile
 =========
 
-Role to import a server configuration profile (SCP) file (xml or json) from a local path or a remote network share (NFS, CIFS, HTTP, HTTPS) using iDRACs (iDRAC7/8 and iDRAC9 only) for Dell EMC PowerEdge servers.
+Role to import a server configuration profile (SCP) using iDRACs (iDRAC7/8 and iDRAC9 only) for Dell EMC PowerEdge servers from:
+  - a SCP file (in xml or json format) from a local path or a remote network share (NFS, CIFS, HTTP, HTTPS), OR
+  - an Import Buffer containing the server configuration profile content string
 
 Requirements
 ------------
@@ -18,6 +20,7 @@ Role Variables
 | idrac_user | yes | str | None | "admin" | iDRAC user with privileges to import the server configuration profile |
 | idrac_password | yes | str | None | "Passw0rd" | iDRAC user password |
 | share_parameters | yes | dict | None | {</br>  "ipaddress": "192.168.20.20",</br>  "share_type": "HTTPS",</br>  "share_name": "scp",</br>  "filename": "scp.xml",</br>  "target": "ALL",</br>  "ignore_certificate_warning": "Enabled"</br>} | Share parameters:</br><ul><li>*ipaddress*:<ul><li>Required: no</li><li>Description: IP address of network share (for CIFS, NFS, HTTP and HTTPS only)</li></ul></li><li>*share_name*:<ul><li>Required: no</li><li>Description: network share name</li></ul></li><li>*share_type*:<ul><li>Required: yes</li><li>Choice: [LOCAL, CIFS, NFS, HTTP, HTTPS]</li></ul></li><li>*filename*:<ul><li>Required: yes</li><li>Description: File name for the SCP</li></ul></li><li>*username*:<ul><li>Required: no</li><li>Description: User name to log on to the share (for CIFS share only)</li></ul></li><li>*password*:<ul><li>Required: no</li><li>Description: Password to log on to the share (for CIFS share only)</li></ul></li><li>*workgroup*:<ul><li>Required: no</li><li>Description: Workgroup name to log on to the share</li></ul></li><li>*target*:<ul><li>Required: no</li><li>Description: SCP target components</li><li>Choices: ['ALL', 'IDRAC', 'BIOS', 'NIC', 'RAID']. Default is 'ALL'</li></ul></li><li>*ignore_certificate_warning*:<ul><li>Required: no</li><li>Description: ignore certificate warning</li><li>Choice: ['Enabled', 'Disabled']. Default is 'Enabled'</li></ul></li></ul> |
+| import_buffer | no | str | None | <pre lang=python>"<SystemConfiguration><Component FQDD=\"iDRAC.Embedded.1\"><Attribute Name=\"NIC.1#DNSDomainName\">acme.com</Attribute><Attribute Name=\"NIC.1#DNSRacName\">idrac-ABCDEF</Attribute></Component></SystemConfiguration>"</pre> | SCP content buffer. ```share_parameters.share_type``` must be set to ```LOCAL```. This is mutually exclusive with ```share_parameters.filename``` |
 | host_power_state | no | str  | <ul><li>'On' *(default)*</li><li>'Off'</li> | 'On' | Host power state after import of server configuration profile |
 | shutdown_type | no | str  | <ul><li>'Graceful' *(default)*</li><li>'Forced'</li><li>'NoReboot"</li></ul> | 'Graceful' | Server shutdown type |
 
@@ -99,8 +102,23 @@ Example Playbook
              password: "{{ cifs_share_password }}"
   ```
 
+* Import server configuration profile using an import buffer.
+
+  ```
+       - name: import scp from a CIFS share
+         include_role:
+           name: idrac_import_server_config_profile
+         vars:
+           idrac_ip: "{{ inventory_hostname }}"
+           idrac_user: "{{ user }}"
+           idrac_password: "{{ password }}"
+           share_parameters:
+             share_type: "LOCAL"
+           import_buffer: "<SystemConfiguration><Component FQDD=\"iDRAC.Embedded.1\"><Attribute Name=\"NIC.1#DNSDomainName\">acme.com</Attribute><Attribute Name=\"NIC.1#DNSRacName\">idrac-ABCDEF</Attribute></Component></SystemConfiguration>"
+  ```
+
 Author Information
 ------------------
 
 Anupam Aloke ([@anupamaloke](https://github.com/anupamaloke))
-Dell Technologies &copy;2020
+Dell Technologies &copy;2021

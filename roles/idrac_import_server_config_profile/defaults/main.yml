@@ -21,6 +21,9 @@ share_parameters:
   target: "{{ share_parameters_default.target }}"
   ignore_certificate_warning: "{{ share_parameters_default.ignore_certificate_warning }}"
 
+idrac_import_scp_validate_certs: "{{ idrac_import_scp_validate_certs_default }}"
+idrac_import_scp_force_basic_auth: "{{ idrac_import_scp_force_basic_auth_default }}"
+
 # Default - don't modify
 time_to_wait_min: 300
 time_to_wait_max: 3600
@@ -31,6 +34,8 @@ share_parameters_default:
   target: "ALL"
   ignore_certificate_warning: "Enabled"
   share_type_default: "LOCAL"
+idrac_import_scp_validate_certs_default: no
+idrac_import_scp_force_basic_auth_default: yes
 
 # Allowable values - don't modify
 shutdown_type_allow_values: ["Graceful", "Forced", "NoReboot"]

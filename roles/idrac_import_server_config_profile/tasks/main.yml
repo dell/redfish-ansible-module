@@ -1,7 +1,94 @@
 ---
 # tasks file for import server configuration profile
 
-- name: Import SCP payload
+- ansible.builtin.assert:
+    that:
+      - idrac_ip
+      - idrac_user
+      - idrac_password
+    fail_msg: "'idrac_ip', 'idrac_user', and 'idrac_password' are mandatory arguments."
+
+- ansible.builtin.assert:
+    that:
+      - share_parameters.share_type
+      - (share_parameters.share_type|lower) in (share_type_allow_values|lower)
+    fail_msg: "Invalid share type '{{ share_parameters.share_type }}'. Valid values are {{ share_type_allow_values }}."
+
+- ansible.builtin.assert:
+    that:
+      - (share_parameters.target|lower) in (target_allow_values|lower)
+    fail_msg: "Invalid target '{{ share_parameters.target }}'. Valid values are {{ target_allow_values }}."
+  when: "'target' in share_parameters.keys()"
+
+- ansible.builtin.assert:
+    that:
+      - (host_power_state|lower) in (host_power_state_allow_values|lower)
+    fail_msg: "Invalid host power state '{{ host_power_state }}'. Valid values are {{ host_power_state_allow_values }}."
+  when: host_power_state
+
+- ansible.builtin.assert:
+    that:
+      - (shutdown_type|lower) in (shutdown_type_allow_values|lower)
+    fail_msg: "Invalid shutdown type '{{ shutdown_type }}'. Valid values are {{ shutdown_type_allow_values }}."
+  when: shutdown_type
+
+- ansible.builtin.assert:
+    that:
+      - (share_parameters.filename is defined and share_parameters.filename|length) > 0 or (import_buffer is defined and import_buffer|length > 0)
+    fail_msg: "Missing required arguments. Either 'share_parameters.filename' or 'import_buffer' must be defined."
+
+- name: Read SCP file contents into import buffer when share type is local
+  block:
+    - name: assert if share name is not defined
+      ansible.builtin.assert:
+        that:
+          - "'share_name' in share_parameters.keys()"
+          - share_parameters.share_name
+        fail_msg: "share_parameters.share_name is undefined."
+
+    - name: checking whether the SCP file exists
+      ansible.builtin.stat:
+        path: "{{ (share_parameters.share_name, share_parameters.filename) | path_join }}"
+      register: result
+
+    - name: assert if the SCP file does not exist 
+      ansible.builtin.assert:
+        that: result.stat.exists
+        fail_msg: "file '{{ (share_parameters.share_name, share_parameters.filename) | path_join }}' does not exist. Please check the file name and the path."
+
+    - name: assert if the SCP file extension is neither XML nor JSON
+      ansible.builtin.assert:
+        that:
+          - (share_parameters.filename | splitext | last | lower) in ['.xml', '.json']
+        fail_msg: "Invalid SCP file extension. Must be either XML or JSON."
+
+    - name: read and stringify SCP XML file content
+      ansible.builtin.set_fact:
+        scp_import_buffer: "{{ lookup('file', ( (share_parameters.share_name, share_parameters.filename) | path_join) ) | regex_replace('[\n\t]', '') }}"
+      when: (share_parameters.filename | splitext | last | lower) == '.xml'
+
+    - name: read and stringify SCP JSON file content
+      ansible.builtin.set_fact:
+        scp_import_buffer: "{{ lookup('file', ( (share_parameters.share_name, share_parameters.filename) | path_join) ) | regex_replace('[\n\t]', '') | string }}"
+      when: (share_parameters.filename | splitext | last | lower) == '.json'
+
+    - name: read and stringify SCP JSON file content
+      ansible.builtin.set_fact:
+        scp_import_buffer: "{{ scp_import_buffer | to_json }}"
+      when: (share_parameters.filename | splitext | last | lower) == '.json'
+
+  when:
+    - (share_parameters.filename) is defined
+    - (share_parameters.filename|length) > 0
+    - (import_buffer) is not defined or (import_buffer|length) <= 0
+
+- name: Read import buffer string if provided as an argument
+  ansible.builtin.set_fact:
+    scp_import_buffer: "{{ import_buffer }}"
+  when:
+    - (import_buffer is defined) and  (import_buffer|length) > 0
+
+- name: Create import SCP payload
   block:
     - name: initialize import scp payload
       ansible.builtin.set_fact:
@@ -13,11 +100,6 @@
           IgnoreCertificateWarning: "{{ share_parameters.ignore_certificate_warning | default(share_parameters_default.ignore_certificate_warning) }}"
           ShareType: "{{ share_parameters.share_type | upper }}"
           Target: "{{ share_parameters.target | default(share_parameters_default.target) }}"
-
-    - name: add import buffer if share type is local
-      ansible.builtin.set_fact:
-        scp_import_buffer: "{{ lookup('file', share_parameters.share_name + '/' + share_parameters.filename) | replace('\n', '') | replace('\t', '') }}"
-      when: (share_parameters.share_type | upper) == 'LOCAL'
 
     - name: add import buffer to payload if share type is local
       ansible.builtin.set_fact:
@@ -69,11 +151,11 @@
     body: "{{ import_scp_payload }}"
     body_format: "json"
     status_code: 202
-    validate_certs: no
-    force_basic_auth: no
+    validate_certs: "{{ idrac_import_scp_validate_certs }}"
+    force_basic_auth: "{{ idrac_import_scp_force_basic_auth }}"
   register: import_scp_response
 
-- name: get the job id
+- name: get the import scp job id
   ansible.builtin.set_fact:
     import_scp_job_id: "{{ import_scp_response.location.split('/')[-1] }}"
   when:
