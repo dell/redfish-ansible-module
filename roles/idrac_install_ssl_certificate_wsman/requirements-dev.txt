@@ -6,7 +6,7 @@
 #
 ansible-base==2.10.7
     # via ansible
-ansible==2.10.0
+ansible==2.10.7
     # via
     #   -r requirements-dev.in
     #   molecule
