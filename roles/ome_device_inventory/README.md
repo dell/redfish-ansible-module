@@ -8,8 +8,19 @@ Role to run the inventory task for a device (servers, chassis, I/O modules etc.)
 
 Requirements
 ------------
-- ansible >= 2.9
+- Ansible >= 2.9
+- Jinja2 >= 2.10
 - OpenManage Enterprise >= 3.5
+- You must set the ```ANSIBLE_JINJA2_NATIVE``` environment variable to ```true``` before using this role. There are two ways in which you can set it. See [Ansible Documentation](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#default-jinja2-native) for more details.
+  - **Using Environment Variable**
+    ```
+    $ export ANSIBLE_JINJA2_NATIVE=true
+    ```
+  - **ansible.cfg**: 
+Open your ```ansible.cfg``` file in an editor and add the following key in the ```[defaults]``` section:
+    ```
+    jinja2_native=true
+    ```
 
 Role Variables
 --------------
