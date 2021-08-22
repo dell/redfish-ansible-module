@@ -42,12 +42,9 @@
   delegate_to: localhost
   register: ome_device_info
 
-- name: "End play if no devices are present in the group {{ ome_group_name }}"
-  block:
-    - ansible.builtin.debug:
-        msg: "No devices are present in the group {{ ome_group_name }}. Ending play..."
-
-    - ansible.builtin.meta: end_host
+- name: "Do nothing if no devices are present in the group {{ ome_group_name }}"
+  ansible.builtin.debug:
+    msg: "No devices are present in the group {{ ome_group_name }}"
   when:
     - ome_device_info.json['@odata.count'] == 0
 
