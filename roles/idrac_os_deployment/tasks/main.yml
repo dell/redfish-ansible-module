@@ -1,0 +1,34 @@
+---
+# tasks file for idrac_os_deployment
+
+- ansible.builtin.assert:
+    that:
+      - (command|lower) in (idrac_osd_command_allowable_values|lower)
+    fail_msg: "Invalid command: '{{ command }}'. Value commands are {{ idrac_osd_command_allowable_values }}."
+
+- name: common osd tasks
+  import_tasks: idrac_osd_common.yml
+  tags:
+    - "{{ command }}"
+    - "{{ command | lower }}"
+
+- name: get attach status
+  import_tasks: idrac_get_attach_status.yml
+  when: (command|lower) == "getattachstatus"
+  tags:
+    - "{{ command }}"
+    - "{{ command | lower }}"
+
+- name: boot to network ISO
+  include: idrac_boot_to_network_iso.yml
+  when: (command|lower) == "boottonetworkiso"
+  tags:
+    - "{{ command }}"
+    - "{{ command | lower }}"
+
+- name: detach ISO image
+  include: idrac_detach_iso_image.yml
+  when: (command|lower) == "detachisoimage"
+  tags:
+    - "{{ command }}"
+    - "{{ command | lower }}"

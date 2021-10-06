@@ -1,0 +1,88 @@
+---
+
+- name: Get ISO attach status
+  ansible.builtin.import_tasks: idrac_get_attach_status.yml
+  tags:
+    - "{{ command }}"
+    - "{{ command | lower }}"
+
+- ansible.builtin.debug:
+    msg: "No ISO image file is attached."
+  when:
+    - idrac_iso_attach_status.ISOAttachStatus == "NotAttached"
+    - idrac_iso_attach_status.DriversAttachStatus == "NotAttached"
+  tags:
+    - "{{ command }}"
+    - "{{ command | lower }}"
+
+- block:
+    - name: detach ISO image
+      ansible.builtin.uri:
+        url: "https://{{ idrac_ip }}{{ idrac_osd_service_url }}/Actions/DellOSDeploymentService.DetachISOImage"
+        user: "{{ idrac_user }}"
+        password: "{{ idrac_password }}"
+        method: POST
+        headers:
+          Accept: "application/json"
+          Content-Type: "application/json"
+          OData-Version: "4.0"
+        body: "{}"
+        status_code: 200
+        validate_certs: "{{ validate_certs }}"
+        force_basic_auth: "{{ force_basic_auth }}"
+      register: detach_status
+      delegate_to: localhost
+
+    - ansible.builtin.debug:
+        msg: "Successfuly detached the ISO image"
+
+  when:
+    - idrac_osd_service_url is defined and idrac_osd_service_url|length > 0
+    - idrac_iso_attach_status
+    - idrac_iso_attach_status.ISOAttachStatus == "Attached" or
+      idrac_iso_attach_status.DriversAttachStatus == "Attached"
+  tags:
+    - "{{ command }}"
+    - "{{ command | lower }}"
+
+- block:
+    - name: detach ISO image
+      ansible.builtin.uri:
+        url: "https://{{ idrac_ip }}:{{ idrac_https_port }}/wsman"
+        user: "{{ idrac_user }}"
+        password: "{{ idrac_password }}"
+        method: POST
+        headers:
+          Content-Type: "application/xml"
+        body: "{{ lookup('ansible.builtin.template', 'idrac_detach_iso_image.j2') }}"
+        validate_certs: "{{ validate_certs }}"
+        force_basic_auth: "{{ force_basic_auth }}"
+        status_code: 200
+      register: wsman_envelope
+      changed_when:
+        - (wsman_envelope.content is search(".*<n1:ReturnValue>0</n1:ReturnValue>.*")) or
+          (wsman_envelope.content is search(".*<n1:ReturnValue>4096</n1:ReturnValue>.*"))
+      tags:
+        - "{{ command }}"
+
+    - ansible.builtin.debug:
+        msg: "Successfully detached the ISO image"
+      when:
+        - wsman_envelope
+        - (wsman_envelope.content is search(".*<n1:ReturnValue>0</n1:ReturnValue>.*")) or
+          (wsman_envelope.content is search(".*<n1:ReturnValue>4096</n1:ReturnValue>.*"))
+
+    - ansible.builtin.fail:
+        msg: "Failed to detach the ISO image"
+      when:
+        - wsman_envelope
+        - wsman_envelope.content is search(".*<n1:ReturnValue>2</n1:ReturnValue>.*")
+
+  when:
+    - idrac_osd_service_url is not defined
+    - idrac_iso_attach_status
+    - idrac_iso_attach_status.ISOAttachStatus == "Attached" or
+      idrac_iso_attach_status.DriversAttachStatus == "Attached"
+  tags:
+    - "{{ command }}"
+    - "{{ command | lower }}"
