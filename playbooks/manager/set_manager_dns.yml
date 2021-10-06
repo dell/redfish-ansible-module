@@ -5,26 +5,18 @@
   gather_facts: False
 
   vars:
-    - dnsserver: 192.168.0.10
-    - dnsdomain: mydomain.com
+    ansible_python_interpreter: "/usr/bin/env python"
+    manager_attributes:
+      IPv4Static.1.DNS1: 192.168.0.10
+      NICStatic.1.DNSDomainName: mydomain.com
+
   tasks:
 
-  - name: Configure Static DNS Settings
-    idrac_redfish_config:
+  - name: Configure Static DNS Settings and Domain Name
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
-      manager_attribute_name: IPv4Static.1.DNS1
-      manager_attribute_value: "{{ dnsserver }}"
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-
-  - name: Configure Domain Name
-    idrac_redfish_config:
-      category: Manager
-      command: SetManagerAttributes
-      manager_attribute_name: NICStatic.1.DNSDomainName
-      manager_attribute_value: "{{ dnsdomain }}"
+      manager_attributes: "{{ manager_attributes }}"
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"

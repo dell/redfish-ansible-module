@@ -5,6 +5,7 @@
   gather_facts: False
 
   vars:
+    ansible_python_interpreter: "/usr/bin/env python"
     datatype: BiosBootOrder
 
   tasks:
@@ -13,7 +14,7 @@
     include_tasks: create_output_file.yml
 
   - name: Get device boot order
-    redfish_facts:
+    community.general.redfish_facts:
       category: Systems
       command: GetBiosBootOrder
       baseuri: "{{ baseuri }}"
@@ -22,6 +23,6 @@
     register: result
 
   - name: Copy results to output file
-    copy:
+    ansible.builtin.copy:
       content: "{{ result | to_nice_json }}"
       dest: "{{ template }}.json"

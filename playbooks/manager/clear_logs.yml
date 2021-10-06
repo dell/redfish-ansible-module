@@ -4,10 +4,13 @@
   name: Clear System Logs
   gather_facts: False
 
+  vars:
+    ansible_python_interpreter: "/usr/bin/env python"
+
   tasks:
 
   - name: Clear Logs
-    redfish_command:
+    community.general.redfish_command:
       category: Manager
       command: ClearLogs
       baseuri: "{{ baseuri }}"

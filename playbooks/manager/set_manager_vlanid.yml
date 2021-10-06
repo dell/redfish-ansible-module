@@ -5,7 +5,9 @@
   gather_facts: False
 
   vars:
-    - vlanid: 1
+    manager_vlan_attributes:
+      NIC.1.VLanEnable: "Enabled"
+      NIC.1.VLanID: 1
 
   tasks:
 
@@ -13,18 +15,7 @@
     idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
-      manager_attribute_name: NIC.1.VLanEnable
-      manager_attribute_value: Enabled
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-
-  - name: Set Manager's VLAN ID
-    idrac_redfish_config:
-      category: Manager
-      command: SetManagerAttributes
-      manager_attribute_name: NIC.1.VLanID
-      manager_attribute_value: "{{ vlanid }}"
+      manager_attributes: "{{ manager_vlan_attributes }}"
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"

@@ -4,10 +4,13 @@
   name: Manage System Power - Greaceful restart
   gather_facts: False
 
+  vars:
+    ansible_python_interpreter: "/usr/bin/env python"
+
   tasks:
 
   - name: Restart system power gracefully
-    redfish_command:
+    community.general.redfish_command:
       category: Systems
       command: PowerReboot
       baseuri: "{{ baseuri }}"

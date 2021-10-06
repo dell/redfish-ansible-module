@@ -4,10 +4,13 @@
   name: Set default BIOS settings
   gather_facts: False
 
+  vars:
+    ansible_python_interpreter: "/usr/bin/env python"
+
   tasks:
 
   - name: Set BIOS default settings
-    redfish_config:
+    community.general.redfish_config:
       category: Systems
       command: SetBiosDefaultSettings
       baseuri: "{{ baseuri }}"
@@ -16,7 +19,7 @@
     register: bios_default
 
   - name: Reboot system to apply new BIOS settings
-    redfish_command:
+    community.general.redfish_command:
       category: Systems
       command: PowerReboot
       baseuri: "{{ baseuri }}"

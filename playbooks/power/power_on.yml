@@ -4,10 +4,13 @@
   name: Manage System Power - Turn on
   gather_facts: False
 
+  vars:
+    ansible_python_interpreter: "/usr/bin/env python"
+
   tasks:
 
   - name: Turn system power on
-    redfish_command:
+    community.general.redfish_command:
       category: Systems
       command: PowerOn
       baseuri: "{{ baseuri }}"

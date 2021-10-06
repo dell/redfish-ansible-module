@@ -4,13 +4,16 @@
   name: Disable User
   gather_facts: False
 
+  vars:
+    ansible_python_interpreter: "/usr/bin/env python"
+
   tasks:
 
   - name: Disable user
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: DisableUser
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
-      id: "{{ id }}"
+      account_username: "{{ account_username }}"

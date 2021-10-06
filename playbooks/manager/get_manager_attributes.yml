@@ -5,6 +5,7 @@
   gather_facts: False
 
   vars:
+    ansible_python_interpreter: "/usr/bin/env python"
     datatype: ManagerAttributes
 
   tasks:
@@ -13,7 +14,7 @@
     include_tasks: create_output_file.yml
 
   - name: Get Manager attributes
-    idrac_redfish_facts:
+    community.general.idrac_redfish_info:
       category: Manager
       command: GetManagerAttributes
       baseuri: "{{ baseuri }}"
@@ -23,6 +24,6 @@
     register: result
 
   - name: Copy results to output file
-    copy:
+    ansible.builtin.copy:
       content: "{{ result | to_nice_json }}"
       dest: "{{ template }}.json"

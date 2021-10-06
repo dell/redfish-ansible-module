@@ -4,10 +4,13 @@
   name: Restart Manager
   gather_facts: False
 
+  vars:
+    ansible_python_interpreter: "/usr/bin/env python"
+
   tasks:
 
   - name: Restart Manager gracefully
-    redfish_command:
+    community.general.redfish_command:
       category: Manager
       command: GracefulRestart
       baseuri: "{{ baseuri }}"

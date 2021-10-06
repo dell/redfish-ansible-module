@@ -5,16 +5,17 @@
   gather_facts: False
 
   vars:
-    - timezone: "US/Central" 
+    ansible_python_interpreter: "/usr/bin/env python"
+    manager_timezone_attributes:
+      Time.1.Timezone: "US/Central" 
 
   tasks:
 
   - name: Set Manager Timezone to {{ timezone }}
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
-      manager_attribute_name: Time.1.Timezone
-      manager_attribute_value: "{{ timezone }}"
+      manager_attributes: "{{ manager_timezone_attributes }}"
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
