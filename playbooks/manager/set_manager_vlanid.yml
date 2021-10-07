@@ -12,7 +12,7 @@
   tasks:
 
   - name: Enable Manager's VLAN ID
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       manager_attributes: "{{ manager_vlan_attributes }}"
