@@ -54,7 +54,7 @@ pysnmp-mibs==0.1.6
     # via omsdk
 python-version==0.0.2
     # via omsdk
-pyyaml==5.3.1
+pyyaml==5.4
     # via
     #   ansible-core
     #   omsdk
