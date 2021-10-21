@@ -19,9 +19,9 @@ Role Variables
 | idrac_user | yes | str | None | "admin" | iDRAC user name |
 | idrac_password | yes | str | None | "Passw0rd" | iDRAC user password |
 | command | no | str | <ul><li>'GetAttachStatus' *(default)*</li><li>'BootToNetworkISO'</li><li>'DetachISOImage'</li></ul> | 'GetAttachStatus' | <ul><li>'GetAttachStatus' - attach status of the ISO image and the Drivers packs</li><li>'BootToNetworkISO' - boot to an ISO image from a remote network share (CIFS, NFS)</li><li>'DetachISOImage' - detach an ISO image</li></ul> |
-| share_name | no | str | None | '\\192.168.11.11\cifs_share' | CIFS or NFS network share. This is a **required** argument when I(command=BootToNetworkISO) |
+| share_name | no | str | None | "\\\\192.168.11.11\\cifs_share"<br/>"192.168.11.11:/nfsfileshare" | CIFS or NFS network share. This is a **required** argument when I(command=BootToNetworkISO) |
 | iso_image | no | str | None | "VMware-VMvisor-Installer-7.0.0-15843807.x86_64-DellEMC_Customized-A00.iso" | ISO filename. This is a **required** argument when I(command=BootToNetworkISO) |
-| expose_duration | no | str | 1080 | "VMware-VMvisor-Installer-7.0.0-15843807.x86_64-DellEMC_Customized-A00.iso" | Time (in minutes) for the ISO image file to be exposed as a local CD-ROM device to the host server. When the time expires, the ISO image gets automatically detached. This is **optional** when I(command=BootToNetworkISO) |
+| expose_duration | no | str | 1080 | 30 | Time (in minutes) for the ISO image file to be exposed as a local CD-ROM device to the host server. When the time expires, the ISO image gets automatically detached. This is **optional** when I(command=BootToNetworkISO) |
 
 Dependencies
 ------------
