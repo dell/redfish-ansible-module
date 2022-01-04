@@ -1,0 +1,11 @@
+---
+# tasks file for ome_quick_deploy
+
+- name: configure quick deploy options
+  ome_chassis_quick_deploy:
+    hostname: "{{ ome_hostname }}"
+    username: "{{ ome_username }}"
+    password: "{{ ome_password }}"
+    device_id: "{{ device_id | default(omit) }}"
+    device_service_tag: "{{ device_service_tag | default(omit) }}"
+    quick_deploy_options: "{{ quick_deploy_options }}"
