@@ -775,15 +775,6 @@ def run_configure_quick_deploy_options(module, rest_obj):
     diff, payload = get_diff_payload_quick_deploy_options(
         module, target_options, existing_options
     )
-    # """
-    module.exit_json(
-        msg="DEBUG",
-        device=existing_options,
-        module_options=target_options,
-        diff=diff,
-        job_payload=payload,
-    )
-    # """
 
     if diff:
         if module.check_mode:
