@@ -34,7 +34,7 @@ options:
     description:
       - Target chassis device service tag
       - This option is mutually exclusive with I(device_id).
-  quick_deploy_options_type:
+  setting_type:
     type: str
     description:
       - C(Server) means that the I(quick_deploy_options) settings are for the server sleds.
@@ -57,6 +57,7 @@ options:
           - IPv4 network type.
           - If C(Static), then I(ipv4_subnet_mask) and I(ipv4_gateway) must be specified. 
           - C(DHCP) means the DHCP based IPv4 address.
+        choices: [ Static, DHCP ]
       ipv4_subnet_mask:
         type: str
         description:
@@ -69,6 +70,28 @@ options:
           - IPv4 gateway.
           - Required if I(ipv4_network_type) is equal to C(Static).
           - This option is ignored if I(ipv4_network_type) is equal to C(DHCP).
+      ipv6_enabled:
+        type: bool
+        description:
+          - Enable or disable the IPv6 protocol.
+      ipv6_network_type:
+        type: str
+        description:
+          - IPv4 network type.
+          - If C(Static), then I(ipv4_subnet_mask) and I(ipv4_gateway) must be specified.
+          - C(DHCP) means the DHCP based IPv4 address.
+        choices: [ Static, DHCP ]
+      ipv6_prefix_length:
+        type: int
+        description:
+          - IPV6 prefix length.
+          - Required if I(ipv6_network_type) is equal to C(Static).
+      ipv6_gateway:
+        type: str
+        description:
+          - IPv6 gateway.
+          - Required if I(ipv6_network_type) is equal to C(Static).
+          - This option is ignored if I(ipv6_network_type) is equal to C(DHCP).
       slots:
         type: list
         elements: dict
@@ -83,10 +106,12 @@ options:
             type: str
             description:
               - IPv4 address of the slot. 
+              - Required if I(ipv4_network_type) is C(Static).
           slot_ipv6_address:
             type: str
             description:
               - IPv6 address of the slot.
+              - Required if I(ipv6_network_type) is C(Static).
           vlan_id:
             type: int
             description:
@@ -109,7 +134,7 @@ EXAMPLES = """
     hostname: "192.168.10.10"
     username: "username"
     password: "password"
-    quick_deploy_options_type: "Server"
+    setting_type: "ServerQuickDeploy"
     quick_deploy_options:
       ipv4_enabled: True
       ipv4_network_type: "Static"
@@ -128,7 +153,7 @@ EXAMPLES = """
     hostname: "192.168.10.10"
     username: "username"
     password: "password"
-    quick_deploy_options_type: "Server"
+    setting_type: "ServerQuickDeploy"
     quick_deploy_options:
       ipv4_enabled: True
       ipv4_network_type: "DHCP"
@@ -147,7 +172,7 @@ EXAMPLES = """
     username: "username"
     password: "password"
     device_service_tag: "ABC1234"
-    quick_deploy_options_type: "Server"
+    setting_type: "Server"
     quick_deploy_options:
       ipv4_enabled: True
       ipv4_network_type: "Static"
@@ -169,7 +194,7 @@ EXAMPLES = """
     username: "username"
     password: "password"
     device_id: 12345
-    quick_deploy_options_type: "Server"
+    setting_type: "Server"
     quick_deploy_options:
       ipv4_enabled: True
       ipv4_network_type: "Static"
@@ -191,7 +216,7 @@ msg:
   type: str
   description: Overall status of the quick deploy settings configuration
   returned: always
-  sample: "Successfully configured the quick deploy settings."
+  sample: "Successfully updated the quick deploy options settings."
 error_info:
   description: Details of the HTTP Error.
   returned: on HTTP error
@@ -228,9 +253,11 @@ from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.module_utils.urls import ConnectionError
 from ansible_collections.dellemc.openmanage.plugins.module_utils.ome import RestOME
 
-# job poll intervals and timeout
+# OME job related variables
 JOB_TIMEOUT_SECONDS = 300
 JOB_POLL_INTERVAL_SECONDS = 5
+JOB_QUICK_DEPLOY_ID = 42
+
 # slots indices
 SLOT_START_INDEX = 1
 SLOT_END_INDEX = 8
@@ -553,7 +580,7 @@ def get_diff_payload_quick_deploy_options(module, new_options, old_options):
         merged_options = copy.deepcopy(equal_options)
     except copy.Error as err:
         module.fail_json(
-            msg="Failed to copy the equal options. Error: {}".format(str(err))
+            msg="Failed to copy the equal options. Error: {0}".format(str(err))
         )
 
     merged_options.update(diff_options)
@@ -618,12 +645,12 @@ def get_default_quick_deploy_options_payload(setting_type):
 
     payload = {
         "JobName": "Quick Deploy",
-        "JobDescription": "New Quick Deploy Configuration for DeviceId ({0})",
+        "JobDescription": "New Quick Deploy Configuration",
         "Schedule": "startnow",
         "State": "Enabled",
         "Targets": [],
         "Params": [ops_name_param],
-        "JobType": {"Id": 42, "Name": "QuickDeploy_Task"},
+        "JobType": {"Id": JOB_QUICK_DEPLOY_ID, "Name": "QuickDeploy_Task"},
     }
     return payload
 
