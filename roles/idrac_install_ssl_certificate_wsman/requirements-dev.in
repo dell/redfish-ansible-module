@@ -1,7 +1,0 @@
-ansible
-docker
-molecule
-pre-commit
-pip-tools
-omsdk
-pyOpenSSL

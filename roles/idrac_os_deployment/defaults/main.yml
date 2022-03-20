@@ -1,9 +1,0 @@
----
-# defaults file for idrac_os_deployment
-
-idrac_https_port: "{{ idrac_osd_https_port_default }}"
-expose_duration: "{{ idrac_osd_expose_duration_default }}"
-command: "{{ idrac_osd_command_default }}"
-
-validate_certs: "{{ idrac_osd_validate_certs_default }}"
-force_basic_auth: "{{ idrac_osd_force_basic_auth_default }}"
