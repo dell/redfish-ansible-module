@@ -8,7 +8,7 @@ ansible==4.2.0
     # via -r requirements.in
 ansible-core==2.11.5
     # via ansible
-certifi==2020.6.20
+certifi==2022.12.7
     # via requests
 cffi==1.14.2
     # via cryptography
