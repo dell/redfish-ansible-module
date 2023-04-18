@@ -20,7 +20,7 @@ cryptography==3.3.2
     #   pyopenssl
 enum34==1.1.10
     # via omsdk
-future==0.18.2
+future==0.18.3
     # via omsdk
 idna==2.10
     # via requests
