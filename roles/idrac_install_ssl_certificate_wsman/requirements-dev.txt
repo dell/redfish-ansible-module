@@ -68,7 +68,7 @@ fasteners==0.15
     # via python-gilt
 filelock==3.0.12
     # via virtualenv
-future==0.18.2
+future==0.18.3
     # via omsdk
 identify==1.4.28
     # via pre-commit
