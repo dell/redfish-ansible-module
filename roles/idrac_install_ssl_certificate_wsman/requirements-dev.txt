@@ -66,7 +66,7 @@ enum34==1.1.10
     # via omsdk
 fasteners==0.15
     # via python-gilt
-filelock==3.0.12
+filelock==3.20.3
     # via virtualenv
 future==0.18.2
     # via omsdk
