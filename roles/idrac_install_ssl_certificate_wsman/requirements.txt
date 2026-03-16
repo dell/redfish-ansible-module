@@ -10,11 +10,11 @@ ansible-core==2.11.5
     # via ansible
 certifi==2020.6.20
     # via requests
-cffi==1.14.2
+cffi==2.0.0
     # via cryptography
 chardet==3.0.4
     # via requests
-cryptography==3.3.2
+cryptography==46.0.5
     # via
     #   ansible-core
     #   pyopenssl
@@ -42,7 +42,7 @@ pycparser==2.20
     # via cffi
 pycryptodomex==3.9.8
     # via pysnmp
-pyopenssl==19.1.0
+pyopenssl==26.0.0
     # via -r requirements.in
 pyparsing==2.4.7
     # via packaging
@@ -62,9 +62,5 @@ requests==2.24.0
     # via omsdk
 resolvelib==0.5.4
     # via ansible-core
-six==1.15.0
-    # via
-    #   cryptography
-    #   pyopenssl
 urllib3==1.25.10
     # via requests
